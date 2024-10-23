@@ -7,13 +7,14 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
+  TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
 import CustomButton from "@/components/ui/CustomButton";
 import InputField from "@/components/Auth/InputField";
 import { icons, images, translationsLogin } from "@/constants";
 import OAuth from "@/components/Auth/OAuth";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import LeagoMark from "@/components/Auth/LeagoMark";
 
 // Define a type for the language
@@ -25,11 +26,13 @@ const signUp = () => {
   const t = translationsLogin[language]; // Choose the right translation
 
   const [form, setForm] = useState({
-    name: "" as any,
     email: "" as any,
     password: "" as any,
-    // phone: "" as any,
   });
+
+  const handleInputChange = (field: string, value: string) => {
+    setForm({ ...form, [field]: value });
+  };
 
   let changelangS =
     language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold";
@@ -51,6 +54,12 @@ const signUp = () => {
                 className="z-0 w-full h-[250px]"
               />
               <LeagoMark />
+              <TouchableOpacity
+                className="absolute top-14 right-8 z-40"
+                onPress={() => router.replace("/(root)/(tabs)/Home")}
+              >
+                <Image source={icons.backHome} className="w-8 h-8" />
+              </TouchableOpacity>
               <Text
                 className={`text-lg text-secondary-white font-JakartaSemiBold absolute bottom-7 left-5 ${changelangS}`}
               >
@@ -70,7 +79,7 @@ const signUp = () => {
                   labelStyle={`text-black ${changelangS}`}
                   icon={icons.email}
                   value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e })}
+                  onChangeText={(text) => handleInputChange("email", text)}
                 />
                 {/* <InputField
                   label={t.phone}
@@ -86,7 +95,7 @@ const signUp = () => {
                   labelStyle={`text-black ${changelangS}`}
                   icon={icons.lock}
                   value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e })}
+                  onChangeText={(text) => handleInputChange("password", text)}
                 />
               </View>
               <CustomButton

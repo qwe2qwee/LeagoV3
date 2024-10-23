@@ -24,6 +24,7 @@ import target from "../assets/icons/target.png";
 import to from "../assets/icons/to.png";
 import people from "../assets/icons/people.png";
 import phone from "../assets/icons/Phone.png";
+import backHome from "../assets/icons/backHome.png";
 
 //Images
 
@@ -61,6 +62,7 @@ export const icons = {
   email,
   eyecross,
   google,
+  backHome,
   home,
   list,
   lock,
@@ -180,6 +182,7 @@ export const translationsignUp = {
     name: "Name",
     email: "Email",
     phone: "Phone",
+    placeHol: "56",
     password: "Password",
     signUp: "Sign Up",
     alreadyAccount: "Already have an account?",
@@ -191,6 +194,7 @@ export const translationsignUp = {
     name: "الاسم",
     email: "البريد الإلكتروني",
     phone: "الهاتف",
+    placeHol: "56",
     password: "كلمة المرور",
     signUp: "إنشاء حساب",
     alreadyAccount: "هل لديك حساب؟",

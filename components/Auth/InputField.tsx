@@ -20,7 +20,9 @@ const InputField = ({
   inputStyle,
   placeholder,
   iconStyle,
+  onChangeText,
   className,
+  maxLength,
   ...props
 }: InputFieldProps) => {
   return (
@@ -37,6 +39,8 @@ const InputField = ({
         <TextInput
           secureTextEntry={secureTextEntry}
           placeholder={placeholder}
+          onChangeText={onChangeText}
+          maxLength={maxLength}
           className={`rounded-xl p-4 text-[15px] font-JakartaSemiBold text-left  flex-1 ${inputStyle}  `}
         />
       </View>

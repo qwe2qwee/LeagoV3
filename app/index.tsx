@@ -6,7 +6,7 @@ import { router } from "expo-router";
 const Home = () => {
   return (
     <SafeAreaView className="flex-1 items-center justify-center bg-white">
-      <TouchableOpacity onPress={() => router.push("/(auth)/welcome" as any)}>
+      <TouchableOpacity onPress={() => router.push("/(auth)/sign-up" as any)}>
         <Text>Home</Text>
       </TouchableOpacity>
     </SafeAreaView>

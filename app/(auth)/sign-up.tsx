@@ -7,14 +7,16 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
+  TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
 import CustomButton from "@/components/ui/CustomButton";
 import InputField from "@/components/Auth/InputField";
 import { icons, images, translationsignUp } from "@/constants";
 import OAuth from "@/components/Auth/OAuth";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import LeagoMark from "@/components/Auth/LeagoMark";
+import { createUser } from "@/appwrite/apit";
 
 // Define a type for the language
 type Language = "en" | "ar";
@@ -24,17 +26,43 @@ const signUp = () => {
 
   const t = translationsignUp[language]; // Choose the right translation
 
+  let birthday = "1999-01-01" as any;
+  let gender = "male" as any;
+  let address = "unknown";
+
+  // State for form fields
   const [form, setForm] = useState({
-    name: "" as any,
-    email: "" as any,
-    password: "" as any,
-    phone: "" as any,
+    name: "",
+    email: "",
+    password: "",
+    phone: "",
   });
 
   let changelangS =
     language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold";
+
+  // Handler for form field updates
+  const handleInputChange = (field: string, value: string) => {
+    setForm({ ...form, [field]: value });
+  };
+
   const onSignUpPress = async () => {
-    console.log("Sign Up Pressed");
+    console.log(form); // Debug: Check the form content before sending
+
+    try {
+      const d = await createUser(
+        form.email,
+        form.password,
+        form.name,
+        form.phone,
+        birthday,
+        gender,
+        address
+      );
+      console.log("User created successfully:", d);
+    } catch (error) {
+      console.error("Error during signup:", error);
+    }
   };
 
   return (
@@ -51,6 +79,12 @@ const signUp = () => {
                 className="z-0 w-full h-[250px]"
               />
               <LeagoMark />
+              <TouchableOpacity
+                className="absolute top-14 right-8 z-40"
+                onPress={() => router.replace("/(root)/(tabs)/Home")}
+              >
+                <Image source={icons.backHome} className="w-8 h-8" />
+              </TouchableOpacity>
               <Text
                 className={`text-lg text-secondary-white font-JakartaSemiBold absolute bottom-7 left-5 ${changelangS}`}
               >
@@ -64,13 +98,14 @@ const signUp = () => {
             </View>
             <View className="p-5">
               <View className="flex flex-1 w-full">
+                {/* Updated InputFields */}
                 <InputField
                   label={t.name}
                   placeholder={t.name}
                   labelStyle={`text-black ${changelangS}`}
                   icon={icons.person}
                   value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e })}
+                  onChangeText={(text) => handleInputChange("name", text)}
                 />
                 <InputField
                   label={t.email}
@@ -78,15 +113,18 @@ const signUp = () => {
                   labelStyle={`text-black ${changelangS}`}
                   icon={icons.email}
                   value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e })}
+                  onChangeText={(text) => handleInputChange("email", text)}
                 />
                 <InputField
                   label={t.phone}
-                  placeholder={t.phone}
+                  placeholder={t.placeHol}
                   labelStyle={`text-black ${changelangS}`}
                   icon={icons.phone}
                   value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e })}
+                  maxLength={9}
+                  onChangeText={(text) =>
+                    handleInputChange("phone", `+966${text.trim()}`)
+                  }
                 />
                 <InputField
                   label={t.password}
@@ -94,15 +132,14 @@ const signUp = () => {
                   labelStyle={`text-black ${changelangS}`}
                   icon={icons.lock}
                   value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e })}
+                  onChangeText={(text) => handleInputChange("password", text)}
                 />
               </View>
               <CustomButton
                 title={t.signUp}
                 textStyle={`text-lg ${changelangS}`}
                 onPress={onSignUpPress}
-                className="
-                mt-5"
+                className="mt-5"
               />
               {/* Optional OAuth */}
               <OAuth />
@@ -110,7 +147,7 @@ const signUp = () => {
                 href="/(auth)/sign-in"
                 className=" mx-auto flex justify-center items-center mt-3"
               >
-                <Text className={`text-black text-lg  mt-5 ${changelangS}`}>
+                <Text className={`text-black text-lg mt-5 ${changelangS}`}>
                   {t.alreadyAccount}
                 </Text>
                 <Text className={`text-primary-500 text-lg ${changelangS}`}>

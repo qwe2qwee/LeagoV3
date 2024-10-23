@@ -4,9 +4,82 @@ import { account, appwriteConfig, avatars, databases, storage } from "./config";
 /** ======================================
  * USER LOGIC
  * ====================================== */
+// Interface for Appwrite User
+declare interface AppwriteUser extends AppwriteDocument {
+  email: string;
+  name: string;
+  phone_number: string;
+}
+
+
+
+// Helper function to get localized error message
+function getLocalizedErrorMessage(errorKey: string, language: string): string {
+  const errorMessages = {
+    en: {
+      accountCreationFailed: "Account creation failed",
+      phoneNumberExists: "Phone number already exists",
+      emailExists: "Email already exists",
+      phoneUpdateFailed: "Failed to update phone number",
+    },
+    es: {
+      accountCreationFailed: "La creación de la cuenta falló",
+      phoneNumberExists: "El número de teléfono ya existe",
+      emailExists: "El correo electrónico ya existe",
+      phoneUpdateFailed: "Error al actualizar el número de teléfono",
+    },
+    // Add other languages as needed
+  };
+  
+  return errorMessages[language]?.[errorKey] || errorMessages.en[errorKey];
+}
+
+// Create a new user account and store it in the database
+export async function createUser(
+  email: string,
+  password: string,
+  name: string,
+  phone: string,
+  languageError: string = 'en'
+): Promise<AppwriteUser> {
+  try {
+    // Check if email or phone number already exists
+    if (await isEmailExisting(email)) {
+      throw new Error(getLocalizedErrorMessage('emailExists', languageError));
+    }
+    if (await isPhoneNumberExisting(phone)) {
+      throw new Error(getLocalizedErrorMessage('phoneNumberExists', languageError));
+    }
+
+    // Create a new account
+    const newAccount = await account.create(ID.unique(), email, password, name);
+    if (!newAccount) {
+      throw new Error(getLocalizedErrorMessage('accountCreationFailed', languageError));
+    }
+
+    // Update the phone number
+    await updatePhoneNumber(phone, password, languageError);
+
+    // Sign in the user
+    await signIn(email, password);
+
+    // Create user in the database
+    const newUser = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
+      newAccount.$id,
+      { email, name, phone_number: phone }
+    );
+
+    return newUser;
+  } catch (error) {
+    console.error("Error creating user:", error);
+    throw error;
+  }
+}
 
 // Check if a phone number already exists in the database
-export async function isPhoneNumberExisting(phone) {
+export async function isPhoneNumberExisting(phone: string): Promise<boolean> {
   try {
     const response = await databases.listDocuments(
       appwriteConfig.databaseId,
@@ -20,27 +93,131 @@ export async function isPhoneNumberExisting(phone) {
   }
 }
 
-// Create a new user account and store it in the database
-export async function createUser(email, password, name, phone) {
+// Function to check if an email exists in the database
+export async function isEmailExisting(email: string): Promise<boolean> {
   try {
-    const newAccount = await account.create(ID.unique(), email, password, name);
-    if (!newAccount) throw new Error("Account creation failed");
-
-    const avatarUrl = avatars.getInitials(name);
-    await signIn(email, password);
-
-    const newUser = await databases.createDocument(
+    const response = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.usersCollectionId,
-      newAccount.$id,
-      { email, name, phone_number: phone }
+      [Query.equal("email", email)]
     );
-
-    return newUser;
+    return response.documents.length > 0;
   } catch (error) {
-    console.error("Error creating user:", error);
+    console.error("Failed to check email:", error);
     throw error;
   }
+}
+
+// Update the user's phone number
+export async function updatePhoneNumber(
+  phone: string,
+  password: string,
+  languageError: string = 'en'
+): Promise<any> {
+  try {
+    const result = await account.updatePhone(phone, password);
+    return result;
+  } catch (error) {
+    const errorMessage = getLocalizedErrorMessage('phoneUpdateFailed', languageError);
+    console.error(errorMessage, error);
+    throw new Error(errorMessage);
+  }
+}
+
+// Sign in the user
+async function signIn(email: string, password: string): Promise<void> {
+  try {
+    await account.createEmailSession(email, password);
+  } catch (error) {
+    console.error("Sign-in failed:", error);
+    throw error;
+  }
+}
+// Function to check if a UeserName already exists in the database
+export async function isUeserNameExisting(phone) {
+  try {
+    const response = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
+      [Query.equal("userName", phone)]
+    );
+    return response.documents.length > 0; // Return true if a document with the phone number exists
+  } catch (error) {
+    console.error("Failed to check phone number:", error);
+    throw error;
+  }
+}
+
+// Function to transliterate Arabic name to English
+function transliterateArabicToEnglish(name) {
+  return name
+    .split("")
+    .map((char) => transliterationMap[char] || char) // Map Arabic chars to English equivalents
+    .join("")
+    .replace(/\s+/g, ""); // Remove any spaces in the transliterated name
+}
+
+// Function to send OTP to email
+export async function sendOtpToEmail(email) {
+  try {
+    // Here, you would use Appwrite's built-in method or a custom implementation to send an OTP to the email.
+    const response = await account.createMagicURLToken(ID.unique(), email);
+    return response; // Return response if OTP sent successfully
+  } catch (error) {
+    console.error("Failed to send OTP to email:", error);
+    throw error;
+  }
+}
+
+// Function to getEmail to Sign In
+
+export const getEmailByPhoneNumber = async (phone) => {
+  try {
+    const response = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
+      [Query.equal("phone", phone)]
+    );
+
+    if (response.documents.length > 0) {
+      return response.documents[0].email;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching email by phone number:", error);
+    throw error;
+  }
+};
+
+// Function to send OTP to phone
+export async function sendOtpToPhone(phone) {
+  try {
+    // Here, you would use Appwrite's built-in method or a custom implementation to send an OTP to the email.
+    const response = await account.createPhoneToken(ID.unique(), phone);
+    return response.userId; // Return response if OTP sent successfully
+  } catch (error) {
+    console.error("Failed to send OTP to email:", error);
+    throw error;
+  }
+}
+
+// Function to generate a unique username based on an Arabic name without spaces
+export async function generateUniqueUserName(arabicName) {
+  if (!arabicName) throw Error("arabicName cannot be null or undefined");
+  const englishName = transliterateArabicToEnglish(arabicName.trim()); // Convert Arabic to English and remove spaces
+  let baseUserName = `@${englishName}`; // Prepend @ to the transliterated name
+  let userName = baseUserName;
+  let counter = 1;
+
+  // Check if the username exists, and if it does, append a number to create a unique one
+  while (await isUeserNameExisting(userName)) {
+    if (counter > 1000) throw Error("Failed to generate a unique username");
+    userName = `${baseUserName}${counter}`; // Append counter to the base username
+    counter++;
+  }
+
+  return userName; // Return the unique username
 }
 
 // Reset user's password
@@ -83,17 +260,6 @@ export async function deleteUser(userId) {
     console.log("User deleted successfully");
   } catch (error) {
     console.error("Failed to delete user:", error);
-    throw error;
-  }
-}
-
-// Update the user's phone number
-export async function updatePhoneNumber(phone, password) {
-  try {
-    const result = await account.updatePhone(phone, password);
-    return result;
-  } catch (error) {
-    console.error("Failed to update phone number:", error);
     throw error;
   }
 }
