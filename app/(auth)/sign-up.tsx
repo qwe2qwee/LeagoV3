@@ -8,60 +8,141 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   TouchableOpacity,
+  Alert,
+  ActivityIndicator, // Added for loading indication
 } from "react-native";
 import React, { useState } from "react";
+import ReactNativeModal from "react-native-modal";
 import CustomButton from "@/components/ui/CustomButton";
 import InputField from "@/components/Auth/InputField";
 import { icons, images, translationsignUp } from "@/constants";
 import OAuth from "@/components/Auth/OAuth";
 import { Link, router } from "expo-router";
 import LeagoMark from "@/components/Auth/LeagoMark";
-import { createUser } from "@/appwrite/apit";
+import {
+  createUser,
+  getLocalizedErrorMessage,
+  isEmailExisting,
+  isPhoneNumberExisting,
+} from "@/lib/appwrite/apit";
+import { UpdatePhoneNumberAndSendOTP } from "@/lib/UpdatePhoneNumberAndSendOTP";
+import OTPComponent from "@/components/Auth/OTPComponent";
 
-// Define a type for the language
 type Language = "en" | "ar";
 
 const signUp = () => {
-  const [language, setLanguage] = useState<Language>("ar"); // Simulating language toggle
+  const [language, setLanguage] = useState<Language>("ar");
+  const t = translationsignUp[language];
 
-  const t = translationsignUp[language]; // Choose the right translation
-
-  let birthday = "1999-01-01" as any;
-  let gender = "male" as any;
-  let address = "unknown";
-
-  // State for form fields
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
     phone: "",
   });
+  const [loading, setLoading] = useState(false);
 
-  let changelangS =
+  const [isModalVisible, setModalVisible] = useState(true);
+  const [otpCode, setOtpCode] = useState("");
+
+  const birthday = "1999-01-01";
+  const gender = "other";
+  const address = "unknown";
+  const changelangS =
     language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold";
 
-  // Handler for form field updates
   const handleInputChange = (field: string, value: string) => {
     setForm({ ...form, [field]: value });
   };
 
-  const onSignUpPress = async () => {
-    console.log(form); // Debug: Check the form content before sending
+  const handleOtpSubmit = async (verify: string) => {
+    if (verify === "ok") {
+      try {
+        setLoading(true);
+        const newUser = await createUser(
+          form.email,
+          form.password,
+          form.name,
+          form.phone,
+          birthday,
+          gender,
+          address
+        );
+        console.log("User created successfully:", newUser);
+        setForm({ name: "", email: "", password: "", phone: "" });
+        setModalVisible(false);
+        router.replace("/(root)/(tabs)/Home");
+      } catch (error) {
+        if (error instanceof Error) {
+          Alert.alert(t.error, error.message);
+        } else {
+          Alert.alert(t.error, "Error during signup");
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
 
+  const handleRsendOtp = async () => {
     try {
-      const d = await createUser(
-        form.email,
-        form.password,
-        form.name,
-        form.phone,
-        birthday,
-        gender,
-        address
-      );
-      console.log("User created successfully:", d);
+      setLoading(true);
+      await UpdatePhoneNumberAndSendOTP(form.phone, language);
     } catch (error) {
-      console.error("Error during signup:", error);
+      if (error instanceof Error) {
+        Alert.alert(t.error, error.message);
+      } else {
+        Alert.alert(t.error, "Failed to resend OTP");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const validateForm = () => {
+    if (!form.name || !form.email || !form.password || !form.phone) {
+      Alert.alert(t.error, t.missingFields);
+      return false;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(form.email)) {
+      Alert.alert(t.error, t.invalidEmail);
+      return false;
+    }
+    if (form.phone.length !== 13) {
+      Alert.alert(t.error, t.invalidPhone);
+      return false;
+    }
+    if (form.password.length < 8) {
+      Alert.alert(t.error, t.weakPassword); // Add this translation to handle weak password
+      return false;
+    }
+    return true;
+  };
+
+  const onSignUpPress = async () => {
+    if (!validateForm()) return;
+
+    setLoading(true);
+    try {
+      if (await isEmailExisting(form.email)) {
+        throw new Error(getLocalizedErrorMessage("emailExists", language));
+      }
+      if (await isPhoneNumberExisting(form.phone)) {
+        throw new Error(
+          getLocalizedErrorMessage("phoneNumberExists", language)
+        );
+      }
+
+      await UpdatePhoneNumberAndSendOTP(form.phone, language);
+      setModalVisible(true);
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert(t.error, error.message);
+      } else {
+        Alert.alert(t.error, "Error during signup");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -73,6 +154,13 @@ const signUp = () => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView className="flex-1 bg-white">
           <View className="flex-1 bg-white">
+            {loading && (
+              <ActivityIndicator
+                size="large"
+                color="#0000ff"
+                style={{ marginTop: 20 }}
+              />
+            )}
             <View className="relative w-full h-[250px]">
               <Image
                 source={images.signUpCar}
@@ -98,7 +186,6 @@ const signUp = () => {
             </View>
             <View className="p-5">
               <View className="flex flex-1 w-full">
-                {/* Updated InputFields */}
                 <InputField
                   label={t.name}
                   placeholder={t.name}
@@ -141,7 +228,6 @@ const signUp = () => {
                 onPress={onSignUpPress}
                 className="mt-5"
               />
-              {/* Optional OAuth */}
               <OAuth />
               <Link
                 href="/(auth)/sign-in"
@@ -156,6 +242,21 @@ const signUp = () => {
               </Link>
             </View>
           </View>
+          <ReactNativeModal
+            isVisible={isModalVisible}
+            onBackdropPress={() => setModalVisible(false)}
+            onBackButtonPress={() => setModalVisible(false)}
+          >
+            <View className="bg-white p-5 rounded-lg">
+              <OTPComponent
+                onVerifyOTP={handleOtpSubmit}
+                onResendOTP={handleRsendOtp}
+                otpLength={4}
+                emailORPhoneNumber={form.phone}
+                language={language}
+              />
+            </View>
+          </ReactNativeModal>
         </ScrollView>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

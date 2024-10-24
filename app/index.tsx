@@ -2,6 +2,7 @@ import { View, Text, TouchableHighlight, TouchableOpacity } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
+import OTPComponent from "@/components/Auth/OTPComponent";
 
 const Home = () => {
   return (
