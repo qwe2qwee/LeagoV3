@@ -150,7 +150,6 @@ export const buttonTitles = {
   },
 };
 
-// Basic translations for English and Arabic for Login
 export const translationsLogin = {
   en: {
     loginTitle: "Welcome Back!",
@@ -161,6 +160,8 @@ export const translationsLogin = {
     forgotPassword: "Forgot Password?",
     noAccount: "Don't have an account?",
     createAccount: "Create one",
+    error: "Error",
+    missingFields: "Please enter both email and password.",
   },
   ar: {
     loginTitle: "مرحبًا بعودتك!",
@@ -171,6 +172,8 @@ export const translationsLogin = {
     forgotPassword: "هل نسيت كلمة المرور؟",
     noAccount: "ليس لديك حساب؟",
     createAccount: "إنشاء حساب",
+    error: "خطأ",
+    missingFields: "يرجى إدخال البريد الإلكتروني وكلمة المرور.",
   },
 };
 
