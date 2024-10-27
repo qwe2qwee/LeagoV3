@@ -165,7 +165,7 @@ const OTPComponent: React.FC<OTPComponentProps> = ({
 
       <TouchableOpacity onPress={onResendOTP} className="mt-4">
         <Text
-          className={`text-blue-500 underline ${language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold"}`}
+          className={`text-primary-300 underline ${language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold"}`}
         >
           {language === "ar" ? "إعادة إرسال رمز التحقق" : "Resend OTP"}
         </Text>

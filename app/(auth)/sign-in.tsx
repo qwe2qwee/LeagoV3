@@ -8,6 +8,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import CustomButton from "@/components/ui/CustomButton";
@@ -16,6 +17,7 @@ import { icons, images, translationsLogin } from "@/constants";
 import OAuth from "@/components/Auth/OAuth";
 import { Link, router } from "expo-router";
 import LeagoMark from "@/components/Auth/LeagoMark";
+import { signIn } from "@/lib/appwrite/apit";
 
 // Define a type for the language
 type Language = "en" | "ar";
@@ -36,8 +38,23 @@ const signUp = () => {
 
   let changelangS =
     language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold";
-  const onSignUpPress = async () => {
-    console.log("Sign Up Pressed");
+  const onSignInPress = async () => {
+    if (!form.email || !form.password) {
+      Alert.alert(t.error, t.missingFields);
+      return;
+    }
+
+    try {
+      await signIn(form.email, form.password, language);
+      // Handle successful sign-in if needed
+      router.replace("/(root)/(tabs)/Home");
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert(t.error, error.message);
+      } else {
+        Alert.alert(t.error, "Error during sign-in");
+      }
+    }
   };
 
   return (
@@ -101,7 +118,7 @@ const signUp = () => {
               <CustomButton
                 title={t.signIn}
                 textStyle={`text-lg ${changelangS}`}
-                onPress={onSignUpPress}
+                onPress={onSignInPress}
                 className="
                 mt-5"
               />

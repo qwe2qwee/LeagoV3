@@ -190,7 +190,7 @@ export async function createUser(
 }
 
 // Sign in the user
-async function signIn(
+export async function signIn(
   email: string,
   password: string,
   languageError: "en" | "ar" = "en"

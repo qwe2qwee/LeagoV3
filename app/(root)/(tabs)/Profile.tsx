@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
+import React, { useState } from "react";
 import { profilePage } from "@/constants";
-import { useState } from "react";
 import TouchableFeildWithIcon from "@/components/profile/TouchableFeildWithIcon";
 
 type Language = "en" | "ar";
