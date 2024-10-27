@@ -140,3 +140,9 @@ declare interface DriverCardProps {
   selected: number;
   setSelected: () => void;
 }
+
+declare interface TouchableFeildWithIconProps {
+  icon: any;
+  title: string;
+  pathName: string;
+}

@@ -42,7 +42,7 @@ const signUp = () => {
   });
   const [loading, setLoading] = useState(false);
 
-  const [isModalVisible, setModalVisible] = useState(true);
+  const [isModalVisible, setModalVisible] = useState(false);
   const [otpCode, setOtpCode] = useState("");
 
   const birthday = "1999-01-01";
