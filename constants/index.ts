@@ -25,14 +25,15 @@ import to from "../assets/icons/to.png";
 import people from "../assets/icons/people.png";
 import phone from "../assets/icons/Phone.png";
 import backHome from "../assets/icons/backHome.png";
-import global from "../assets/icons/profile-icons/global.png"
-import InfoCircle from "../assets/icons/profile-icons/InfoCircle.png"
-import location from "../assets/icons/profile-icons/location.png"
-import lockPass from "../assets/icons/profile-icons/lock.png"
-import moon from "../assets/icons/profile-icons/moon.png"
-import notification from "../assets/icons/profile-icons/notification.png"
-import profileInfo from "../assets/icons/profile-icons/profile.png"
-import wallet from "../assets/icons/profile-icons/wallet-2.png"
+import global from "../assets/icons/profile-icons/global.png";
+import InfoCircle from "../assets/icons/profile-icons/InfoCircle.png";
+import location from "../assets/icons/profile-icons/location.png";
+import lockPass from "../assets/icons/profile-icons/lock.png";
+import moon from "../assets/icons/profile-icons/moon.png";
+import notification from "../assets/icons/profile-icons/notification.png";
+import profileInfo from "../assets/icons/profile-icons/profile.png";
+import wallet from "../assets/icons/profile-icons/wallet-2.png";
+import hyundai from "../assets/icons/hyundai1.png";
 
 //Images
 
@@ -62,6 +63,7 @@ export const icons = {
   arrowUp,
   backArrow,
   bills,
+  hyundai,
   people,
   checkmark,
   phone,
@@ -233,26 +235,26 @@ export type TranslationSignUpKeys = keyof typeof translationsignUp;
 
 export const profilePage = {
   en: {
-    personalInfo : {
+    personalInfo: {
       icon: profileInfo,
       title: "Personal Information",
     },
-    documents : {
+    documents: {
       icon: wallet,
-      title: "Your Identity"
+      title: "Your Identity",
     },
-    address : {
+    address: {
       icon: location,
-      title: "My Address"
+      title: "My Address",
     },
     changePass: {
       icon: lockPass,
-      title: "Change Password"
+      title: "Change Password",
     },
-    generalInfo : {
+    generalInfo: {
       notification: {
         icon: notification,
-        title: "Notification"
+        title: "Notification",
       },
       languages: {
         icon: global,
@@ -260,31 +262,31 @@ export const profilePage = {
       },
       help: {
         icon: InfoCircle,
-        title: "Help and Support"
-      }
+        title: "Help and Support",
+      },
     },
   },
   ar: {
-    personalInfo : {
+    personalInfo: {
       icon: profileInfo,
       title: "المعلومات الشخصية",
     },
-    documents : {
+    documents: {
       icon: wallet,
-      title: "المستندات"
+      title: "المستندات",
     },
-    address : {
+    address: {
       icon: location,
-      title: "العنوان"
+      title: "العنوان",
     },
     changePass: {
       icon: lockPass,
-      title: "تغيير كلمة المرور"
+      title: "تغيير كلمة المرور",
     },
     generalInfo: {
       notification: {
         icon: notification,
-        title: "التنبيهات"
+        title: "التنبيهات",
       },
       languages: {
         icon: global,
@@ -292,10 +294,8 @@ export const profilePage = {
       },
       help: {
         icon: InfoCircle,
-        title: "المساعدة و الدعم"
-      }
-    }
-  }
-}
-
-
+        title: "المساعدة و الدعم",
+      },
+    },
+  },
+};

@@ -7,7 +7,7 @@ import OTPComponent from "@/components/Auth/OTPComponent";
 const Home = () => {
   return (
     <SafeAreaView className="flex-1 items-center justify-center bg-white">
-      <TouchableOpacity onPress={() => router.push("/(auth)/sign-up" as any)}>
+      <TouchableOpacity onPress={() => router.push("/(root)/Home" as any)}>
         <Text>Home</Text>
       </TouchableOpacity>
     </SafeAreaView>
