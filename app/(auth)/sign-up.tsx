@@ -41,7 +41,9 @@ const signUp = () => {
     phone: "",
   });
   const [loading, setLoading] = useState(false);
+
   const [isModalVisible, setModalVisible] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
 
   const birthday = "1999-01-01";
   const gender = "other";
