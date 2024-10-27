@@ -14,7 +14,7 @@ const TouchableFeildWithIcon = ({
         resizeMode="contain"
         className="w-7 h-7"
       />
-      <Text className='pr-4 '>{title}</Text>
+      <Text className='pr-4 font-ZainBold'>{title}</Text>
     </TouchableOpacity>
   )
 }
