@@ -144,5 +144,5 @@ declare interface DriverCardProps {
 declare interface TouchableFeildWithIconProps {
   icon: any;
   title: string;
-  pathName: string;
+  pathName: any;
 }

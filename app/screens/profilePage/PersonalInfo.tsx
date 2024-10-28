@@ -1,12 +1,12 @@
 import { View, Text } from "react-native";
 import React from "react";
 
-const d = () => {
+const PersonalInfo= () => {
   return (
     <View>
-      <Text>d</Text>
+      <Text> PersonalInfo</Text>
     </View>
   );
 };
 
-export default d;
+export default PersonalInfo;

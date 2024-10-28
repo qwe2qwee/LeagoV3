@@ -2,6 +2,7 @@ import { View, Text } from "react-native";
 import React, { useState } from "react";
 import { profilePage, profileSections } from "@/constants";
 import TouchableFeildWithIcon from "@/components/profile/TouchableFeildWithIcon";
+import { router } from "expo-router";
 
 type Language = "en" | "ar";
 
@@ -20,7 +21,7 @@ const profile = () => {
           <TouchableFeildWithIcon 
             icon={fieldTranslator.personalInfo.icon}
             title={fieldTranslator.personalInfo.title}
-            pathName=""
+            pathName= {() => router.push("/screens/PersonalInfo")}
           />
           <TouchableFeildWithIcon 
             icon={fieldTranslator.documents.icon}
