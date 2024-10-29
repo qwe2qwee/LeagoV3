@@ -25,6 +25,7 @@ import to from "../assets/icons/to.png";
 import people from "../assets/icons/people.png";
 import phone from "../assets/icons/Phone.png";
 import backHome from "../assets/icons/backHome.png";
+<<<<<<< HEAD
 import global from "../assets/icons/profile-icons/global.png";
 import InfoCircle from "../assets/icons/profile-icons/InfoCircle.png";
 import location from "../assets/icons/profile-icons/location.png";
@@ -34,6 +35,15 @@ import notification from "../assets/icons/profile-icons/notification.png";
 import profileInfo from "../assets/icons/profile-icons/profile.png";
 import wallet from "../assets/icons/profile-icons/wallet-2.png";
 import hyundai from "../assets/icons/hyundai1.png";
+=======
+import global from "../assets/icons/profile-icons/global.png"
+import InfoCircle from "../assets/icons/profile-icons/InfoCircle.png"
+import location from "../assets/icons/profile-icons/location.png"
+import lockPass from "../assets/icons/profile-icons/lock.png"
+import notification from "../assets/icons/profile-icons/notification.png"
+import profileInfo from "../assets/icons/profile-icons/profile.png"
+import wallet from "../assets/icons/profile-icons/wallet-2.png"
+>>>>>>> c7aa46848e0e5074df0c6c14e6a640b012936501
 
 //Images
 
@@ -232,6 +242,19 @@ export const translationsignUp = {
 export type TranslationSignUpKeys = keyof typeof translationsignUp;
 
 // Profile Page
+
+export const profileSections = {
+  en: {
+    account: "Account",
+    security: "Security",
+    general: "General"
+  },
+  ar: {
+    account: "إدارة الحساب",
+    security: "الأمان",
+    general: "عام"
+  }
+}
 
 export const profilePage = {
   en: {
