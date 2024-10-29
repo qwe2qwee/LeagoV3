@@ -2,6 +2,7 @@ import {
   AppwriteAccount,
   AppwriteDocument,
   AppwriteUser,
+  CarDocument,
   FileUpload,
   PhoneTokenResponse,
   SessionResponse,
@@ -141,6 +142,8 @@ const transliterationMap: TransliterationMap = {
  * @param languageError The language to use for error messages. Defaults to "en".
  * @returns The newly created user document
  */
+
+// Create a new user function
 export async function createUser(
   email: string,
   password: string,
@@ -152,6 +155,7 @@ export async function createUser(
   languageError: "en" | "ar" = "en"
 ): Promise<AppwriteUser> {
   try {
+    // Create an account with unique ID
     const newAccount = await account.create(ID.unique(), email, password, name);
     if (!newAccount) {
       throw new Error(
@@ -159,17 +163,24 @@ export async function createUser(
       );
     }
 
+    // Sign in the user
     await signIn(email, password, languageError);
+
+    // Update phone number (you may need an actual function for this)
     await updatePhoneNumber(phone, password, languageError);
 
+    // Define user details
     const userDetails = {
-      name, // New field: name
-      birthday, // New field: birthday
-      gender, // New field: gender
-      address, // New field: address
+      name,
+      birthday,
+      gender,
+      address,
     };
 
-    const jsonD = JSON.stringify(userDetails);
+    // Convert userDetails to a JSON string and store it in the details array
+    const jsonUserDetails = JSON.stringify(userDetails);
+
+    // Create a new document for user details in Appwrite's database
     const newUser = await databases.createDocument<AppwriteUser>(
       appwriteConfig.databaseId as string,
       appwriteConfig.usersCollectionId as string,
@@ -177,8 +188,8 @@ export async function createUser(
       {
         email,
         userName: transliterateArabicToEnglish(name),
-        phone_number: phone,
-        deatails: [jsonD],
+        phoneNumber: phone,
+        details: [jsonUserDetails], // Store JSON string in details array
       }
     );
 
@@ -189,7 +200,7 @@ export async function createUser(
   }
 }
 
-// Sign in the user
+// Function to sign in the user
 export async function signIn(
   email: string,
   password: string,
@@ -207,14 +218,15 @@ export async function signIn(
   }
 }
 
-// Update the user's phone number
+// Example: Function to update the phone number (if applicable)
 export async function updatePhoneNumber(
   phone: string,
   password: string,
   languageError: "en" | "ar" = "en"
-): Promise<void> {
+): Promise<AppwriteAccount> {
   try {
-    await account.updatePhone(phone, password);
+    const updatedAccount = await account.updatePhone(phone, password);
+    return updatedAccount;
   } catch (error) {
     const errorMessage = getLocalizedErrorMessage(
       "phoneUpdateFailed",
@@ -224,7 +236,6 @@ export async function updatePhoneNumber(
     throw new Error(errorMessage);
   }
 }
-
 /** ======================================
  * HELPER FUNCTIONS
  * ====================================== */
@@ -250,7 +261,7 @@ export async function isPhoneNumberExisting(phone: string): Promise<boolean> {
     const response = await databases.listDocuments(
       appwriteConfig.databaseId as string,
       appwriteConfig.usersCollectionId as string,
-      [Query.equal("phone_number", phone)]
+      [Query.equal("phoneNumber", phone)]
     );
     return response.documents.length > 0;
   } catch (error) {
@@ -308,7 +319,7 @@ export const getEmailByPhoneNumber = async (
     const response = await databases.listDocuments<AppwriteUser>(
       appwriteConfig.databaseId as string,
       appwriteConfig.usersCollectionId as string,
-      [Query.equal("phone_number", phone)]
+      [Query.equal("phoneNumber", phone)]
     );
 
     if (response.documents.length > 0) {
@@ -450,24 +461,26 @@ export async function signOut(): Promise<void> {
  * ====================================== */
 
 // Function to upload a file to Appwrite's storage
+// Function to upload a file
 export async function uploadFile(
   file: FileUpload,
   type: string
-): Promise<webkitURL | undefined> {
+): Promise<string | undefined> {
   if (!file) return;
 
   // Prepare the file asset with MIME type
   const asset = { type: file.mimeType, ...file };
 
   try {
+    const storage = new Storage(); // Create Storage instance
     const uploadedFile: UploadedFileResponse = await storage.createFile(
       appwriteConfig.storageIdDocs as string,
       ID.unique(),
-      asset as any
+      asset
     );
 
     // Retrieve and return the file preview URL
-    return await getFilePreview(uploadedFile.$id, type);
+    return await getFilePreview(uploadedFile.$id);
   } catch (error) {
     console.error("Failed to upload file:", error);
     throw new Error("Unable to upload file. Please try again.");
@@ -475,16 +488,14 @@ export async function uploadFile(
 }
 
 // Function to get a file preview URL from storage
-export async function getFilePreview(
-  fileId: string,
-  type: string
-): Promise<webkitURL> {
+export async function getFilePreview(fileId: string): Promise<string> {
   try {
-    const fileUrl = storage.getFilePreview(
+    const storage = new Storage();
+    const fileUrl = await storage.getFilePreview(
       appwriteConfig.storageIdDocs as string,
       fileId
     );
-    return fileUrl;
+    return fileUrl; // Ensure this returns a string URL
   } catch (error) {
     console.error("Failed to get file preview:", error);
     throw new Error("Unable to retrieve file preview. Please try again.");
@@ -504,8 +515,8 @@ export async function createUserDocs(
 
     // Create document data object
     const documentData: UserDocumentData = {
-      identity: identityUrl as webkitURL | undefined,
-      license: licenseUrl as webkitURL | undefined,
+      identity: identityUrl || undefined, // Use `||` to ensure proper handling
+      license: licenseUrl || undefined,
       creatorId: userId,
     };
 
@@ -523,5 +534,25 @@ export async function createUserDocs(
     throw new Error(
       "Unable to upload documents. Please check the file formats."
     );
+  }
+}
+
+// Function to list car documents from the database
+export async function listCars(
+  queries: any[] = [Query.limit(10)] // Optional: queries to filter the results
+): Promise<CarDocument[]> {
+  try {
+    // Call Appwrite's listDocuments API to retrieve car documents
+    const response = await databases.listDocuments<CarDocument>(
+      appwriteConfig.databaseId as string,
+      appwriteConfig.carsCollectionId as string, // Collection ID for car documents
+      queries
+    );
+
+    // Return the array of car documents
+    return response.documents;
+  } catch (error) {
+    console.error("Error listing cars:", error);
+    throw new Error("Unable to retrieve the car list. Please try again.");
   }
 }
