@@ -1,8 +1,8 @@
-import { View, Text } from "react-native";
+import { View, Text, SafeAreaView, StyleSheet, StatusBar } from "react-native";
 import React, { useState } from "react";
-import { profilePage, profileSections } from "@/constants";
-import { router } from "expo-router";
+import { profilePage, profileSections } from "@/constants/profilePage";
 import TouchableFeildWithIcon from "@/components/profile/TouchableFeildWithIcon";
+import { Platform } from "react-native";
 
 type Language = "en" | "ar";
 
@@ -12,12 +12,13 @@ const profile = () => {
   const SecTranslator = profileSections[language];
 
   return (
-    <View className="items-center justify-center h-full w-full gap-6">
-      <View className="itmes-center justify-center">
-        <Text className="text-sm pr-10 py-2.5 font-ZainBold">
+    <SafeAreaView style={styles.droidSafeArea} >
+      <View className="h-full w-full border-2 border-red-500 p-6">
+        <View className="itmes-center justify-center">
+        <Text className="text-sm font-ZainBold">
           {SecTranslator.account}
         </Text>
-        <View className="w-80 mx-10">
+        <View className="pt-2">
           <TouchableFeildWithIcon
             icon={fieldTranslator.personalInfo.icon}
             title={fieldTranslator.personalInfo.title}
@@ -34,24 +35,25 @@ const profile = () => {
             pathName="/(root)/Home"
           />
         </View>
-      </View>
-      <View className="itmes-center justify-center">
-        <Text className="text-sm pr-10 py-2.5 font-ZainBold">
+        </View>
+        <View className="itmes-center justify-center pt-6">
+        <Text className="text-sm font-ZainBold">
           {SecTranslator.security}
         </Text>
-        <View className="w-80 mx-10">
+        <View className="pt-2 ">
           <TouchableFeildWithIcon
             icon={fieldTranslator.changePass.icon}
             title={fieldTranslator.changePass.title}
             pathName="/(root)/Home"
           />
         </View>
+        </View>
+        <View className="itmes-center justify-center">
       </View>
-      <View className="itmes-center justify-center">
-        <Text className="text-sm pr-10 py-2.5 font-ZainBold">
+        <Text className="text-sm font-ZainBold pt-6">
           {SecTranslator.general}
         </Text>
-        <View className="w-80 mx-10">
+        <View className="pt-2">
           <TouchableFeildWithIcon
             icon={fieldTranslator.generalInfo.notification.icon}
             title={fieldTranslator.generalInfo.notification.title}
@@ -69,8 +71,15 @@ const profile = () => {
           />
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  droidSafeArea: {
+    flex: 1,
+    paddingTop: Platform.OS === 'android' ?  StatusBar.currentHeight : 0
+},
+})
 
 export default profile;

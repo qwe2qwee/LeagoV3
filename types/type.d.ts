@@ -146,3 +146,9 @@ declare interface TouchableFeildWithIconProps {
   title: string;
   pathName: any;
 }
+
+declare interface InfoBoxWithTitleProps {
+  title: string;
+  info: srting;
+  icon? : any
+}

@@ -25,14 +25,6 @@ import to from "../assets/icons/to.png";
 import people from "../assets/icons/people.png";
 import phone from "../assets/icons/Phone.png";
 import backHome from "../assets/icons/backHome.png";
-import global from "../assets/icons/profile-icons/global.png";
-import InfoCircle from "../assets/icons/profile-icons/InfoCircle.png";
-import location from "../assets/icons/profile-icons/location.png";
-import lockPass from "../assets/icons/profile-icons/lock.png";
-import moon from "../assets/icons/profile-icons/moon.png";
-import notification from "../assets/icons/profile-icons/notification.png";
-import profileInfo from "../assets/icons/profile-icons/profile.png";
-import wallet from "../assets/icons/profile-icons/wallet-2.png";
 import hyundai from "../assets/icons/hyundai1.png";
 
 //Images
@@ -231,84 +223,4 @@ export const translationsignUp = {
 
 export type TranslationSignUpKeys = keyof typeof translationsignUp;
 
-// Profile Page
 
-export const profileSections = {
-  en: {
-    account: "Account",
-    security: "Security",
-    general: "General",
-  },
-  ar: {
-    account: "إدارة الحساب",
-    security: "الأمان",
-    general: "عام",
-  },
-};
-
-export const profilePage = {
-  en: {
-    personalInfo: {
-      icon: profileInfo,
-      title: "Personal Information",
-    },
-    documents: {
-      icon: wallet,
-      title: "Your Identity",
-    },
-    address: {
-      icon: location,
-      title: "My Address",
-    },
-    changePass: {
-      icon: lockPass,
-      title: "Change Password",
-    },
-    generalInfo: {
-      notification: {
-        icon: notification,
-        title: "Notification",
-      },
-      languages: {
-        icon: global,
-        title: "Languages",
-      },
-      help: {
-        icon: InfoCircle,
-        title: "Help and Support",
-      },
-    },
-  },
-  ar: {
-    personalInfo: {
-      icon: profileInfo,
-      title: "المعلومات الشخصية",
-    },
-    documents: {
-      icon: wallet,
-      title: "المستندات",
-    },
-    address: {
-      icon: location,
-      title: "العنوان",
-    },
-    changePass: {
-      icon: lockPass,
-      title: "تغيير كلمة المرور",
-    },
-    generalInfo: {
-      notification: {
-        icon: notification,
-        title: "التنبيهات",
-      },
-      languages: {
-        icon: global,
-        title: "اللغة",
-      },
-      help: {
-        icon: InfoCircle,
-        title: "المساعدة و الدعم",
-      },
-    },
-  },
-};
