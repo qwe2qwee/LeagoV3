@@ -6,7 +6,7 @@ import moon from "../../assets/icons/profile-icons/moon.png";
 import notification from "../../assets/icons/profile-icons/notification.png";
 import profileInfo from "../../assets/icons/profile-icons/profile.png";
 import wallet from "../../assets/icons/profile-icons/wallet-2.png";
-import calinder from "../../assets/icons/profile-icons/Calendar.png";
+import calindar from "../../assets/icons/profile-icons/Calendar.png";
 
 // Profile Page
 
@@ -114,7 +114,7 @@ export const personalInfoPage = {
     gender: "Gender",
     mobileNo: "Mobile Number",
     email: "Email",
-    icon: calinder
+    icon: calindar
   },
   ar: {
     fullName: "الاسم",
@@ -122,6 +122,6 @@ export const personalInfoPage = {
     gender: "الجنس",
     mobileNo: "رقم الجوال",
     email: "البريد الإلكتروني",
-    icon: calinder
+    icon: calindar
   },
 };
