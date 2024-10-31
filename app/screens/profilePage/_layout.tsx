@@ -1,5 +1,4 @@
-import { Stack } from "expo-router"
-
+import { Stack } from "expo-router";
 
 const _layout = () => {
   return (
@@ -7,7 +6,7 @@ const _layout = () => {
       <Stack.Screen name="PersonalInfo" options={{ headerShown: false }} />
       <Stack.Screen name="Documents" options={{ headerShown: false }} />
     </Stack>
-  )
-}
+  );
+};
 
-export default _layout
+export default _layout;
