@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { router } from "expo-router";
 import { profilePage, profileSections } from "@/constants/profilePage";
 import TouchableFeildWithIcon from "@/components/Profile/TouchableFeildWithIcon";
+import { Platform } from "react-native";
 
 type Language = "en" | "ar";
 
