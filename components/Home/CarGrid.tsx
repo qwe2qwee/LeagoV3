@@ -1,4 +1,3 @@
-// File: components/CarGrid.tsx
 import React, { useEffect, useState } from "react";
 import {
   FlatList,
@@ -7,162 +6,86 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
+  StyleSheet,
 } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome"; // Import FontAwesome for the heart icon
-
-interface Car {
-  id: number;
-  brand: string;
-  name: string;
-  price: string;
-  image: string;
-  carLocation: { lat: number; lon: number }; // Car location with latitude and longitude
-  city: string;
-  ownerId: string;
-  details: string; // JSON string that needs parsing
-  likes: number;
-  hide: boolean;
-}
+import Icon from "react-native-vector-icons/FontAwesome";
+import { parseCarLocation, parseDetails, listCars } from "@/lib/appwrite/apit";
+import { CarDocument } from "@/types/AppwriteTypes";
+import { router } from "expo-router";
 
 interface CarGridProps {
   selectedBrand: string | null;
-  userLocation: { lat: number; lon: number }; // User's location to find nearby cars
+  userLocation: { lat: number; lon: number };
+  language: "en" | "ar";
 }
 
-const mockCars: Car[] = [
-  {
-    id: 1,
-    brand: "Toyota",
-    name: "Camry",
-    price: "$20,000",
-    image:
-      "https://th.bing.com/th/id/R.8b01377204f7e5e60f3928fa9c6d8d8d?rik=veNTNapnhdPf5A&riu=http%3a%2f%2fpluspng.com%2fimg-png%2fpng-hd-images-of-cars-volkswagen-png-hd-1500.png&ehk=bzMQ1ueAXMsJzhilqNehN77R9uwSPUm8hoyg%2bCU3wYo%3d&risl=&pid=ImgRaw&r=0",
-    carLocation: { lat: 34.0522, lon: -118.2437 },
-    city: "Los Angeles",
-    ownerId: "123",
-    details: '{"mileage": "20,000 miles", "year": "2018", "color": "Red"}',
-    likes: 120,
-    hide: false,
+const translations = {
+  en: {
+    city: "City",
+    year: "Year",
+    dailyRate: "/day",
+    noCarsAvailable: "No cars available",
   },
-  {
-    id: 2,
-    brand: "Toyota",
-    name: "Camry",
-    price: "$20,000",
-    image:
-      "https://th.bing.com/th/id/R.8b01377204f7e5e60f3928fa9c6d8d8d?rik=veNTNapnhdPf5A&riu=http%3a%2f%2fpluspng.com%2fimg-png%2fpng-hd-images-of-cars-volkswagen-png-hd-1500.png&ehk=bzMQ1ueAXMsJzhilqNehN77R9uwSPUm8hoyg%2bCU3wYo%3d&risl=&pid=ImgRaw&r=0",
-    carLocation: { lat: 34.0522, lon: -118.2437 },
-    city: "Los Angeles",
-    ownerId: "123",
-    details: '{"mileage": "20,000 miles", "year": "2018", "color": "Red"}',
-    likes: 120,
-    hide: false,
+  ar: {
+    city: "المدينة",
+    year: "السنة",
+    dailyRate: "/اليوم",
+    noCarsAvailable: "لا توجد سيارات متاحة",
   },
-  {
-    id: 3,
-    brand: "Toyota",
-    name: "Camry",
-    price: "$20,000",
-    image:
-      "https://th.bing.com/th/id/R.8b01377204f7e5e60f3928fa9c6d8d8d?rik=veNTNapnhdPf5A&riu=http%3a%2f%2fpluspng.com%2fimg-png%2fpng-hd-images-of-cars-volkswagen-png-hd-1500.png&ehk=bzMQ1ueAXMsJzhilqNehN77R9uwSPUm8hoyg%2bCU3wYo%3d&risl=&pid=ImgRaw&r=0",
-    carLocation: { lat: 34.0522, lon: -118.2437 },
-    city: "Los Angeles",
-    ownerId: "123",
-    details: '{"mileage": "20,000 miles", "year": "2018", "color": "Red"}',
-    likes: 120,
-    hide: false,
-  },
-  {
-    id: 4,
-    brand: "Toyota",
-    name: "Camry",
-    price: "$20,000",
-    image:
-      "https://th.bing.com/th/id/R.8b01377204f7e5e60f3928fa9c6d8d8d?rik=veNTNapnhdPf5A&riu=http%3a%2f%2fpluspng.com%2fimg-png%2fpng-hd-images-of-cars-volkswagen-png-hd-1500.png&ehk=bzMQ1ueAXMsJzhilqNehN77R9uwSPUm8hoyg%2bCU3wYo%3d&risl=&pid=ImgRaw&r=0",
-    carLocation: { lat: 21.680871, lon: -320.904937 },
-    city: "عند البحر الاحمر",
-    ownerId: "123",
-    details: '{"mileage": "20,000 miles", "year": "2018", "color": "Red"}',
-    likes: 120,
-    hide: false,
-  },
-  {
-    id: 5,
-    brand: "Toyota",
-    name: "Camry",
-    price: "$20,000",
-    image:
-      "https://th.bing.com/th/id/R.8b01377204f7e5e60f3928fa9c6d8d8d?rik=veNTNapnhdPf5A&riu=http%3a%2f%2fpluspng.com%2fimg-png%2fpng-hd-images-of-cars-volkswagen-png-hd-1500.png&ehk=bzMQ1ueAXMsJzhilqNehN77R9uwSPUm8hoyg%2bCU3wYo%3d&risl=&pid=ImgRaw&r=0",
-    carLocation: { lat: 21.764809, lon: -320.801359 },
-    city: "في الحمدانية",
-    ownerId: "123",
-    details: '{"mileage": "20,000 miles", "year": "2018", "color": "Red"}',
-    likes: 120,
-    hide: false,
-  },
-  {
-    id: 6,
-    brand: "Toyota",
-    name: "Camry",
-    price: "$20,000",
-    image:
-      "https://th.bing.com/th/id/R.8b01377204f7e5e60f3928fa9c6d8d8d?rik=veNTNapnhdPf5A&riu=http%3a%2f%2fpluspng.com%2fimg-png%2fpng-hd-images-of-cars-volkswagen-png-hd-1500.png&ehk=bzMQ1ueAXMsJzhilqNehN77R9uwSPUm8hoyg%2bCU3wYo%3d&risl=&pid=ImgRaw&r=0",
-    carLocation: { lat: 21.588537, lon: -320.808197 },
-    city: " في الصفا",
-    ownerId: "123",
-    details: '{"mileage": "20,000 miles", "year": "2018", "color": "Red"}',
-    likes: 120,
-    hide: false,
-  },
-  // Add more mock data here if needed
-];
-
-// Helper function to parse car details
-const parseDetails = (details: string) => {
-  try {
-    return JSON.parse(details);
-  } catch (error) {
-    console.error("Error parsing details:", error);
-    return {};
-  }
 };
 
-// Placeholder function to calculate distance (Haversine Formula or basic distance calculation)
 const calculateDistance = (
   loc1: { lat: number; lon: number },
   loc2: { lat: number; lon: number }
-) => {
-  // For simplicity, we're calculating Euclidean distance, but you can use Haversine for accuracy.
+): number => {
   return Math.sqrt(
     Math.pow(loc2.lat - loc1.lat, 2) + Math.pow(loc2.lon - loc1.lon, 2)
   );
 };
 
-const CarGrid: React.FC<CarGridProps> = ({ selectedBrand, userLocation }) => {
-  const [filteredCars, setFilteredCars] = useState<Car[]>(mockCars);
-  const [likedCars, setLikedCars] = useState<number[]>([]); // Array to track liked cars by their ID
-
+const CarGrid: React.FC<CarGridProps> = ({
+  selectedBrand,
+  userLocation,
+  language,
+}) => {
+  const [filteredCars, setFilteredCars] = useState<CarDocument[]>([]);
+  const [likedCars, setLikedCars] = useState<string[]>([]);
   const screenWidth = Dimensions.get("window").width;
+  const { city, year, noCarsAvailable } = translations[language];
 
   useEffect(() => {
-    let filteredList = mockCars.filter((car) => !car.hide); // Exclude hidden cars
+    const fetchAndFilterCars = async () => {
+      try {
+        const cars = await listCars();
 
-    // Filter by brand if selected
-    if (selectedBrand) {
-      filteredList = filteredList.filter((car) => car.brand === selectedBrand);
-    }
+        let filteredList = cars.filter((car: any) => !car.isHidden);
+        if (selectedBrand) {
+          filteredList = filteredList.filter(
+            (car: any) => car.brand === selectedBrand
+          );
+        }
 
-    // Sort cars by proximity to the user's location
-    filteredList.sort((a, b) => {
-      const distanceA = calculateDistance(userLocation, a.carLocation);
-      const distanceB = calculateDistance(userLocation, b.carLocation);
-      return distanceA - distanceB;
-    });
+        filteredList.sort((a: any, b: any) => {
+          const carLocationA = parseCarLocation(JSON.stringify(a.carLocation));
+          const carLocationB = parseCarLocation(b.carLocation);
 
-    setFilteredCars(filteredList);
+          if (!carLocationA || !carLocationB) return 0;
+
+          const distanceA = calculateDistance(userLocation, carLocationA);
+          const distanceB = calculateDistance(userLocation, carLocationB);
+          return distanceA - distanceB;
+        });
+
+        setFilteredCars(filteredList);
+      } catch (error) {
+        console.error("Failed to fetch cars:", error);
+      }
+    };
+
+    fetchAndFilterCars();
   }, [selectedBrand, userLocation]);
 
-  const toggleLike = (carId: number) => {
+  const toggleLike = (carId: string) => {
     setLikedCars((prev) =>
       prev.includes(carId)
         ? prev.filter((id) => id !== carId)
@@ -170,62 +93,129 @@ const CarGrid: React.FC<CarGridProps> = ({ selectedBrand, userLocation }) => {
     );
   };
 
-  const renderItem = ({ item, index }: { item: Car; index: number }) => {
-    const isSingleItem = filteredCars.length === 1;
-    const isLastInRow = filteredCars.length === 3 && index === 2; // For three items, check if it's the last item
-    const carDetails = parseDetails(item.details);
+  const renderItem = ({ item }: { item: CarDocument }) => {
+    const carDetails = Array.isArray(item.details)
+      ? parseDetails(item.details)
+      : [];
+    if (!carDetails || carDetails.length === 0) return null;
+
+    const carInfo = carDetails[0];
 
     return (
-      <View
-        className={`bg-white m-2 p-4 rounded-lg shadow relative ${isSingleItem ? "flex-row" : ""}`}
-        style={
-          isSingleItem
-            ? { width: screenWidth - 32, alignItems: "center" }
-            : isLastInRow
-              ? { flex: 1, marginLeft: screenWidth / 8 } // Center align the third item when there are 3 items
-              : { flex: 1 }
-        }
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={() => {
+          if (carInfo.image && carInfo.rentType) {
+            router.push({
+              pathname: "/screens/Home/CarDetailsPage",
+              params: {
+                carId: item?.$id,
+                carDetails: JSON.stringify(carInfo),
+                carName: item.brand,
+                carRentSalary: JSON.stringify(carInfo.rentType),
+                carImages: JSON.stringify(carInfo.image),
+                carImage: carInfo.image,
+                ownerId: item.ownerId,
+                carCity: item.city,
+              },
+            });
+          } else {
+            console.error("Incomplete car details");
+          }
+        }}
+        style={[styles.cardContainer, { width: screenWidth * 0.45 }]}
       >
         <Image
-          source={{ uri: item.image }}
-          className={
-            isSingleItem
-              ? "h-24 w-24 rounded-lg mr-4"
-              : "h-24 w-full rounded-lg"
-          }
+          source={{ uri: carInfo.image }}
+          style={styles.carImage}
           resizeMode="contain"
         />
-        <View className={isSingleItem ? "flex-1" : ""}>
-          <Text className="text-lg font-bold mt-2">{item.name}</Text>
-          <Text className="text-sm text-gray-500">{item.brand}</Text>
-          <Text className="text-sm text-green-600">{item.price}/شهري</Text>
-          <Text className="text-sm text-gray-500">{`City: ${item.city}`}</Text>
-          <Text className="text-sm text-gray-500">{`Mileage: ${carDetails.mileage}`}</Text>
-          <Text className="text-sm text-gray-500">{`Year: ${carDetails.year}`}</Text>
+        <View>
+          <Text style={styles.carBrand}>{item.brand}</Text>
+          <Text style={styles.carColor}>{carInfo.color}</Text>
+          <Text style={styles.carPrice}>
+            {carInfo.rentType?.monthly?.price}
+          </Text>
+          <Text style={styles.carCity}>{`${city}: ${item.city}`}</Text>
+          <Text style={styles.carYear}>{`${year}: ${carInfo.year}`}</Text>
         </View>
         <TouchableOpacity
-          onPress={() => toggleLike(item.id)}
-          style={{ position: "absolute", top: 8, right: 8 }}
+          onPress={() => toggleLike(item.$id)}
+          style={styles.likeIcon}
         >
           <Icon
-            name={likedCars.includes(item.id) ? "heart" : "heart-o"}
+            name={likedCars.includes(item.$id) ? "heart" : "heart-o"}
             size={24}
-            color={likedCars.includes(item.id) ? "red" : "gray"}
+            color={likedCars.includes(item.$id) ? "red" : "gray"}
           />
         </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
     );
   };
+
+  if (filteredCars.length === 0) {
+    return <Text style={styles.noCarsText}>{noCarsAvailable}</Text>;
+  }
 
   return (
     <FlatList
       data={filteredCars}
       scrollEnabled={false}
       numColumns={2}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={(item) => item.$id}
       renderItem={renderItem}
     />
   );
 };
+
+const styles = StyleSheet.create({
+  cardContainer: {
+    backgroundColor: "white",
+    margin: 8,
+    padding: 16,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    position: "relative",
+  },
+  carImage: {
+    height: 96,
+    width: "100%",
+    borderRadius: 8,
+  },
+  carBrand: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginTop: 8,
+  },
+  carColor: {
+    fontSize: 12,
+    color: "gray",
+  },
+  carPrice: {
+    fontSize: 14,
+    color: "green",
+  },
+  carCity: {
+    fontSize: 12,
+    color: "gray",
+  },
+  carYear: {
+    fontSize: 12,
+    color: "gray",
+  },
+  likeIcon: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+  },
+  noCarsText: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+    color: "gray",
+  },
+});
 
 export default CarGrid;

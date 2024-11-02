@@ -26,6 +26,8 @@ import people from "../assets/icons/people.png";
 import phone from "../assets/icons/Phone.png";
 import backHome from "../assets/icons/backHome.png";
 import hyundai from "../assets/icons/hyundai1.png";
+import HeartD from "../assets/icons/HeartD.png";
+import Time from "../assets/icons/Time.png";
 
 //Images
 
@@ -59,12 +61,14 @@ export const icons = {
   people,
   checkmark,
   phone,
+  Time,
   close,
   dollar,
   email,
   eyecross,
   google,
   backHome,
+  HeartD,
   home,
   list,
   lock,
@@ -221,6 +225,38 @@ export const translationsignUp = {
   },
 };
 
+export const bookingPage = {
+  en: {
+    bookingDetails: "Booking Details",
+    selectRentalPeriod: "Select Rental Period",
+    startDate: "Start Date",
+    endDate: "End Date",
+    selectStartDate: "Select Start Date",
+    selectEndDate: "Select End Date",
+    totalDays: "Total Days",
+    totalPrice: "Total Price",
+    confirmBooking: "Confirm Booking",
+    invalidBooking: "Invalid booking",
+    invalidBookingMessage: "Please select valid dates for your booking.",
+    bookingConfirmed: "Booking confirmed",
+    bookingSuccessMessage:
+      "Your rental has been booked successfully! Total price: $",
+  },
+  ar: {
+    bookingDetails: "تفاصيل الحجز",
+    selectRentalPeriod: "اختر مدة الإيجار",
+    startDate: "تاريخ البدء",
+    endDate: "تاريخ الانتهاء",
+    selectStartDate: "اختر تاريخ البدء",
+    selectEndDate: "اختر تاريخ الانتهاء",
+    totalDays: "إجمالي الأيام",
+    totalPrice: "السعر الإجمالي",
+    confirmBooking: "تأكيد الحجز",
+    invalidBooking: "الحجز غير صالح",
+    invalidBookingMessage: "يرجى اختيار تواريخ صالحة للحجز.",
+    bookingConfirmed: "تم تأكيد الحجز",
+    bookingSuccessMessage: "تم حجز الإيجار بنجاح! السعر الإجمالي: $",
+  },
+};
+
 export type TranslationSignUpKeys = keyof typeof translationsignUp;
-
-

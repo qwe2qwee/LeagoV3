@@ -2,6 +2,7 @@ import {
   AppwriteAccount,
   AppwriteDocument,
   AppwriteUser,
+  CarDataProps,
   CarDocument,
   FileUpload,
   PhoneTokenResponse,
@@ -13,6 +14,7 @@ import {
 } from "@/types/AppwriteTypes";
 import { ID, Query } from "react-native-appwrite";
 import { account, appwriteConfig, avatars, databases, storage } from "./config";
+import { ParsedDetail, ParsedRentDetail } from "@/types/type";
 // Import necessary types from appwriteTypes
 
 // Error localization definition for English and Arabic
@@ -537,10 +539,79 @@ export async function createUserDocs(
   }
 }
 
+/// cars logic heree  ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Helper function to parse carLocation JSON string
+export function parseCarLocation(
+  carLocation: string | { lat: number; lon: number }
+): { lat: number; lon: number } | null {
+  // console.log("Received carLocation:", carLocation);
+
+  // Check if `carLocation` is already an object with lat and lon properties
+  if (typeof carLocation === "object" && carLocation !== null) {
+    return carLocation as { lat: number; lon: number };
+  }
+
+  // If `carLocation` is a string, try parsing it as JSON
+  if (typeof carLocation === "string") {
+    try {
+      return JSON.parse(carLocation);
+    } catch (error) {
+      console.error("Error parsing carLocation:", error);
+      return null;
+    }
+  }
+
+  console.error(
+    "carLocation is neither an object nor a JSON string:",
+    carLocation
+  );
+  return null;
+}
+
+// Helper function to parse details array with an image URL
+
+export function parseDetails(details: any) {
+  // console.log("Received details:", details);
+
+  // If `details` is a string, try parsing it as JSON
+  if (typeof details === "string") {
+    try {
+      details = JSON.parse(details);
+    } catch (error) {
+      console.error("Error parsing details as JSON:", error);
+      return []; // Return an empty array if parsing fails
+    }
+  }
+
+  if (!Array.isArray(details)) {
+    console.error(
+      "Expected details to be an array after parsing. Received:",
+      details
+    );
+    return [];
+  }
+
+  try {
+    return details.flatMap((detail) => {
+      console.log("Processing detail:", detail);
+
+      const { name, image, rentType, color, mileage, year } = detail;
+
+      if (!rentType || typeof rentType !== "object") return []; // Skip if rentType is missing or not an object
+
+      return detail; // Return the object as-is
+    });
+  } catch (error) {
+    console.error("Error processing details:", error);
+    return [];
+  }
+}
+
 // Function to list car documents from the database
 export async function listCars(
-  queries: any[] = [Query.limit(10)] // Optional: queries to filter the results
-): Promise<CarDocument[]> {
+  queries: any[] = [] // Optional: queries to filter the results
+) {
   try {
     // Call Appwrite's listDocuments API to retrieve car documents
     const response = await databases.listDocuments<CarDocument>(
@@ -549,10 +620,46 @@ export async function listCars(
       queries
     );
 
-    // Return the array of car documents
-    return response.documents;
+    // console.log("Car documents retrieved successfully:", response.documents[0]);
+
+    // Parse carLocation and details JSON strings into objects
+    const cars = response.documents.map((car) => ({
+      ...car,
+      carLocation: parseCarLocation(car.carLocation), // Parse carLocation JSON string
+      details: parseDetails(car.details), // Parse each item in details JSON array
+    }));
+
+    return cars as any;
   } catch (error) {
     console.error("Error listing cars:", error);
     throw new Error("Unable to retrieve the car list. Please try again.");
   }
 }
+
+export const createCarDocument = async (carData: CarDataProps) => {
+  try {
+    // Format the data for Appwrite, converting nested objects to JSON strings
+    const formattedData = {
+      carLocation: JSON.stringify(carData.carLocation),
+      city: carData.city,
+      ownerId: carData.ownerId,
+      brand: carData.brand,
+      details: JSON.stringify(carData.details),
+      isHidden: carData.isHidden,
+    };
+
+    // Replace YOUR_DATABASE_ID and YOUR_COLLECTION_ID with the actual values
+    const response = await databases.createDocument(
+      appwriteConfig.databaseId as string,
+      appwriteConfig.carsCollectionId as string,
+      ID.unique(), // Generates a unique document ID
+      formattedData
+    );
+
+    console.log("Document created successfully:", response);
+    return response;
+  } catch (error) {
+    console.error("Error creating document:", error);
+    throw error;
+  }
+};

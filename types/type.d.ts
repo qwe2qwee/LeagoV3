@@ -147,8 +147,55 @@ declare interface TouchableFeildWithIconProps {
   pathName: any;
 }
 
+// for parse the car
+
+export type ParsedDetail = {
+  rentType: rentType;
+  name: string;
+  image?: string;
+  color: string[];
+  mileage: string;
+  year: string;
+};
+
+type RentOption = {
+  price: number;
+  availability: boolean;
+};
+
+export type rentType = {
+  daily?: RentOption;
+  weekly?: RentOption;
+  monthly?: RentOption;
+  ownership?: RentOption;
+};
+
+export type ParsedRentDetail = {
+  rentType: rentType;
+  name: string;
+  image?: string;
+  color: string[];
+  mileage: string;
+  year: string;
+};
+
+export type CarDetailInput = {
+  rentType: rentType;
+  name: string;
+  image: string;
+  color: string[];
+  mileage: string;
+  year: string;
+};
+
+declare interface TouchableFeildWithIconProps {
+  icon: any;
+  title: string;
+  pathName: any;
+}
+
 declare interface InfoBoxWithTitleProps {
   title: string;
   info: srting;
-  icon? : any
+  icon?: any;
 }

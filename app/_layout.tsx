@@ -50,7 +50,18 @@ export default function RootLayout() {
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="(root)" options={{ headerShown: false }} />
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      <Stack.Screen name="screens" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="screens/profilePage"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="screens/Home/CarDetailsPage"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="screens/Home/BookingPage"
+        options={{ headerShown: false }}
+      />
 
       <Stack.Screen name="+not-found" />
     </Stack>

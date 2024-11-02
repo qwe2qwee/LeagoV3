@@ -27,6 +27,7 @@ const Home: React.FC = () => {
         <CarGrid
           userLocation={{ lat: 21.608616, lon: -320.815205 }}
           selectedBrand={selectedBrand}
+          language="ar"
         />
       </ScrollView>
     </SafeAreaView>
