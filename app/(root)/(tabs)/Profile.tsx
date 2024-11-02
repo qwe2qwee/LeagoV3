@@ -1,7 +1,7 @@
 import { View, Text, SafeAreaView, StyleSheet, StatusBar } from "react-native";
 import React, { useState } from "react";
 import { profilePage, profileSections } from "@/constants/profilePage";
-import TouchableFeildWithIcon from "@/components/profile/TouchableFeildWithIcon";
+import TouchableFeildWithIcon from "@/components/Profile/TouchableFeildWithIcon";
 import { Platform } from "react-native";
 
 type Language = "en" | "ar";
