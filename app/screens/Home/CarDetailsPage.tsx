@@ -1,53 +1,168 @@
-import React from "react";
-import { View, Text, Image, ScrollView, Pressable } from "react-native";
+import React, { useState } from "react";
+import { View, Text, Image, Pressable, ScrollView } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import CustomButton from "@/components/ui/CustomButton";
+import { icons } from "@/constants";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-const CarDetailsPage: React.FC = () => {
-  const { carId, carDetails, carName, carRentSalary, carImages, carImage } =
-    useLocalSearchParams();
+const CarDetailsPage = () => {
+  const {
+    carId,
+    carDetails,
+    carName,
+    carRentSalary,
+    carImages,
+    carImage,
+    carCity,
+  } = useLocalSearchParams();
   const router = useRouter();
+  let bookingTime = "Today , 01:00 PM - 02:00 PM ";
+  const [language, setLanguage] = useState<"en" | "ar">("ar");
 
-  // Parsing JSON strings from the params
-  const parsedCarDetails = JSON.parse(carDetails[0] as string);
-  const parsedRentSalary = JSON.parse(carRentSalary as string);
-  const parsedImages = JSON.parse(carImages as string);
-  console.log(parsedCarDetails);
+  const translations = {
+    en: {
+      noImageAvailable: "No Image Available",
+      bookingHours: "Booking Hours",
+      carDetails: "Car Details",
+      mileage: "Mileage",
+      bookNow: "Book Now",
+    },
+    ar: {
+      noImageAvailable: "لا توجد صورة متاحة",
+      bookingHours: "ساعات الحجز",
+      carDetails: "تفاصيل السيارة",
+      mileage: "عدد الأميال",
+      bookNow: "احجز الآن",
+    },
+  };
+
+  // Helper function to parse JSON only if it's a valid string
+  const parseJSON = (data: any) => {
+    if (typeof data === "string") {
+      try {
+        return JSON.parse(data);
+      } catch (error) {
+        console.error("Failed to parse JSON:", error);
+      }
+    }
+    return data; // If already parsed or invalid
+  };
+
+  const parsedCarDetails = parseJSON(carDetails);
+  const parsedRentSalary = parseJSON(carRentSalary);
+  const imageUri = Array.isArray(parseJSON(carImages))
+    ? parseJSON(carImages)[0]
+    : carImage;
 
   return (
-    <ScrollView className="p-4">
-      <Image
-        source={{ uri: carImage as string }}
-        className="h-48 w-full rounded-lg"
-        resizeMode="contain"
-      />
-      <Text className="text-2xl font-bold my-4">{carName}</Text>
-      <Text className="text-lg text-gray-600">
-        {parsedCarDetails.year} - {parsedCarDetails.color}
-      </Text>
-      <Text className="text-lg text-gray-600">{parsedCarDetails.city}</Text>
-      <Text className="text-xl text-green-600 my-2">
-        ${parsedRentSalary.daily.price}/day
-      </Text>
+    <SafeAreaView className="bg-white flex-1">
+      <ScrollView>
+        {/* Image Section */}
+        <View className="relative items-center justify-center bg-[#F7F7F7] rounded-lg h-72 w-full">
+          {imageUri ? (
+            <Image
+              source={{ uri: imageUri }}
+              className="h-52 w-52 rounded-lg"
+              resizeMode="contain"
+            />
+          ) : (
+            <Text className="text-gray-500">
+              {translations[language].noImageAvailable}
+            </Text>
+          )}
 
-      <View className="mt-4">
-        <Text className="text-lg font-semibold">Car Details</Text>
-        <Text className="text-gray-600">
-          Mileage: {parsedCarDetails.mileage}
-        </Text>
-        <Text className="text-gray-600">
-          Transmission: {parsedCarDetails.transmission}
-        </Text>
-      </View>
+          {/* Floating Top Buttons */}
+          <View className="absolute top-2 left-2 right-2 flex-row justify-between p-2 z-10">
+            <Pressable
+              onPress={() => router.back()}
+              className="bg-white rounded-full p-3 shadow-md"
+            >
+              <Image
+                source={icons.backArrow}
+                resizeMode="contain"
+                className="w-6 h-6"
+              />
+            </Pressable>
+            <Pressable className="bg-white rounded-full p-3 shadow-md">
+              <Image
+                source={icons.HeartD}
+                resizeMode="contain"
+                className="w-6 h-6"
+              />
+            </Pressable>
+          </View>
+        </View>
 
-      <Pressable
-        onPress={() => router.push({ pathname: "/book", params: { carId } })}
-        className="mt-6 p-4 bg-blue-600 rounded-lg"
-      >
-        <Text className="text-white text-center text-lg font-semibold">
-          Book Now
-        </Text>
-      </Pressable>
-    </ScrollView>
+        <View className="p-3">
+          {/* Car Details Header */}
+          <View className="flex-row justify-between mt-4">
+            <Text className="text-2xl font-bold">{carName}</Text>
+            <Text className="text-xl text-black">
+              ${parsedRentSalary?.daily?.price || "N/A"}/day
+            </Text>
+          </View>
+          <View className="flex-row items-center justify-between my-3">
+            <View className="flex-row items-center">
+              <Image
+                source={icons.point}
+                className="w-5 h-5 mr-1"
+                tintColor={"#9CA4AB"}
+                resizeMode="contain"
+              />
+              <Text className="text-sm text-[#9CA4AB]">{carCity || "N/A"}</Text>
+            </View>
+
+            <Text className="text-sm text-[#9CA4AB] mt-2">
+              {parsedCarDetails?.year || "N/A"} -{" "}
+              {parsedCarDetails?.color || "N/A"}
+            </Text>
+          </View>
+          <View className="flex-col items-start my-3">
+            <View className="flex-row items-center">
+              <Image
+                source={icons.Time}
+                className="w-5 h-5 mr-1"
+                tintColor={"#9CA4AB"}
+                resizeMode="contain"
+              />
+              <Text className="text-sm text-[#9CA4AB]">
+                {translations[language].bookingHours}
+              </Text>
+            </View>
+            <View className="m-3 ml-6 border-dashed border-[#E2E3E8] border-2 p-1">
+              <Text className="text-primary-400">{bookingTime}</Text>
+            </View>
+          </View>
+
+          {/* Additional Car Details */}
+          <View className="mt-4">
+            <Text className="text-lg font-semibold">
+              {translations[language].carDetails}
+            </Text>
+            <Text className="text-gray-600">
+              {translations[language].mileage}:{" "}
+              {parsedCarDetails?.mileage || "N/A"}
+            </Text>
+          </View>
+
+          {/* Book Now Button */}
+          <CustomButton
+            title={translations[language].bookNow}
+            className="rounded-lg mt-6 p-4"
+            onPress={() => {
+              if (carId) {
+                router.push({
+                  pathname: "/screens/Home/BookingPage",
+                  params: { carId, carRentSalary },
+                });
+              } else {
+                console.error("carId is missing.");
+              }
+            }}
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

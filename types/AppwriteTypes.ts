@@ -83,6 +83,30 @@ export interface FilePreview {
   url: string;
 }
 
+export type RentType = {
+  daily: { price: number; availability: boolean };
+  weekly: { price: number; availability: boolean };
+  monthly: { price: number; availability: boolean };
+  ownership: { price: number; availability: boolean };
+};
+
+export type CarDetails = {
+  image: string;
+  mileage: string;
+  year: string;
+  color: string;
+  rentType: RentType;
+};
+
+export type CarDataProps = {
+  carLocation: { lat: number; lon: number };
+  city: string;
+  ownerId: string;
+  brand: string;
+  details: CarDetails[];
+  isHidden: boolean;
+};
+
 // Appwrite Account service interface for creating and managing users
 export interface AccountService {
   create: (
@@ -123,5 +147,7 @@ export interface CarDocument extends AppwriteDocument {
   carLocation: string; // Location of the car
   city: string; // City where the car is located
   ownerId: string; // ID of the car owner
-  details: string[]; // Array of JSON strings with additional car details (e.g., rentPrice, rentType, brand)
+  brand: string;
+  details: any; // Array of JSON strings with additional car details (e.g., rentPrice, rentType, brand, the image URL)
+  isHidden: boolean;
 }
