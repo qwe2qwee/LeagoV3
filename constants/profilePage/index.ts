@@ -2,7 +2,6 @@ import global from "../../assets/icons/profile-icons/global.png";
 import InfoCircle from "../../assets/icons/profile-icons/InfoCircle.png";
 import location from "../../assets/icons/profile-icons/location.png";
 import lockPass from "../../assets/icons/profile-icons/lock.png";
-import moon from "../../assets/icons/profile-icons/moon.png";
 import notification from "../../assets/icons/profile-icons/notification.png";
 import profileInfo from "../../assets/icons/profile-icons/profile.png";
 import wallet from "../../assets/icons/profile-icons/wallet-2.png";
@@ -114,7 +113,7 @@ export const personalInfoPage = {
     gender: "Gender",
     mobileNo: "Mobile Number",
     email: "Email",
-    icon: calindar
+    icon: calindar,
   },
   ar: {
     fullName: "الاسم",
@@ -122,6 +121,25 @@ export const personalInfoPage = {
     gender: "الجنس",
     mobileNo: "رقم الجوال",
     email: "البريد الإلكتروني",
-    icon: calindar
+    icon: calindar,
+  },
+};
+
+export const address = {
+  en: {
+    country: "Country",
+    region: "Region",
+    city: "City",
+    district: "District",
+    street: "Street",
+    building: "Building Number"
+  },
+  ar: {
+    country: "الدولة",
+    region: "المنطقة",
+    city: "المدينة",
+    district: "اسم الحي",
+    street: "اسم الشارع",
+    building: "رقم المبنى"
   },
 };

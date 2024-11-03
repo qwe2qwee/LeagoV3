@@ -150,5 +150,4 @@ declare interface TouchableFeildWithIconProps {
 declare interface InfoBoxWithTitleProps {
   title: string;
   info: srting;
-  icon? : any
 }

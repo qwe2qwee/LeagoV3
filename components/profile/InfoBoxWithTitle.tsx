@@ -1,8 +1,8 @@
 import { View, Text, Image, TouchableOpacity, Modal } from "react-native";
-import React, { useState } from "react";
+import React from "react";
 import { InfoBoxWithTitleProps } from "@/types/type";
 
-const InfoBoxWithTitle = ({ title, info, icon }: InfoBoxWithTitleProps) => {
+const InfoBoxWithTitle = ({ title, info}: InfoBoxWithTitleProps) => {
   
   return (
     <View className="justify-center items-end p-6 pb-0">
