@@ -464,43 +464,53 @@ export async function signOut(): Promise<void> {
 
 // Function to upload a file to Appwrite's storage
 // Function to upload a file
+// Function to upload a file to Appwrite storage
+
+// Define a type for the file object
+interface FileAsset {
+  uri: string;
+  mimeType: string;
+  name: string;
+  type?: string; // Additional field to pass to the asset
+}
+
 export async function uploadFile(
-  file: FileUpload,
+  file: FileAsset | null,
   type: string
 ): Promise<string | undefined> {
   if (!file) return;
 
-  // Prepare the file asset with MIME type
-  const asset = { type: file.mimeType, ...file };
+  const asset = { ...file, type: file.mimeType };
 
   try {
-    const storage = new Storage(); // Create Storage instance
-    const uploadedFile: UploadedFileResponse = await storage.createFile(
+    // Upload file to Appwrite
+    const uploadedFile = await storage.createFile(
       appwriteConfig.storageIdDocs as string,
       ID.unique(),
-      asset
+      asset as any
     );
 
-    // Retrieve and return the file preview URL
-    return await getFilePreview(uploadedFile.$id);
+    return await getFilePreview(uploadedFile.$id, type);
   } catch (error) {
     console.error("Failed to upload file:", error);
-    throw new Error("Unable to upload file. Please try again.");
+    throw error;
   }
 }
 
 // Function to get a file preview URL from storage
-export async function getFilePreview(fileId: string): Promise<string> {
+export async function getFilePreview(
+  fileId: string,
+  type: string
+): Promise<webkitURL> {
   try {
-    const storage = new Storage();
-    const fileUrl = await storage.getFilePreview(
+    const fileUrl = storage.getFilePreview(
       appwriteConfig.storageIdDocs as string,
       fileId
     );
-    return fileUrl; // Ensure this returns a string URL
+    return fileUrl;
   } catch (error) {
     console.error("Failed to get file preview:", error);
-    throw new Error("Unable to retrieve file preview. Please try again.");
+    throw error;
   }
 }
 
@@ -536,6 +546,21 @@ export async function createUserDocs(
     throw new Error(
       "Unable to upload documents. Please check the file formats."
     );
+  }
+}
+
+// Function to fetch user's documents from Appwrite storage
+export async function fetchUsersDocs(userId: string): Promise<any> {
+  try {
+    const response = await databases.getDocument(
+      appwriteConfig.databaseId as string,
+      appwriteConfig.userdocs as string,
+      userId
+    );
+    return response.documents[0];
+  } catch (error) {
+    console.error("Failed to fetch user documents:", error);
+    throw error;
   }
 }
 

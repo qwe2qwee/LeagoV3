@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Image, Pressable, ScrollView } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import CustomButton from "@/components/ui/CustomButton";
-import { icons } from "@/constants";
+import { getColorHashCode, icons } from "@/constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const CarDetailsPage = () => {
@@ -54,6 +54,8 @@ const CarDetailsPage = () => {
     ? parseJSON(carImages)[0]
     : carImage;
 
+  let color = getColorHashCode(parsedCarDetails?.color);
+
   return (
     <SafeAreaView className="bg-white flex-1">
       <ScrollView>
@@ -96,7 +98,9 @@ const CarDetailsPage = () => {
         <View className="p-3">
           {/* Car Details Header */}
           <View className="flex-row justify-between mt-4">
-            <Text className="text-2xl font-bold">{carName}</Text>
+            <Text className="text-2xl font-bold">
+              {parsedCarDetails.name[language]}
+            </Text>
             <Text className="text-xl text-black">
               ${parsedRentSalary?.daily?.price || "N/A"}/day
             </Text>
@@ -114,7 +118,10 @@ const CarDetailsPage = () => {
 
             <Text className="text-sm text-[#9CA4AB] mt-2">
               {parsedCarDetails?.year || "N/A"} -{" "}
-              {parsedCarDetails?.color || "N/A"}
+              <View
+                className="w-5 h-2 rounded-full border-[1px] border-gray-300 "
+                style={{ backgroundColor: color }}
+              ></View>
             </Text>
           </View>
           <View className="flex-col items-start my-3">

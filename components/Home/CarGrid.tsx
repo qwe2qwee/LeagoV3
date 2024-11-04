@@ -12,6 +12,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { parseCarLocation, parseDetails, listCars } from "@/lib/appwrite/apit";
 import { CarDocument } from "@/types/AppwriteTypes";
 import { router } from "expo-router";
+import { getColorHashCode } from "@/constants";
 
 interface CarGridProps {
   selectedBrand: string | null;
@@ -101,6 +102,8 @@ const CarGrid: React.FC<CarGridProps> = ({
 
     const carInfo = carDetails[0];
 
+    let color = getColorHashCode(carInfo.color);
+
     return (
       <TouchableOpacity
         activeOpacity={0.7}
@@ -130,9 +133,19 @@ const CarGrid: React.FC<CarGridProps> = ({
           style={styles.carImage}
           resizeMode="contain"
         />
-        <View>
-          <Text style={styles.carBrand}>{item.brand}</Text>
-          <Text style={styles.carColor}>{carInfo.color}</Text>
+        <View
+          style={{
+            display: "flex",
+            direction: language === "ar" ? "rtl" : "ltr", // Sets text direction
+            justifyContent: "space-between", // Example flex property
+            alignItems: language === "ar" ? "flex-end" : "flex-start", // Example flex property
+          }}
+        >
+          <Text style={styles.carBrand}>{carInfo.name[language]}</Text>
+          <View
+            style={{ backgroundColor: color }}
+            className={`  w-2 h-2 rounded-full  border-[1px]`}
+          ></View>
           <Text style={styles.carPrice}>
             {carInfo.rentType?.monthly?.price}
           </Text>

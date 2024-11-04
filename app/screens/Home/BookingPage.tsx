@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Pressable, Alert, Platform } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  Alert,
+  Platform,
+  StyleSheet,
+} from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import CustomButton from "@/components/ui/CustomButton";
@@ -179,6 +186,7 @@ const BookingPage: React.FC = () => {
           mode="date"
           display={Platform.OS === "ios" ? "inline" : "default"}
           minimumDate={today}
+          style={styles.picker}
           onChange={(event, date) => {
             setShowDatePicker(null);
             if (date) {
@@ -212,3 +220,22 @@ const BookingPage: React.FC = () => {
 };
 
 export default BookingPage;
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+    backgroundColor: "#000", // Customize background color
+    borderRadius: 10,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#1F2937", // Customize label color
+    marginBottom: 10,
+  },
+  picker: {
+    backgroundColor: "#000", // Customize picker background color
+    borderRadius: 10,
+    padding: 10,
+  },
+});

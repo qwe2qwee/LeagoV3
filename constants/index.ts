@@ -85,6 +85,44 @@ export const icons = {
   to,
 };
 
+// Define the Colors object and its type
+export const Colors = {
+  RED: "#FF0000",
+  BLUE: "#0000FF",
+  GREEN: "#008000",
+  YELLOW: "#FFFF00",
+  ORANGE: "#FFA500",
+  PURPLE: "#800080",
+  PINK: "#FFC0CB",
+  BROWN: "#A52A2A",
+  BLACK: "#000000",
+  WHITE: "#FFFFFF",
+  GRAY: "#808080",
+  CYAN: "#00FFFF",
+  MAGENTA: "#FF00FF",
+  LIME: "#00FF00",
+  NAVY: "#000080",
+  TEAL: "#008080",
+  OLIVE: "#808000",
+  MAROON: "#800000",
+  SILVER: "#C0C0C0",
+  GOLD: "#FFD700",
+} as const;
+
+type ColorName = keyof typeof Colors;
+
+export function getColorHashCode(colorName: string): string {
+  // Convert the color name to uppercase
+  const colorNameUpperCase = colorName.toUpperCase() as ColorName;
+
+  // Check if the color name exists in the Colors object
+  if (colorNameUpperCase in Colors) {
+    return Colors[colorNameUpperCase];
+  } else {
+    return "Color not found";
+  }
+}
+
 export const onboarding = [
   {
     id: 1,

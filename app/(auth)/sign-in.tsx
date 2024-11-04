@@ -18,12 +18,14 @@ import OAuth from "@/components/Auth/OAuth";
 import { Link, router } from "expo-router";
 import LeagoMark from "@/components/Auth/LeagoMark";
 import { signIn } from "@/lib/appwrite/apit";
+import useAuthStore from "@/store/useAuthStore";
 
 // Define a type for the language
 type Language = "en" | "ar";
 
 const signUp = () => {
   const [language, setLanguage] = useState<Language>("ar"); // Simulating language toggle
+  const { user, getCurrentUser, loading, error } = useAuthStore();
 
   const t = translationsLogin[language]; // Choose the right translation
 
@@ -47,6 +49,7 @@ const signUp = () => {
     try {
       await signIn(form.email, form.password, language);
       // Handle successful sign-in if needed
+      await getCurrentUser();
       router.replace("/(root)/(tabs)/Home");
     } catch (error) {
       if (error instanceof Error) {

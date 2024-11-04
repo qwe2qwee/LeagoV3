@@ -20,6 +20,24 @@ export interface AppwriteUser extends AppwriteDocument {
   details: string;
 }
 
+export interface AppwriteUserParse extends AppwriteDocument {
+  email: string;
+  userName: string;
+  phoneNumber: string;
+  details: UserDetails;
+}
+
+// types/UserDetails.ts
+export interface UserDetails {
+  name: string;
+  birthday: string;
+  gender: "male" | "female" | "other";
+  address: string;
+  // Additional fields can be added here, such as:
+  // phone: string;
+  // email: string;
+}
+
 // Interface for the Appwrite Account object
 export interface AppwriteAccount extends Models.User<Models.Preferences> {
   $id: string;
@@ -95,6 +113,7 @@ export type CarDetails = {
   mileage: string;
   year: string;
   color: string;
+  name: any;
   rentType: RentType;
 };
 
