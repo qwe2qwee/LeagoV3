@@ -688,3 +688,25 @@ export const createCarDocument = async (carData: CarDataProps) => {
     throw error;
   }
 };
+
+// To keep signed in
+
+export const getCurrentUser = async () => {
+  try {
+    const currentAccount = await account.get();
+
+    if (!currentAccount) throw Error;
+
+    const currentUser = await databases.listDocuments(
+      appwriteConfig.databaseId as string,
+      appwriteConfig.usersCollectionId as string,
+      [Query.equal("account", currentAccount.$id)]
+    );
+
+    if (!currentUser) throw Error;
+
+    return currentUser.documents[0];
+  } catch (error) {
+    console.log(error)
+  }
+}

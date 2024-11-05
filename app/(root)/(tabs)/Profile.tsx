@@ -32,7 +32,7 @@ const profile = () => {
           <TouchableFeildWithIcon
             icon={fieldTranslator.address.icon}
             title={fieldTranslator.address.title}
-            pathName="/(root)/Home"
+            pathName="/screens/profilePage/Address"
           />
         </View>
       </View>
