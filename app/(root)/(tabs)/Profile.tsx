@@ -27,7 +27,7 @@ const profile = () => {
           <TouchableFeildWithIcon
             icon={fieldTranslator.documents.icon}
             title={fieldTranslator.documents.title}
-            pathName="/screens/profilePage/Documents"
+            pathName="/screens/Auth/SelectUsersDocs"
           />
           <TouchableFeildWithIcon
             icon={fieldTranslator.address.icon}

@@ -41,7 +41,7 @@ const useAuthStore = create<AuthState>((set) => ({
   user: null,
   loading: false,
   error: null,
-  language: "en",
+  language: "ar",
   latitude: null,
   longitude: null,
 

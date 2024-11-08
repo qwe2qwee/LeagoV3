@@ -1,4 +1,4 @@
-import { TouchableOpacity, Text } from "react-native";
+import { TouchableOpacity, Text, ActivityIndicator } from "react-native";
 
 import { ButtonProps } from "@/types/type";
 
@@ -41,21 +41,30 @@ const CustomButton = ({
   IconRight,
   className,
   textStyle,
+  loading = false, // Add the loading prop with a default value of false
   ...props
 }: ButtonProps) => {
   return (
     <TouchableOpacity
       onPress={onPress}
-      className={`w-full rounded-xl p-3 flex flex-row justify-center items-center shadow-md shadow-neutral-400/70 ${getBgVariantStyle(bgVariant)} ${className}`}
+      className={`w-full rounded-xl p-3 flex flex-row justify-center items-center shadow-md shadow-neutral-400/70 ${getBgVariantStyle(bgVariant)} ${className} ${loading == true ? "h-14" : ""}
+      `}
+      disabled={loading} // Disable the button while loading
       {...props}
     >
-      {IconLeft && <IconLeft />}
-      <Text
-        className={`text-lg font-bold ${getTextVariantStyle(textVariant)} ${textStyle}`}
-      >
-        {title}
-      </Text>
-      {IconRight && <IconRight />}
+      {loading ? (
+        <ActivityIndicator size="small" color="#fff" /> // Show loading indicator
+      ) : (
+        <>
+          {IconLeft && <IconLeft />}
+          <Text
+            className={`text-lg font-bold ${getTextVariantStyle(textVariant)} ${textStyle}`}
+          >
+            {title}
+          </Text>
+          {IconRight && <IconRight />}
+        </>
+      )}
     </TouchableOpacity>
   );
 };

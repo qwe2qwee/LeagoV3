@@ -1,21 +1,13 @@
 import {
   AppwriteAccount,
-  AppwriteDocument,
   AppwriteUser,
   CarDataProps,
   CarDocument,
-  FileUpload,
   PhoneTokenResponse,
   SessionResponse,
-  UploadedFileResponse,
-  UserDocsForm,
-  UserDocument,
-  UserDocumentData,
 } from "@/types/AppwriteTypes";
 import { ID, Query } from "react-native-appwrite";
 import { account, appwriteConfig, avatars, databases, storage } from "./config";
-import { ParsedDetail, ParsedRentDetail } from "@/types/type";
-// Import necessary types from appwriteTypes
 
 // Error localization definition for English and Arabic
 type ErrorMessages = {
@@ -467,88 +459,78 @@ export async function signOut(): Promise<void> {
 // Function to upload a file to Appwrite storage
 
 // Define a type for the file object
-interface FileAsset {
-  uri: string;
-  mimeType: string;
-  name: string;
-  type?: string; // Additional field to pass to the asset
-}
+// Define types for the file and function parameters
+// Define the type for DocumentPicker file result
+// Define the type for DocumentPicker file result
 
+// Upload File
 export async function uploadFile(
-  file: FileAsset | null,
+  file: { name: string; mimeType: string; size: number; uri: string },
   type: string
 ): Promise<string | undefined> {
   if (!file) return;
 
-  const asset = { ...file, type: file.mimeType };
+  // Asset distribution based on the solution you found
+  const asset = {
+    name: file.name,
+    type: file.mimeType,
+    size: file.size,
+    uri: file.uri,
+  };
 
   try {
+    // Convert URI to a File-like object
     // Upload file to Appwrite
     const uploadedFile = await storage.createFile(
-      appwriteConfig.storageIdDocs as string,
-      ID.unique(),
-      asset as any
+      appwriteConfig.storageIdDocs as string, // Replace with your Appwrite bucket ID
+      ID.unique(), // Generate a unique file ID
+      asset // Directly passing the file data
     );
 
-    return await getFilePreview(uploadedFile.$id, type);
+    // Get file preview URL (assuming getFilePreview is a helper function)
+    const fileUrl = await getFilePreview(uploadedFile.$id, type);
+    return fileUrl;
   } catch (error) {
-    console.error("Failed to upload file:", error);
-    throw error;
+    throw new Error(`File upload error: ${error}`);
   }
 }
 
-// Function to get a file preview URL from storage
+// Function to get a preview URL for the uploaded file
 export async function getFilePreview(
   fileId: string,
   type: string
-): Promise<webkitURL> {
+): Promise<string> {
   try {
-    const fileUrl = storage.getFilePreview(
-      appwriteConfig.storageIdDocs as string,
-      fileId
-    );
-    return fileUrl;
+    let fileUrl: webkitURL;
+
+    if (type === "video") {
+      fileUrl = storage.getFileView(
+        appwriteConfig.storageIdDocs as string,
+        fileId
+      );
+    } else if (type === "image") {
+      fileUrl = storage.getFilePreview(
+        appwriteConfig.storageIdDocs as string,
+        fileId,
+        2000,
+        2000,
+        "top" as any,
+        100
+      );
+    } else {
+      throw new Error("Invalid file type");
+    }
+
+    if (!fileUrl) throw new Error("Failed to generate file preview URL");
+
+    return fileUrl as any;
   } catch (error) {
     console.error("Failed to get file preview:", error);
-    throw error;
-  }
-}
-
-// Example function for creating a user document in the database with specific data
-export async function createUserDocs(
-  form: UserDocsForm,
-  userId: string
-): Promise<UserDocument> {
-  try {
-    const [licenseUrl, identityUrl] = await Promise.all([
-      uploadFile(form.License, "image"),
-      uploadFile(form.Identity, "image"),
-    ]);
-
-    // Create document data object
-    const documentData: UserDocumentData = {
-      identity: identityUrl || undefined, // Use `||` to ensure proper handling
-      license: licenseUrl || undefined,
-      creatorId: userId,
-    };
-
-    // Save the document data in the database
-    const docs = await databases.createDocument<UserDocument>(
-      appwriteConfig.databaseId as string,
-      appwriteConfig.userdocs as string,
-      ID.unique(),
-      documentData
-    );
-
-    return docs;
-  } catch (error) {
-    console.error("Failed to create user documents:", error);
     throw new Error(
-      "Unable to upload documents. Please check the file formats."
+      `Failed to get file preview: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 }
-
 // Function to fetch user's documents from Appwrite storage
 export async function fetchUsersDocs(userId: string): Promise<any> {
   try {
@@ -619,7 +601,7 @@ export function parseDetails(details: any) {
 
   try {
     return details.flatMap((detail) => {
-      console.log("Processing detail:", detail);
+      // console.log("Processing detail:", detail);
 
       const { name, image, rentType, color, mileage, year } = detail;
 
@@ -707,6 +689,6 @@ export const getCurrentUser = async () => {
 
     return currentUser.documents[0];
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-}
+};
