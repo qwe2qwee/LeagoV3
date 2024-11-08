@@ -5,9 +5,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AdCardSection from "@/components/Home/AdCardSection";
 import CarFilter from "@/components/Home/CarFilter";
 import CarGrid from "@/components/Home/CarGrid";
+import useAuthStore from "@/store/useAuthStore";
 
 const Home: React.FC = () => {
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
+  const { language, user } = useAuthStore();
 
   return (
     <SafeAreaView className="flex-1 rt bg-gray-100">
@@ -27,7 +29,7 @@ const Home: React.FC = () => {
         <CarGrid
           userLocation={{ lat: 21.608616, lon: -320.815205 }}
           selectedBrand={selectedBrand}
-          language="ar"
+          language={language}
         />
       </ScrollView>
     </SafeAreaView>
