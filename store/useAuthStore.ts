@@ -181,7 +181,7 @@ const useAuthStore = create<AuthState>((set) => ({
       );
 
       // Update the state with the new details
-      set({ user: { ...user, details } });
+      set({ user: { ...user, details } } as any);
     } catch (error) {
       const errorMessage = (error as Error).message;
       console.error("Error updating user details:", errorMessage);
