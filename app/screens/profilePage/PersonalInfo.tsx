@@ -31,7 +31,8 @@ const PersonalInfo = () => {
     console.log(date);
   };
   const handleOnPress = () => {
-    setOpen(!open);
+    // setOpen(!open);
+    console.log(user)
   };
 
   return (
@@ -82,11 +83,11 @@ const PersonalInfo = () => {
       </View>
       <InfoBoxWithTitle
         title={personalInfoPageTranslator.mobileNo}
-        info={"+966544463389"}
+        info={user?.phoneNumber}
       />
       <InfoBoxWithTitle
         title={personalInfoPageTranslator.email}
-        info={"ahmed.huyu@gmail.com"}
+        info={user?.email}
       />
     </SafeAreaView>
   );

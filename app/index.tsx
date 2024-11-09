@@ -45,10 +45,13 @@ const Home = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 items-center justify-center bg-white">
+    <SafeAreaView className="flex-1 items-center justify-center bg-white gap-6">
       <Text>{user?.email}</Text>
       <TouchableOpacity onPress={() => router.push("/")}>
         <Text>Home</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => router.push("/sign-in" as any)}>
+        <Text>sign in</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
