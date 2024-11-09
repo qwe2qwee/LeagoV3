@@ -26,7 +26,6 @@ const profile = () => {
         <View className="items-center justify-center h-full w-full gap-6">
           {user && (
             <>
-              {" "}
               <View className="itmes-center justify-center">
                 <Text className="text-sm pr-10 py-2.5 font-ZainBold">
                   {SecTranslator.account}
