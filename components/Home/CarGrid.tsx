@@ -9,14 +9,23 @@ import {
   StyleSheet,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { parseCarLocation, parseDetails, listCars } from "@/lib/appwrite/apit";
+import {
+  parseCarLocation,
+  parseDetails,
+  listCars,
+  likeCar,
+  hasUserLikedCar,
+} from "@/lib/appwrite/apit";
 import { CarDocument } from "@/types/AppwriteTypes";
 import { router } from "expo-router";
 import { getColorHashCode } from "@/constants";
+import useAuthStore from "@/store/useAuthStore";
+
+const defaultLocation = { lat: 21.543333, lon: 39.172778 }; // Coordinates for Jeddah, SA
 
 interface CarGridProps {
   selectedBrand: string | null;
-  userLocation: { lat: number; lon: number };
+  userLocation: { lat: number | null; lon: number | null };
   language: "en" | "ar";
 }
 
@@ -36,11 +45,16 @@ const translations = {
 };
 
 const calculateDistance = (
-  loc1: { lat: number; lon: number },
+  loc1: { lat: number | null; lon: number | null },
   loc2: { lat: number; lon: number }
 ): number => {
+  const safeLoc1 = {
+    lat: loc1.lat ?? defaultLocation.lat,
+    lon: loc1.lon ?? defaultLocation.lon,
+  };
+
   return Math.sqrt(
-    Math.pow(loc2.lat - loc1.lat, 2) + Math.pow(loc2.lon - loc1.lon, 2)
+    Math.pow(loc2.lat - safeLoc1.lat, 2) + Math.pow(loc2.lon - safeLoc1.lon, 2)
   );
 };
 
@@ -53,13 +67,14 @@ const CarGrid: React.FC<CarGridProps> = ({
   const [likedCars, setLikedCars] = useState<string[]>([]);
   const screenWidth = Dimensions.get("window").width;
   const { city, year, noCarsAvailable } = translations[language];
+  const { user } = useAuthStore();
 
   useEffect(() => {
     const fetchAndFilterCars = async () => {
       try {
         const cars = await listCars();
-
         let filteredList = cars.filter((car: any) => !car.isHidden);
+
         if (selectedBrand) {
           filteredList = filteredList.filter(
             (car: any) => car.brand === selectedBrand
@@ -67,9 +82,8 @@ const CarGrid: React.FC<CarGridProps> = ({
         }
 
         filteredList.sort((a: any, b: any) => {
-          const carLocationA = parseCarLocation(JSON.stringify(a.carLocation));
+          const carLocationA = parseCarLocation(a.carLocation);
           const carLocationB = parseCarLocation(b.carLocation);
-
           if (!carLocationA || !carLocationB) return 0;
 
           const distanceA = calculateDistance(userLocation, carLocationA);
@@ -78,15 +92,24 @@ const CarGrid: React.FC<CarGridProps> = ({
         });
 
         setFilteredCars(filteredList);
+
+        // Check liked status for each car
+        const likedStatusPromises = filteredList.map(async (car: any) => {
+          const liked = await hasUserLikedCar(user?.$id, car.$id);
+          return liked ? car.$id : null;
+        });
+        const likedResults = await Promise.all(likedStatusPromises);
+        setLikedCars(likedResults.filter((id) => id !== null) as string[]);
       } catch (error) {
         console.error("Failed to fetch cars:", error);
       }
     };
 
     fetchAndFilterCars();
-  }, [selectedBrand, userLocation]);
+  }, [selectedBrand, userLocation, user?.$id]);
 
-  const toggleLike = (carId: string) => {
+  const toggleLike = async (carId: string) => {
+    await likeCar(user?.$id as any, carId);
     setLikedCars((prev) =>
       prev.includes(carId)
         ? prev.filter((id) => id !== carId)
@@ -101,7 +124,6 @@ const CarGrid: React.FC<CarGridProps> = ({
     if (!carDetails || carDetails.length === 0) return null;
 
     const carInfo = carDetails[0];
-
     let color = getColorHashCode(carInfo.color);
 
     return (
@@ -136,15 +158,15 @@ const CarGrid: React.FC<CarGridProps> = ({
         <View
           style={{
             display: "flex",
-            direction: language === "ar" ? "rtl" : "ltr", // Sets text direction
-            justifyContent: "space-between", // Example flex property
-            alignItems: language === "ar" ? "flex-end" : "flex-start", // Example flex property
+            direction: language === "ar" ? "rtl" : "ltr",
+            justifyContent: "space-between",
+            alignItems: language === "ar" ? "flex-end" : "flex-start",
           }}
         >
           <Text style={styles.carBrand}>{carInfo.name[language]}</Text>
           <View
             style={{ backgroundColor: color }}
-            className={`  w-2 h-2 rounded-full  border-[1px]`}
+            className={`w-2 h-2 rounded-full border-[1px]`}
           ></View>
           <Text style={styles.carPrice}>
             {carInfo.rentType?.monthly?.price}
