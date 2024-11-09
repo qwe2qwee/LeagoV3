@@ -5,6 +5,7 @@ import { router } from "expo-router";
 import Swiper from "react-native-swiper";
 import { buttonTitles, onboarding } from "@/constants";
 import CustomButton from "@/components/ui/CustomButton";
+import useAuthStore from "@/store/useAuthStore";
 
 // Define a type for the language
 type Language = "en" | "ar";
@@ -13,7 +14,7 @@ const Onboarding: React.FC = () => {
   const swiperRef = useRef<Swiper>(null);
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const isLastSlide = activeIndex === onboarding.length - 1;
-  const language: Language = "ar"; // You can change this value based on user preference
+  const { language, user } = useAuthStore();
 
   return (
     <SafeAreaView className="flex h-full items-center justify-between bg-white">

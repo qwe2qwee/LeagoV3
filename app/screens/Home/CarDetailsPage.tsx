@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import CustomButton from "@/components/ui/CustomButton";
 import { getColorHashCode, icons } from "@/constants";
 import { SafeAreaView } from "react-native-safe-area-context";
+import useAuthStore from "@/store/useAuthStore";
 
 const CarDetailsPage = () => {
   const {
@@ -17,7 +18,7 @@ const CarDetailsPage = () => {
   } = useLocalSearchParams();
   const router = useRouter();
   let bookingTime = "Today , 01:00 PM - 02:00 PM ";
-  const [language, setLanguage] = useState<"en" | "ar">("ar");
+  const { language, user } = useAuthStore();
 
   const translations = {
     en: {

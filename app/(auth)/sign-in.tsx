@@ -24,8 +24,7 @@ import useAuthStore from "@/store/useAuthStore";
 type Language = "en" | "ar";
 
 const signUp = () => {
-  const [language, setLanguage] = useState<Language>("ar"); // Simulating language toggle
-  const { user, getCurrentUser, loading, error } = useAuthStore();
+  const { user, getCurrentUser, loading, error, language } = useAuthStore();
 
   const t = translationsLogin[language]; // Choose the right translation
 

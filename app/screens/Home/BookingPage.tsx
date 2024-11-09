@@ -12,11 +12,25 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import CustomButton from "@/components/ui/CustomButton";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { bookingPage } from "@/constants";
+import useAuthStore from "@/store/useAuthStore";
 
 const BookingPage: React.FC = () => {
-  const [language, setLanguage] = useState<"en" | "ar">("en");
+  const { language, user } = useAuthStore();
   const router = useRouter();
   const { carId, carRentSalary } = useLocalSearchParams();
+
+  const translations: any = {
+    en: {
+      daily: "Daily",
+      weekly: "Weekly",
+      monthly: "Monthly",
+    },
+    ar: {
+      daily: "يومي",
+      weekly: "أسبوعي",
+      monthly: "شهري",
+    },
+  };
 
   const parsedCarRentSalary =
     typeof carRentSalary === "string"
@@ -103,9 +117,9 @@ const BookingPage: React.FC = () => {
         >
           {bookingPage[language].bookingDetails}
         </Text>
-        <Pressable onPress={() => setLanguage(language === "en" ? "ar" : "en")}>
+        {/* <Pressable onPress={() => setLanguage(language === "en" ? "ar" : "en")}>
           <Text>{language === "en" ? "AR" : "EN"}</Text>
-        </Pressable>
+        </Pressable> */}
       </View>
 
       <Text
@@ -128,9 +142,9 @@ const BookingPage: React.FC = () => {
             <Text
               className={`${
                 rentalPeriod === period ? "text-white" : "text-textColor-600"
-              } ${!parsedCarRentSalary[period]?.availability ? "text-white" : ""} `}
+              } ${!parsedCarRentSalary[period]?.availability ? "text-white" : ""}`}
             >
-              {period.charAt(0).toUpperCase() + period.slice(1)}
+              {translations[language][period]}
             </Text>
           </Pressable>
         ))}

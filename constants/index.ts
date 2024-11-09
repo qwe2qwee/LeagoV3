@@ -28,6 +28,11 @@ import backHome from "../assets/icons/backHome.png";
 import hyundai from "../assets/icons/hyundai1.png";
 import HeartD from "../assets/icons/HeartD.png";
 import Time from "../assets/icons/Time.png";
+import docsImage from "../assets/icons/docsImage.png";
+import support from "../assets/icons/support.png";
+
+import camera from "../assets/icons/camera.png";
+import Illustration from "../assets/icons/Illustration.png";
 
 //Images
 
@@ -58,11 +63,15 @@ export const icons = {
   backArrow,
   bills,
   hyundai,
+  camera,
   people,
+  Illustration,
   checkmark,
   phone,
   Time,
+  support,
   close,
+  docsImage,
   dollar,
   email,
   eyecross,
@@ -175,6 +184,47 @@ export const onboarding = [
     image: {
       en: images.onboarding3, // English image variant
       ar: images.onboarding3, // Arabic image variant
+    },
+  },
+];
+
+export const onboardingDocs = [
+  {
+    id: 1,
+    skip: {
+      en: "Next",
+      ar: "التالي",
+    },
+    title: {
+      en: "Upload Your Identity",
+      ar: "تحميل وثيقة هويتك",
+    },
+    description: {
+      en: "For secure rentals, upload a clear photo of your ID or driver’s license. This step ensures your profile is verified and ready to start renting cars.",
+      ar: "للحصول على تأجير آمن، قم بتحميل صورة واضحة لهويتك أو رخصة قيادتك. تضمن هذه الخطوة التحقق من ملفك الشخصي ليكون جاهزًا لاستئجار السيارات.",
+    },
+    selectUsersDocument: {
+      en: "Select Identity",
+      ar: " اختر هويتك",
+    },
+  },
+  {
+    id: 2,
+    skip: {
+      en: "Upload",
+      ar: "تحميل",
+    },
+    title: {
+      en: "Upload Your License",
+      ar: "تحميل وثيقة رخصتك",
+    },
+    description: {
+      en: "To ensure compliance and safety, please select the type of license you hold. This helps us match you with vehicles that suit your license qualifications.",
+      ar: "لضمان الامتثال والسلامة، يرجى اختيار نوع الرخصة التي تحملها. سيساعدنا ذلك على مطابقتك مع السيارات المناسبة لمؤهلات رخصتك.",
+    },
+    selectUsersDocument: {
+      en: "Select License",
+      ar: " اختر رخصتك",
     },
   },
 ];

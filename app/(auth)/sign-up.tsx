@@ -27,11 +27,12 @@ import {
 } from "@/lib/appwrite/apit";
 import { UpdatePhoneNumberAndSendOTP } from "@/lib/UpdatePhoneNumberAndSendOTP";
 import OTPComponent from "@/components/Auth/OTPComponent";
+import useAuthStore from "@/store/useAuthStore";
 
 type Language = "en" | "ar";
 
 const signUp = () => {
-  const [language, setLanguage] = useState<Language>("ar");
+  const { language, user } = useAuthStore();
   const t = translationsignUp[language];
 
   const [form, setForm] = useState({

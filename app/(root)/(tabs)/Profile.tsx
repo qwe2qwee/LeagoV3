@@ -4,11 +4,10 @@ import { router } from "expo-router";
 import { profilePage, profileSections } from "@/constants/profilePage";
 import TouchableFeildWithIcon from "@/components/Profile/TouchableFeildWithIcon";
 import { Platform } from "react-native";
-
-type Language = "en" | "ar";
+import useAuthStore from "@/store/useAuthStore";
 
 const profile = () => {
-  const [language, setLanguage] = useState<Language>("ar");
+  const { language } = useAuthStore();
   const fieldTranslator = profilePage[language];
   const SecTranslator = profileSections[language];
 
@@ -27,7 +26,7 @@ const profile = () => {
           <TouchableFeildWithIcon
             icon={fieldTranslator.documents.icon}
             title={fieldTranslator.documents.title}
-            pathName="/screens/profilePage/Documents"
+            pathName="/screens/Auth/SelectUsersDocs"
           />
           <TouchableFeildWithIcon
             icon={fieldTranslator.address.icon}
