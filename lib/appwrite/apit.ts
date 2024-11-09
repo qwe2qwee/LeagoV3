@@ -692,10 +692,16 @@ export const getCurrentUser = async () => {
     console.log(error);
   }
 };
+// This function allows a user to remove their like by deleting the corresponding document in the "Likes" collection
+export async function likeCar(
+  userId: string | null | undefined,
+  carId: string | null | undefined
+) {
+  if (!userId || !carId) {
+    console.error("Invalid input: userId and carId are required.");
+    return;
+  }
 
-//This function allows a user to remove their like by deleting the corresponding document in the "Likes" collection
-
-export async function likeCar(userId: string, carId: string) {
   try {
     // Check if the like already exists
     const existingLikes = await databases.listDocuments(
@@ -705,7 +711,7 @@ export async function likeCar(userId: string, carId: string) {
     );
 
     if (existingLikes.total > 0) {
-      console.log("now you delete the car like.");
+      console.log("Now you delete the car like.");
       await unlikeCar(userId, carId);
       return; // Car is already liked by the user
     }
@@ -729,8 +735,15 @@ export async function likeCar(userId: string, carId: string) {
 }
 
 // This function checks if a specific user has liked a particular car.
+export async function hasUserLikedCar(
+  userId: string | null | undefined,
+  carId: string | null | undefined
+) {
+  if (!userId || !carId) {
+    console.error("Invalid input: userId and carId are required.");
+    return false;
+  }
 
-export async function hasUserLikedCar(userId: string, carId: string) {
   try {
     const likes = await databases.listDocuments(
       appwriteConfig.databaseId as string,
@@ -745,7 +758,13 @@ export async function hasUserLikedCar(userId: string, carId: string) {
   }
 }
 
-export async function getCarLikesCount(carId: string) {
+// This function fetches the total number of likes for a specific car.
+export async function getCarLikesCount(carId: string | null | undefined) {
+  if (!carId) {
+    console.error("Invalid input: carId is required.");
+    return 0;
+  }
+
   try {
     const likes = await databases.listDocuments(
       appwriteConfig.databaseId as string,
@@ -761,7 +780,16 @@ export async function getCarLikesCount(carId: string) {
   }
 }
 
-async function unlikeCar(userId: string, carId: string) {
+// This function allows a user to remove their like by deleting the corresponding document in the "Likes" collection
+async function unlikeCar(
+  userId: string | null | undefined,
+  carId: string | null | undefined
+) {
+  if (!userId || !carId) {
+    console.error("Invalid input: userId and carId are required.");
+    return;
+  }
+
   try {
     // Find the like document
     const likes = await databases.listDocuments(

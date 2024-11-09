@@ -14,11 +14,15 @@ export const profileSections = {
     account: "Account",
     security: "Security",
     general: "General",
+    buttonT: "Logout",
+    usernull: "logIn",
   },
   ar: {
     account: "إدارة الحساب",
     security: "الأمان",
     general: "عام",
+    buttonT: "تسجيل الخروج",
+    usernull: "سجل الدخول",
   },
 };
 
@@ -132,7 +136,7 @@ export const address = {
     city: "City",
     district: "District",
     street: "Street",
-    building: "Building Number"
+    building: "Building Number",
   },
   ar: {
     country: "الدولة",
@@ -140,6 +144,6 @@ export const address = {
     city: "المدينة",
     district: "اسم الحي",
     street: "اسم الشارع",
-    building: "رقم المبنى"
+    building: "رقم المبنى",
   },
 };
