@@ -6,6 +6,7 @@ import InfoBoxWithTitle from "@/components/Profile/InfoBoxWithTitle";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Modal from "react-native-modal";
  import dayjs from "dayjs";
+import useAuthStore from "@/store/useAuthStore";
 
 type Language = "en" | "ar";
 type DateType = any; // Adjust according to the actual type if you know it, or use 'any' for flexibility
@@ -13,6 +14,8 @@ const PersonalInfo = () => {
   const [language, setLanguage] = useState<Language>("ar");
   const pageTitleTranslator = pageTitle[language];
   const personalInfoPageTranslator = personalInfoPage[language];
+
+  const { user } = useAuthStore()
 
   const [open, setOpen] = useState(false);
   // const [date, setDate] = useState("351654");
@@ -30,7 +33,8 @@ const PersonalInfo = () => {
     console.log(date);
   };
   const handleOnPress = () => {
-    setOpen(!open);
+    // setOpen(!open);
+    console.log(user)
   };
 
   return (
@@ -42,7 +46,7 @@ const PersonalInfo = () => {
       </Text>
       <InfoBoxWithTitle
         title={personalInfoPageTranslator.fullName}
-        info={"أحمد حسين يونس"}
+        info={user?.userName}
       />
       <View className="justify-center items-end p-6 pb-0">
         <Text className="text-right font-ZainBold text-[#78828A]">
@@ -79,11 +83,11 @@ const PersonalInfo = () => {
       </View>
       <InfoBoxWithTitle
         title={personalInfoPageTranslator.mobileNo}
-        info={"+966544463389"}
+        info={user?.phoneNumber}
       />
       <InfoBoxWithTitle
         title={personalInfoPageTranslator.email}
-        info={"ahmed.huyu@gmail.com"}
+        info={user?.email}
       />
     </SafeAreaView>
   );
