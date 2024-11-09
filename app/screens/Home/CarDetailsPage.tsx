@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, Image, Pressable, ScrollView } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import CustomButton from "@/components/ui/CustomButton";
 import { getColorHashCode, icons } from "@/constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 import useAuthStore from "@/store/useAuthStore";
+import { getCarLikesCount } from "@/lib/appwrite/apit";
 
 const CarDetailsPage = () => {
   const {
@@ -17,8 +18,9 @@ const CarDetailsPage = () => {
     carCity,
   } = useLocalSearchParams();
   const router = useRouter();
-  let bookingTime = "Today , 01:00 PM - 02:00 PM ";
+  let bookingTime = "Today, 01:00 PM - 02:00 PM";
   const { language, user } = useAuthStore();
+  const [likesCount, setLikesCount] = useState(0);
 
   const translations = {
     en: {
@@ -57,6 +59,22 @@ const CarDetailsPage = () => {
 
   let color = getColorHashCode(parsedCarDetails?.color);
 
+  // Fetch the likes count when the component mounts
+  useEffect(() => {
+    const fetchLikes = async () => {
+      try {
+        if (carId) {
+          const count = await getCarLikesCount(carId as any);
+          setLikesCount(count);
+        }
+      } catch (error) {
+        console.error("Error fetching likes count:", error);
+      }
+    };
+
+    fetchLikes();
+  }, [carId]);
+
   return (
     <SafeAreaView className="bg-white flex-1">
       <ScrollView>
@@ -86,12 +104,17 @@ const CarDetailsPage = () => {
                 className="w-6 h-6"
               />
             </Pressable>
-            <Pressable className="bg-white rounded-full p-3 shadow-md">
-              <Image
-                source={icons.HeartD}
-                resizeMode="contain"
-                className="w-6 h-6"
-              />
+            <Pressable className="bg-white rounded-full p-3 shadow-md relative w-12 h-12">
+              <View className="flex items-center justify-center">
+                <Image
+                  source={icons.HeartD}
+                  resizeMode="contain"
+                  className="w-8 h-8"
+                />
+                <Text className="absolute text-center text-[8px]">
+                  {likesCount}
+                </Text>
+              </View>
             </Pressable>
           </View>
         </View>
@@ -120,7 +143,7 @@ const CarDetailsPage = () => {
             <Text className="text-sm text-[#9CA4AB] mt-2">
               {parsedCarDetails?.year || "N/A"} -{" "}
               <View
-                className="w-5 h-2 rounded-full border-[1px] border-gray-300 "
+                className="w-5 h-2 rounded-full border-[1px] border-gray-300"
                 style={{ backgroundColor: color }}
               ></View>
             </Text>

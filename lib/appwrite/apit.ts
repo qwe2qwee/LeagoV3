@@ -692,3 +692,99 @@ export const getCurrentUser = async () => {
     console.log(error);
   }
 };
+
+//This function allows a user to remove their like by deleting the corresponding document in the "Likes" collection
+
+export async function likeCar(userId: string, carId: string) {
+  try {
+    // Check if the like already exists
+    const existingLikes = await databases.listDocuments(
+      appwriteConfig.databaseId as string,
+      appwriteConfig.likesCollectionId as string,
+      [Query.equal("userId", userId), Query.equal("carId", carId)]
+    );
+
+    if (existingLikes.total > 0) {
+      console.log("now you delete the car like.");
+      await unlikeCar(userId, carId);
+      return; // Car is already liked by the user
+    }
+
+    // If no existing like, create a new like
+    const newLike = await databases.createDocument(
+      appwriteConfig.databaseId as string,
+      appwriteConfig.likesCollectionId as string,
+      ID.unique(), // Generates a unique document ID
+      {
+        userId: userId,
+        carId: carId,
+        createdAt: new Date().toISOString(),
+      }
+    );
+
+    console.log("Car liked successfully", newLike);
+  } catch (error) {
+    console.error("Error liking car:", error);
+  }
+}
+
+// This function checks if a specific user has liked a particular car.
+
+export async function hasUserLikedCar(userId: string, carId: string) {
+  try {
+    const likes = await databases.listDocuments(
+      appwriteConfig.databaseId as string,
+      appwriteConfig.likesCollectionId as string,
+      [Query.equal("userId", userId), Query.equal("carId", carId)]
+    );
+
+    return likes.total > 0; // Returns true if a like document exists
+  } catch (error) {
+    console.error("Error checking if user liked car:", error);
+    return false;
+  }
+}
+
+export async function getCarLikesCount(carId: string) {
+  try {
+    const likes = await databases.listDocuments(
+      appwriteConfig.databaseId as string,
+      appwriteConfig.likesCollectionId as string,
+      [Query.equal("carId", carId)]
+    );
+
+    console.log(`Total likes for car ${carId}:`, likes.total);
+    return likes.total; // Returns the count of like documents for the car
+  } catch (error) {
+    console.error("Error fetching car likes count:", error);
+    return 0;
+  }
+}
+
+async function unlikeCar(userId: string, carId: string) {
+  try {
+    // Find the like document
+    const likes = await databases.listDocuments(
+      appwriteConfig.databaseId as string,
+      appwriteConfig.likesCollectionId as string,
+      [Query.equal("userId", userId), Query.equal("carId", carId)]
+    );
+
+    if (likes.total === 0) {
+      console.log("No like found for this user on this car.");
+      return; // No like found to remove
+    }
+
+    // Delete the like document
+    const likeDocId = likes.documents[0].$id;
+    await databases.deleteDocument(
+      appwriteConfig.databaseId as string,
+      appwriteConfig.likesCollectionId as string,
+      likeDocId
+    );
+
+    console.log("Car unliked successfully");
+  } catch (error) {
+    console.error("Error unliking car:", error);
+  }
+}

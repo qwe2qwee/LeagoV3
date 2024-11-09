@@ -9,7 +9,7 @@ import useAuthStore from "@/store/useAuthStore";
 
 const Home: React.FC = () => {
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
-  const { language, user } = useAuthStore();
+  const { language, user, latitude, longitude } = useAuthStore();
 
   return (
     <SafeAreaView className="flex-1 rt bg-gray-100">
@@ -27,7 +27,7 @@ const Home: React.FC = () => {
 
         {/* Car Grid Section */}
         <CarGrid
-          userLocation={{ lat: 21.608616, lon: -320.815205 }}
+          userLocation={{ lat: latitude, lon: longitude }}
           selectedBrand={selectedBrand}
           language={language}
         />
