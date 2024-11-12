@@ -32,8 +32,7 @@ const PersonalInfo = () => {
     console.log(date);
   };
   const handleOnPress = () => {
-    // setOpen(!open);
-    console.log(user)
+    setOpen(!open);
   };
 
   return (

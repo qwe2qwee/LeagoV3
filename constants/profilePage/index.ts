@@ -167,3 +167,16 @@ export const address = {
     building: "رقم المبنى",
   },
 };
+
+export const languageChoices = {
+  en: {
+    title : "Language",
+    english : "English",
+    arabic : "Arabic"
+  },
+  ar: {
+    title : "اللغة",
+    english : "الإنقليزية",
+    arabic : "العربية"
+  }
+}

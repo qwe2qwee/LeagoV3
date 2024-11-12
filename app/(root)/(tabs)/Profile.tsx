@@ -21,7 +21,7 @@ const profile = () => {
   console.log(user);
 
   return (
-    <SafeAreaView className="flex-1 rt bg-gray-100">
+    <SafeAreaView className="flex-1 rt bg-[#FEFEFE]">
       <ScrollView contentContainerStyle={{ paddingBottom: 100, paddingTop: 9 }}>
         <View className="items-center justify-center h-full w-full gap-6">
           {user && (
@@ -76,7 +76,7 @@ const profile = () => {
               <TouchableFeildWithIcon
                 icon={fieldTranslator.generalInfo.languages.icon}
                 title={fieldTranslator.generalInfo.languages.title}
-                pathName="/(auth)/sign-up"
+                pathName="/screens/profilePage/Languages"
               />
               <TouchableFeildWithIcon
                 icon={fieldTranslator.generalInfo.help.icon}
