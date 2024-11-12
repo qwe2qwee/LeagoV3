@@ -6,6 +6,26 @@ import notification from "../../assets/icons/profile-icons/notification.png";
 import profileInfo from "../../assets/icons/profile-icons/profile.png";
 import wallet from "../../assets/icons/profile-icons/wallet-2.png";
 import calindar from "../../assets/icons/profile-icons/Calendar.png";
+import vector from "../../assets/icons/checkbox/Vector.png";
+import unchecked from "../../assets/icons/checkbox/unchecked.png"
+
+
+// radio button
+
+export const radioButton = {
+  vector,
+  unchecked,
+  sex: {
+    en : {
+      male: "Male",
+      female: "Female"
+    },
+    ar : {
+      male: "ذكر",
+      female: "أنثى"
+    }
+  }
+}
 
 // Profile Page
 

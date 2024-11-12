@@ -7,6 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Modal from "react-native-modal";
 import dayjs from "dayjs";
 import useAuthStore from "@/store/useAuthStore";
+import RadioButton from "@/components/Profile/RadioButton";
 
 type DateType = any; // Adjust according to the actual type if you know it, or use 'any' for flexibility
 const PersonalInfo = () => {
@@ -88,6 +89,9 @@ const PersonalInfo = () => {
       <InfoBoxWithTitle
         title={personalInfoPageTranslator.email}
         info={user?.email}
+      />
+      <RadioButton 
+        title="الجنس"
       />
     </SafeAreaView>
   );
