@@ -95,7 +95,7 @@ const CarGrid: React.FC<CarGridProps> = ({
 
         // Check liked status for each car
         const likedStatusPromises = filteredList.map(async (car: any) => {
-          const liked = await hasUserLikedCar(user?.$id, car.$id);
+          const liked = await hasUserLikedCar(user?.$id ?? "", car.$id);
           return liked ? car.$id : null;
         });
         const likedResults = await Promise.all(likedStatusPromises);
@@ -109,12 +109,21 @@ const CarGrid: React.FC<CarGridProps> = ({
   }, [selectedBrand, userLocation, user?.$id]);
 
   const toggleLike = async (carId: string) => {
-    await likeCar(user?.$id as any, carId);
-    setLikedCars((prev) =>
-      prev.includes(carId)
-        ? prev.filter((id) => id !== carId)
-        : [...prev, carId]
-    );
+    if (!user?.$id) {
+      console.error("User not authenticated.");
+      return;
+    }
+
+    try {
+      await likeCar(user.$id, carId);
+      setLikedCars((prev) =>
+        prev.includes(carId)
+          ? prev.filter((id) => id !== carId)
+          : [...prev, carId]
+      );
+    } catch (error) {
+      console.error("Error toggling like status:", error);
+    }
   };
 
   const renderItem = ({ item }: { item: CarDocument }) => {
@@ -124,7 +133,7 @@ const CarGrid: React.FC<CarGridProps> = ({
     if (!carDetails || carDetails.length === 0) return null;
 
     const carInfo = carDetails[0];
-    let color = getColorHashCode(carInfo.color);
+    let color = getColorHashCode(carInfo.color ?? "unknown");
 
     return (
       <TouchableOpacity
@@ -136,12 +145,12 @@ const CarGrid: React.FC<CarGridProps> = ({
               params: {
                 carId: item?.$id,
                 carDetails: JSON.stringify(carInfo),
-                carName: item.brand,
+                carName: item.brand ?? "Unknown",
                 carRentSalary: JSON.stringify(carInfo.rentType),
                 carImages: JSON.stringify(carInfo.image),
                 carImage: carInfo.image,
-                ownerId: item.ownerId,
-                carCity: item.city,
+                ownerId: item.ownerId ?? "N/A",
+                carCity: item.city ?? "N/A",
               },
             });
           } else {
@@ -151,7 +160,7 @@ const CarGrid: React.FC<CarGridProps> = ({
         style={[styles.cardContainer, { width: screenWidth * 0.45 }]}
       >
         <Image
-          source={{ uri: carInfo.image }}
+          source={{ uri: carInfo.image ?? "" }}
           style={styles.carImage}
           resizeMode="contain"
         />
@@ -163,16 +172,18 @@ const CarGrid: React.FC<CarGridProps> = ({
             alignItems: language === "ar" ? "flex-end" : "flex-start",
           }}
         >
-          <Text style={styles.carBrand}>{carInfo.name[language]}</Text>
+          <Text style={styles.carBrand}>{carInfo.name[language] ?? "N/A"}</Text>
           <View
             style={{ backgroundColor: color }}
             className={`w-2 h-2 rounded-full border-[1px]`}
           ></View>
           <Text style={styles.carPrice}>
-            {carInfo.rentType?.monthly?.price}
+            {carInfo.rentType?.monthly?.price ?? "N/A"}
           </Text>
-          <Text style={styles.carCity}>{`${city}: ${item.city}`}</Text>
-          <Text style={styles.carYear}>{`${year}: ${carInfo.year}`}</Text>
+          <Text style={styles.carCity}>{`${city}: ${item.city ?? "N/A"}`}</Text>
+          <Text
+            style={styles.carYear}
+          >{`${year}: ${carInfo.year ?? "N/A"}`}</Text>
         </View>
         <TouchableOpacity
           onPress={() => toggleLike(item.$id)}
@@ -223,10 +234,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginTop: 8,
-  },
-  carColor: {
-    fontSize: 12,
-    color: "gray",
   },
   carPrice: {
     fontSize: 14,
