@@ -75,7 +75,7 @@ const profile = () => {
               <TouchableFeildWithIcon
                 icon={fieldTranslator.generalInfo.languages.icon}
                 title={fieldTranslator.generalInfo.languages.title}
-                pathName="/screens/profilePage/Languages"
+                pathName="/screens/profilePage/TermsAndConditions"
               />
               <TouchableFeildWithIcon
                 icon={fieldTranslator.generalInfo.help.icon}

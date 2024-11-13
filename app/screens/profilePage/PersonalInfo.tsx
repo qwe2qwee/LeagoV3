@@ -1,4 +1,4 @@
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Pressable, Text, TouchableOpacity, View } from "react-native";
 import { useState } from "react";
 import { pageTitle, personalInfoPage } from "@/constants/profilePage";
 import DateTimePicker from "react-native-ui-datepicker";
@@ -8,6 +8,8 @@ import Modal from "react-native-modal";
 import dayjs from "dayjs";
 import useAuthStore from "@/store/useAuthStore";
 import RadioButton from "@/components/Profile/RadioButton";
+import { router } from "expo-router";
+import { icons } from "@/constants";
 
 type DateType = any; // Adjust according to the actual type if you know it, or use 'any' for flexibility
 const PersonalInfo = () => {
@@ -37,11 +39,23 @@ const PersonalInfo = () => {
 
   return (
     <SafeAreaView className="bg-white  h-full">
-      <Text
-        className={`${language === "ar" ? "font-ZainExtraBold" : "font-MontserratBold"} mt-3 text-center text-[#272B3B] `}
+      <View className="flex-row justify-between items-center p-6 ">
+      <Pressable
+        onPress={() => router.back()}
+        className="bg-white rounded-full shadow-md"
       >
-        {pageTitleTranslator.personalInfo}
-      </Text>
+        <Image
+          source={icons.backArrow}
+          resizeMode="contain"
+          className="w-6 h-6"
+        />
+      </Pressable>
+        <Text
+          className={`${language === "ar" ? "font-ZainExtraBold" : "font-MontserratBold"} text-center text-[#272B3B] `}
+        >
+          {pageTitleTranslator.personalInfo}
+        </Text>
+      </View>
       <InfoBoxWithTitle
         title={personalInfoPageTranslator.fullName}
         info={user?.details?.name || "احمد يونس"}
@@ -89,9 +103,7 @@ const PersonalInfo = () => {
         title={personalInfoPageTranslator.email}
         info={user?.email}
       />
-      <RadioButton 
-        title="الجنس"
-      />
+      <RadioButton title="الجنس" />
     </SafeAreaView>
   );
 };
