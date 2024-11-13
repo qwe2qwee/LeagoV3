@@ -18,12 +18,12 @@ const RadioButton = ({ title }: {title: string}) => {
       <Text className="text-right font-ZainBold text-[#78828A]">{title}</Text>
       <View className="flex flex-row-reverse w-full justify-around items-center mt-6">
         <TouchableOpacity className= "flex flex-row gap-2"  onPress={() => setGender("male")}>
-          <Text className="font-ZainBold text-[#272B3B]">{translator.male}</Text>
+          <Text className="font-ZainBold text-primary-400">{translator.male}</Text>
           <View className="relative w-5 h-5">
             <Image
               source={radioButton.unchecked}
               resizeMode="contain"
-              className={`absolute w-full h-full ${gender === "male" ? "bg-primary-500" : ""} rounded-full`}
+              className={`absolute w-full h-full ${gender === "male" ? "bg-primary-400" : ""} rounded-full`}
             />
             <Image
               source={radioButton.vector}
@@ -33,12 +33,12 @@ const RadioButton = ({ title }: {title: string}) => {
           </View>
         </TouchableOpacity>
         <TouchableOpacity className= "flex flex-row gap-2"  onPress={() => setGender("female")}>
-          <Text className="font-ZainBold text-[#272B3B]">{translator.female}</Text>
+          <Text className="font-ZainBold text-primary-400">{translator.female}</Text>
           <View className="relative w-5 h-5">
             <Image
               source={radioButton.unchecked}
               resizeMode="contain"
-              className={`absolute w-full h-full ${gender === "female" ? "bg-primary-500" : ""} rounded-full`}
+              className={`absolute w-full h-full ${gender === "female" ? "bg-primary-400" : ""} rounded-full`}
             />
             <Image
               source={radioButton.vector}

@@ -23,7 +23,7 @@ const profile = () => {
   return (
     <SafeAreaView className="flex-1 rt bg-[#FEFEFE]">
       <ScrollView contentContainerStyle={{ paddingBottom: 100, paddingTop: 9 }}>
-        <View className="items-center justify-center h-full w-full gap-6">
+        <View className="items-center justify-center h-full w-full">
           {user && (
             <>
               <View className="itmes-center justify-center">
@@ -48,7 +48,7 @@ const profile = () => {
                   />
                 </View>
               </View>
-              <View className="itmes-center justify-center">
+              <View className="itmes-center justify-center mt-4">
                 <Text className="text-sm pr-10 py-2.5 font-ZainBold">
                   {SecTranslator.security}
                 </Text>
@@ -62,8 +62,7 @@ const profile = () => {
               </View>
             </>
           )}
-
-          <View className="itmes-center justify-center">
+          <View className="itmes-center justify-center mt-4">
             <Text className="text-sm pr-10 py-2.5 font-ZainBold">
               {SecTranslator.general}
             </Text>
