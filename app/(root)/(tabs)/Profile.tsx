@@ -7,16 +7,28 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { router } from "expo-router";
-import { profilePage, profileSections } from "@/constants/profilePage";
+import {
+  logOutModal,
+  profilePage,
+  profileSections,
+} from "@/constants/profilePage";
 import TouchableFeildWithIcon from "@/components/Profile/TouchableFeildWithIcon";
-import { Platform } from "react-native";
 import useAuthStore from "@/store/useAuthStore";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Modal from "react-native-modal";
 
 const profile = () => {
   const { language, logout, user } = useAuthStore();
   const fieldTranslator = profilePage[language];
   const SecTranslator = profileSections[language];
+  const logOutTranslator = logOutModal[language];
+
+  const [open, setOpen] = useState(false);
+
+  const handleOnPress = () => {
+    setOpen(!open);
+  };
+  
 
   console.log(user);
 
@@ -86,13 +98,32 @@ const profile = () => {
           </View>
         </View>
         {user && (
-          <TouchableOpacity className="p-2 mx-auto" onPress={logout}>
-            <Text
-              className={`text-primary-400 ${language == "ar" ? "font-ZainRegular" : "font-MontserratMedium"}`}
-            >
-              {profileSections[language].buttonT}
-            </Text>
-          </TouchableOpacity>
+          <>
+            <TouchableOpacity className="p-2 mx-auto" onPress={handleOnPress}>
+              <Text
+                className={`text-primary-400 ${language == "ar" ? "font-ZainRegular" : "font-MontserratMedium"}`}
+              >
+                {profileSections[language].buttonT}
+              </Text>
+            </TouchableOpacity>
+            <Modal animationIn="slideInUp" coverScreen isVisible={open}>
+              <View className="bg-white w-80 h-64 rounded-2xl">
+                <View className="p-16 pb-8">
+                  <Text className="text-center text-lg font-ZainBold">
+                    {logOutTranslator.question}
+                  </Text>
+                </View>
+                <View className="items-center justify-center">
+                  <TouchableOpacity onPress={logout} className="bg-primary-500 w-44 h-11 justify-center items-center rounded-md">
+                    <Text className="text-center text-white font-ZainBold"> {logOutTranslator.yes} </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={handleOnPress} className="mt-4">
+                    <Text className="text-primary-500 font-ZainBold"> {logOutTranslator.cancel} </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+          </>
         )}
         {!user && (
           <TouchableOpacity

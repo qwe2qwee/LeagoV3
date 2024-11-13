@@ -11,7 +11,7 @@ const TermsAndConditions = () => {
   const translator = termsAndConditions[language];
 
   return (
-    <SafeAreaView>
+    <SafeAreaView className="bg-white">
       <View className="flex-row justify-between items-center p-6 ">
         <Pressable
           onPress={() => router.back()}

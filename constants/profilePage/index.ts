@@ -180,3 +180,16 @@ export const languageChoices = {
     arabic : "العربية"
   }
 }
+
+export const logOutModal = {
+  en: {
+    question: "Are you sure want to Log Out ?",
+    yes: "Log Out",
+    cancel: "Cancel"
+  },
+  ar: {
+    question: "هل أنت متأكد من تسجيل الخروج ؟!",
+    yes: "نعم ، تسجيل خروج",
+    cancel: "إلغاء"
+  }
+}
