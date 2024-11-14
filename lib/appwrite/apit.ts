@@ -8,11 +8,6 @@ import {
 } from "@/types/AppwriteTypes";
 import { ID, Query } from "react-native-appwrite";
 import { account, appwriteConfig, avatars, databases, storage } from "./config";
-import {
-  findBrandByPartialModel,
-  getEnglishModelName,
-  modelToBrandMap,
-} from "@/constants/modelToBrandMap";
 
 // Error localization definition for English and Arabic
 type ErrorMessages = {

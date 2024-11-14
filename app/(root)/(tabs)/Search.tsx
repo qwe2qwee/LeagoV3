@@ -180,7 +180,7 @@ const Search = () => {
         <View className="flex-1 justify-between flex-row items-center ">
           <View className="flex-col h-4/5 justify-between">
             <Text className="text-lg font-bold">
-              {carInfo.name?.en || "N/A"}
+              {carInfo.name?.ar || "N/A"}
             </Text>
             <View>
               <View
