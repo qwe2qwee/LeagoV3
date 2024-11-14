@@ -20,7 +20,6 @@ import OAuth from "@/components/Auth/OAuth";
 import { Link, router } from "expo-router";
 import LeagoMark from "@/components/Auth/LeagoMark";
 import {
-  createUser,
   getLocalizedErrorMessage,
   isEmailExisting,
   isPhoneNumberExisting,
@@ -32,7 +31,7 @@ import useAuthStore from "@/store/useAuthStore";
 type Language = "en" | "ar";
 
 const signUp = () => {
-  const { language, user } = useAuthStore();
+  const { language, user, createUser } = useAuthStore();
   const t = translationsignUp[language];
 
   const [form, setForm] = useState({
@@ -67,7 +66,8 @@ const signUp = () => {
           form.phone,
           birthday,
           gender,
-          address
+          address,
+          language
         );
         console.log("User created successfully:", newUser);
         setForm({ name: "", email: "", password: "", phone: "" });

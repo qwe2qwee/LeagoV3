@@ -6,8 +6,20 @@ import { getColorHashCode, icons } from "@/constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 import useAuthStore from "@/store/useAuthStore";
 import { getCarLikesCount } from "@/lib/appwrite/apit";
+import { appwriteConfig, client } from "@/lib/appwrite/config";
 
-const CarDetailsPage = () => {
+interface CarDetails {
+  name: { [key: string]: string };
+  year?: number;
+  color?: string;
+  mileage?: number;
+}
+
+interface RentSalary {
+  daily?: { price: number };
+}
+
+const CarDetailsPage: React.FC = () => {
   const {
     carId,
     carDetails,
@@ -18,9 +30,9 @@ const CarDetailsPage = () => {
     carCity,
   } = useLocalSearchParams();
   const router = useRouter();
-  let bookingTime = "Today, 01:00 PM - 02:00 PM";
-  const { language, user } = useAuthStore();
-  const [likesCount, setLikesCount] = useState(0);
+  const bookingTime = "Today, 01:00 PM - 02:00 PM";
+  const { language = "en", user } = useAuthStore();
+  const [likesCount, setLikesCount] = useState<number>(0);
 
   const translations = {
     en: {
@@ -39,8 +51,7 @@ const CarDetailsPage = () => {
     },
   };
 
-  // Helper function to parse JSON only if it's a valid string
-  const parseJSON = (data: any) => {
+  const parseJSON = (data: any): any => {
     if (typeof data === "string") {
       try {
         return JSON.parse(data);
@@ -48,23 +59,22 @@ const CarDetailsPage = () => {
         console.error("Failed to parse JSON:", error);
       }
     }
-    return data; // If already parsed or invalid
+    return data;
   };
 
-  const parsedCarDetails = parseJSON(carDetails);
-  const parsedRentSalary = parseJSON(carRentSalary);
-  const imageUri = Array.isArray(parseJSON(carImages))
+  const parsedCarDetails: CarDetails = parseJSON(carDetails);
+  const parsedRentSalary: RentSalary = parseJSON(carRentSalary);
+  const imageUri: string | undefined = Array.isArray(parseJSON(carImages))
     ? parseJSON(carImages)[0]
     : carImage;
 
-  let color = getColorHashCode(parsedCarDetails?.color);
+  const color = getColorHashCode(parsedCarDetails?.color as any);
 
-  // Fetch the likes count when the component mounts
   useEffect(() => {
     const fetchLikes = async () => {
       try {
         if (carId) {
-          const count = await getCarLikesCount(carId as any);
+          const count = await getCarLikesCount(carId as string);
           setLikesCount(count);
         }
       } catch (error) {
@@ -73,12 +83,33 @@ const CarDetailsPage = () => {
     };
 
     fetchLikes();
+
+    const documentSubscriptionPath = `databases.${appwriteConfig.databaseId}.collections.${appwriteConfig.likesCollectionId}.documents`;
+
+    const unsubscribe = client.subscribe(
+      [documentSubscriptionPath, "files"],
+      (response: any) => {
+        if (response.payload.$id === carId) {
+          if (
+            response.events.includes("database.documents.delete") ||
+            response.events.includes("database.documents.create")
+          ) {
+            console.log("Document event detected:", response.events);
+            fetchLikes();
+          }
+        }
+        console.log("Subscription Response:", response); // Log specific response details for debugging
+      }
+    );
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, [carId]);
 
   return (
     <SafeAreaView className="bg-white flex-1">
       <ScrollView>
-        {/* Image Section */}
         <View className="relative items-center justify-center bg-[#F7F7F7] rounded-lg h-72 w-full">
           {imageUri ? (
             <Image
@@ -92,7 +123,6 @@ const CarDetailsPage = () => {
             </Text>
           )}
 
-          {/* Floating Top Buttons */}
           <View className="absolute top-2 left-2 right-2 flex-row justify-between p-2 z-10">
             <Pressable
               onPress={() => router.back()}
@@ -120,7 +150,6 @@ const CarDetailsPage = () => {
         </View>
 
         <View className="p-3">
-          {/* Car Details Header */}
           <View className="flex-row justify-between mt-4">
             <Text className="text-2xl font-bold">
               {parsedCarDetails.name[language]}
@@ -165,7 +194,6 @@ const CarDetailsPage = () => {
             </View>
           </View>
 
-          {/* Additional Car Details */}
           <View className="mt-4">
             <Text className="text-lg font-semibold">
               {translations[language].carDetails}
@@ -176,7 +204,6 @@ const CarDetailsPage = () => {
             </Text>
           </View>
 
-          {/* Book Now Button */}
           <CustomButton
             title={translations[language].bookNow}
             className="rounded-lg mt-6 p-4"

@@ -8,6 +8,11 @@ import {
 } from "@/types/AppwriteTypes";
 import { ID, Query } from "react-native-appwrite";
 import { account, appwriteConfig, avatars, databases, storage } from "./config";
+import {
+  findBrandByPartialModel,
+  getEnglishModelName,
+  modelToBrandMap,
+} from "@/constants/modelToBrandMap";
 
 // Error localization definition for English and Arabic
 type ErrorMessages = {
@@ -400,8 +405,6 @@ export async function deleteUser(userId: string): Promise<void> {
   }
 }
 
-// Function to sign in a user with email and password
-
 // Function to get the current user's account information
 export async function getAccount(): Promise<AppwriteAccount> {
   try {
@@ -410,6 +413,41 @@ export async function getAccount(): Promise<AppwriteAccount> {
   } catch (error) {
     console.error("Failed to get account:", error);
     throw new Error("Unable to fetch account information.");
+  }
+}
+
+export const getCurrentUser = async () => {
+  try {
+    const currentAccount = await account.get();
+
+    if (!currentAccount) throw Error;
+
+    const currentUser = await databases.listDocuments(
+      appwriteConfig.databaseId as string,
+      appwriteConfig.usersCollectionId as string,
+      [Query.equal("account", currentAccount.$id)]
+    );
+
+    if (!currentUser) throw Error;
+
+    return currentUser.documents[0];
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// Function to fetch user's documents from Appwrite storage
+export async function fetchUsersDocs(userId: string): Promise<any> {
+  try {
+    const response = await databases.getDocument(
+      appwriteConfig.databaseId as string,
+      appwriteConfig.userdocs as string,
+      userId
+    );
+    return response.documents[0];
+  } catch (error) {
+    console.error("Failed to fetch user documents:", error);
+    throw error;
   }
 }
 
@@ -423,45 +461,13 @@ export async function signOut(): Promise<void> {
   }
 }
 
-// // Function to create user documents in the database
-// export async function createUserDocs(
-//   form: UserDocsForm,
-//   userId: string
-// ): Promise<UserDocument> {
-//   try {
-//     const [licenseUrl, identityUrl] = await Promise.all([
-//       uploadFile(form.License, "image"),
-//       uploadFile(form.Identity, "image"),
-//     ]);
-
-//     const docs = await databases.createDocument<Document>(
-//       appwriteConfig.databaseId,
-//       appwriteConfig.userdocs,
-//       ID.unique(),
-//       { identity: identityUrl, license: licenseUrl, creator: userId }
-//     );
-
-//     return docs;
-//   } catch (error) {
-//     console.error("Failed to create user documents:", error);
-//     throw new Error(
-//       "Unable to upload documents. Please check the file formats."
-//     );
-//   }
-// }
+/** ======================================
+ * USER LOGIC END
+ * ====================================== */
 
 /** ======================================
  * FILE STORAGE LOGIC
  * ====================================== */
-
-// Function to upload a file to Appwrite's storage
-// Function to upload a file
-// Function to upload a file to Appwrite storage
-
-// Define a type for the file object
-// Define types for the file and function parameters
-// Define the type for DocumentPicker file result
-// Define the type for DocumentPicker file result
 
 // Upload File
 export async function uploadFile(
@@ -531,121 +537,123 @@ export async function getFilePreview(
     );
   }
 }
-// Function to fetch user's documents from Appwrite storage
-export async function fetchUsersDocs(userId: string): Promise<any> {
-  try {
-    const response = await databases.getDocument(
-      appwriteConfig.databaseId as string,
-      appwriteConfig.userdocs as string,
-      userId
-    );
-    return response.documents[0];
-  } catch (error) {
-    console.error("Failed to fetch user documents:", error);
-    throw error;
-  }
-}
-
-/// cars logic heree  ///////////////////////////////////////////////////////////////////////////////////////////////////
+/** ======================================
+ * CAR LOGIC
+ * ====================================== */
 
 // Helper function to parse carLocation JSON string
 export function parseCarLocation(
-  carLocation: string | { lat: number; lon: number }
+  carLocation: string | { lat: number; lon: number },
+  lang: "en" | "ar" = "en"
 ): { lat: number; lon: number } | null {
-  // console.log("Received carLocation:", carLocation);
+  const errorMessages = {
+    en: "Error parsing carLocation. Invalid format.",
+    ar: "خطأ في تحليل موقع السيارة. تنسيق غير صالح.",
+  };
 
-  // Check if `carLocation` is already an object with lat and lon properties
   if (typeof carLocation === "object" && carLocation !== null) {
     return carLocation as { lat: number; lon: number };
   }
 
-  // If `carLocation` is a string, try parsing it as JSON
   if (typeof carLocation === "string") {
     try {
       return JSON.parse(carLocation);
     } catch (error) {
-      console.error("Error parsing carLocation:", error);
+      console.error(errorMessages[lang], error);
       return null;
     }
   }
 
-  console.error(
-    "carLocation is neither an object nor a JSON string:",
-    carLocation
-  );
+  console.error(errorMessages[lang]);
   return null;
 }
 
 // Helper function to parse details array with an image URL
+export function parseDetails(details: any, lang: "en" | "ar" = "en") {
+  const errorMessages = {
+    en: "Error parsing details. Expected an array.",
+    ar: "خطأ في تحليل التفاصيل. من المتوقع أن تكون التفاصيل في شكل مصفوفة.",
+  };
 
-export function parseDetails(details: any) {
-  // console.log("Received details:", details);
-
-  // If `details` is a string, try parsing it as JSON
   if (typeof details === "string") {
     try {
       details = JSON.parse(details);
     } catch (error) {
-      console.error("Error parsing details as JSON:", error);
-      return []; // Return an empty array if parsing fails
+      console.error(errorMessages[lang], error);
+      return [];
     }
   }
 
   if (!Array.isArray(details)) {
-    console.error(
-      "Expected details to be an array after parsing. Received:",
-      details
-    );
+    console.error(errorMessages[lang]);
     return [];
   }
 
-  try {
-    return details.flatMap((detail) => {
-      // console.log("Processing detail:", detail);
-
-      const { name, image, rentType, color, mileage, year } = detail;
-
-      if (!rentType || typeof rentType !== "object") return []; // Skip if rentType is missing or not an object
-
-      return detail; // Return the object as-is
-    });
-  } catch (error) {
-    console.error("Error processing details:", error);
-    return [];
-  }
+  return details.flatMap((detail) => {
+    const { rentType } = detail;
+    return rentType && typeof rentType === "object" ? detail : [];
+  });
 }
 
 // Function to list car documents from the database
-export async function listCars(
-  queries: any[] = [] // Optional: queries to filter the results
-) {
+export async function listCars(queries: any[] = [], lang: "en" | "ar" = "en") {
   try {
-    // Call Appwrite's listDocuments API to retrieve car documents
     const response = await databases.listDocuments<CarDocument>(
       appwriteConfig.databaseId as string,
-      appwriteConfig.carsCollectionId as string, // Collection ID for car documents
+      appwriteConfig.carsCollectionId as string,
       queries
     );
 
-    // console.log("Car documents retrieved successfully:", response.documents[0]);
-
-    // Parse carLocation and details JSON strings into objects
-    const cars = response.documents.map((car) => ({
+    return response.documents.map((car) => ({
       ...car,
-      carLocation: parseCarLocation(car.carLocation), // Parse carLocation JSON string
-      details: parseDetails(car.details), // Parse each item in details JSON array
+      carLocation: parseCarLocation(car.carLocation, lang),
+      details: parseDetails(car.details, lang),
     }));
-
-    return cars as any;
   } catch (error) {
-    console.error("Error listing cars:", error);
-    throw new Error("Unable to retrieve the car list. Please try again.");
+    console.error(
+      lang === "en"
+        ? "Unable to retrieve the car list. Please try again."
+        : "تعذر استرجاع قائمة السيارات. حاول مرة أخرى.",
+      error
+    );
+    throw new Error(
+      lang === "en"
+        ? "Unable to retrieve the car list. Please try again."
+        : "تعذر استرجاع قائمة السيارات. حاول مرة أخرى."
+    );
   }
 }
 
-export const createCarDocument = async (carData: CarDataProps) => {
+// Modified search function with pagination
+export async function searchCars(query: string, offset = 0, limit = 10) {
   try {
-    // Format the data for Appwrite, converting nested objects to JSON strings
+    const Cars = await databases.listDocuments<CarDocument>(
+      appwriteConfig.databaseId as string,
+      appwriteConfig.carsCollectionId as string,
+      [
+        Query.search("brand", query as any),
+        Query.limit(limit),
+        Query.offset(offset),
+      ]
+    );
+
+    return Cars.documents.map((car) => ({
+      ...car,
+      carLocation: parseCarLocation(car.carLocation, "en"),
+      details: parseDetails(car.details, "en"),
+    }));
+  } catch (error) {
+    console.error("Error searching products:", error);
+    throw error;
+  }
+}
+
+// Function to create a new car document
+export const createCarDocument = async (
+  carData: CarDataProps,
+  lang: "en" | "ar" = "en"
+) => {
+  try {
     const formattedData = {
       carLocation: JSON.stringify(carData.carLocation),
       city: carData.city,
@@ -655,55 +663,41 @@ export const createCarDocument = async (carData: CarDataProps) => {
       isHidden: carData.isHidden,
     };
 
-    // Replace YOUR_DATABASE_ID and YOUR_COLLECTION_ID with the actual values
     const response = await databases.createDocument(
       appwriteConfig.databaseId as string,
       appwriteConfig.carsCollectionId as string,
-      ID.unique(), // Generates a unique document ID
+      ID.unique(),
       formattedData
     );
 
     console.log("Document created successfully:", response);
     return response;
   } catch (error) {
-    console.error("Error creating document:", error);
+    console.error(
+      lang === "en" ? "Error creating document." : "خطأ في إنشاء المستند.",
+      error
+    );
     throw error;
   }
 };
 
-// To keep signed in
-
-export const getCurrentUser = async () => {
-  try {
-    const currentAccount = await account.get();
-
-    if (!currentAccount) throw Error;
-
-    const currentUser = await databases.listDocuments(
-      appwriteConfig.databaseId as string,
-      appwriteConfig.usersCollectionId as string,
-      [Query.equal("account", currentAccount.$id)]
-    );
-
-    if (!currentUser) throw Error;
-
-    return currentUser.documents[0];
-  } catch (error) {
-    console.log(error);
-  }
-};
-// This function allows a user to remove their like by deleting the corresponding document in the "Likes" collection
+// Function to like a car document
 export async function likeCar(
   userId: string | null | undefined,
-  carId: string | null | undefined
+  carId: string | null | undefined,
+  lang: "en" | "ar" = "en"
 ) {
+  const errorMessages = {
+    en: "Invalid input: userId and carId are required.",
+    ar: "مدخلات غير صالحة: معرف المستخدم ومعرف السيارة مطلوبان.",
+  };
+
   if (!userId || !carId) {
-    console.error("Invalid input: userId and carId are required.");
+    console.error(errorMessages[lang]);
     return;
   }
 
   try {
-    // Check if the like already exists
     const existingLikes = await databases.listDocuments(
       appwriteConfig.databaseId as string,
       appwriteConfig.likesCollectionId as string,
@@ -711,16 +705,14 @@ export async function likeCar(
     );
 
     if (existingLikes.total > 0) {
-      console.log("Now you delete the car like.");
-      await unlikeCar(userId, carId);
-      return; // Car is already liked by the user
+      await unlikeCar(userId, carId, lang);
+      return;
     }
 
-    // If no existing like, create a new like
     const newLike = await databases.createDocument(
       appwriteConfig.databaseId as string,
       appwriteConfig.likesCollectionId as string,
-      ID.unique(), // Generates a unique document ID
+      ID.unique(),
       {
         userId: userId,
         carId: carId,
@@ -728,19 +720,30 @@ export async function likeCar(
       }
     );
 
-    console.log("Car liked successfully", newLike);
+    console.log(
+      lang === "en" ? "Car liked successfully" : "تم الإعجاب بالسيارة بنجاح",
+      newLike
+    );
   } catch (error) {
-    console.error("Error liking car:", error);
+    console.error(
+      lang === "en" ? "Error liking car." : "خطأ في الإعجاب بالسيارة.",
+      error
+    );
   }
 }
 
-// This function checks if a specific user has liked a particular car.
+// Function to check if a user has liked a car
 export async function hasUserLikedCar(
   userId: string | null | undefined,
-  carId: string | null | undefined
+  carId: string | null | undefined,
+  lang: "en" | "ar" = "en"
 ) {
   if (!userId || !carId) {
-    console.error("Invalid input: userId and carId are required.");
+    console.error(
+      lang === "en"
+        ? "Invalid input: userId and carId are required."
+        : "مدخلات غير صالحة: معرف المستخدم ومعرف السيارة مطلوبان."
+    );
     return false;
   }
 
@@ -751,17 +754,29 @@ export async function hasUserLikedCar(
       [Query.equal("userId", userId), Query.equal("carId", carId)]
     );
 
-    return likes.total > 0; // Returns true if a like document exists
+    return likes.total > 0;
   } catch (error) {
-    console.error("Error checking if user liked car:", error);
+    console.error(
+      lang === "en"
+        ? "Error checking if user liked car."
+        : "خطأ في التحقق من الإعجاب بالسيارة.",
+      error
+    );
     return false;
   }
 }
 
-// This function fetches the total number of likes for a specific car.
-export async function getCarLikesCount(carId: string | null | undefined) {
+// Function to get total likes for a car
+export async function getCarLikesCount(
+  carId: string | null | undefined,
+  lang: "en" | "ar" = "en"
+) {
   if (!carId) {
-    console.error("Invalid input: carId is required.");
+    console.error(
+      lang === "en"
+        ? "Invalid input: carId is required."
+        : "مدخلات غير صالحة: معرف السيارة مطلوب."
+    );
     return 0;
   }
 
@@ -773,25 +788,34 @@ export async function getCarLikesCount(carId: string | null | undefined) {
     );
 
     console.log(`Total likes for car ${carId}:`, likes.total);
-    return likes.total; // Returns the count of like documents for the car
+    return likes.total;
   } catch (error) {
-    console.error("Error fetching car likes count:", error);
+    console.error(
+      lang === "en"
+        ? "Error fetching car likes count."
+        : "خطأ في جلب عدد الإعجابات للسيارة.",
+      error
+    );
     return 0;
   }
 }
 
-// This function allows a user to remove their like by deleting the corresponding document in the "Likes" collection
+// Function to unlike a car
 async function unlikeCar(
   userId: string | null | undefined,
-  carId: string | null | undefined
+  carId: string | null | undefined,
+  lang: "en" | "ar" = "en"
 ) {
   if (!userId || !carId) {
-    console.error("Invalid input: userId and carId are required.");
+    console.error(
+      lang === "en"
+        ? "Invalid input: userId and carId are required."
+        : "مدخلات غير صالحة: معرف المستخدم ومعرف السيارة مطلوبان."
+    );
     return;
   }
 
   try {
-    // Find the like document
     const likes = await databases.listDocuments(
       appwriteConfig.databaseId as string,
       appwriteConfig.likesCollectionId as string,
@@ -799,11 +823,14 @@ async function unlikeCar(
     );
 
     if (likes.total === 0) {
-      console.log("No like found for this user on this car.");
-      return; // No like found to remove
+      console.log(
+        lang === "en"
+          ? "No like found for this user on this car."
+          : "لم يتم العثور على إعجاب لهذا المستخدم على هذه السيارة."
+      );
+      return;
     }
 
-    // Delete the like document
     const likeDocId = likes.documents[0].$id;
     await databases.deleteDocument(
       appwriteConfig.databaseId as string,
@@ -811,8 +838,15 @@ async function unlikeCar(
       likeDocId
     );
 
-    console.log("Car unliked successfully");
+    console.log(
+      lang === "en"
+        ? "Car unliked successfully"
+        : "تم إلغاء الإعجاب بالسيارة بنجاح"
+    );
   } catch (error) {
-    console.error("Error unliking car:", error);
+    console.error(
+      lang === "en" ? "Error unliking car." : "خطأ في إلغاء الإعجاب بالسيارة.",
+      error
+    );
   }
 }

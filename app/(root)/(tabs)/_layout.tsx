@@ -61,12 +61,12 @@ export default function Layout() {
         }}
       />
       <Tabs.Screen
-        name="Branches"
+        name="Search"
         options={{
-          title: "Branches",
+          title: "Search",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <TabIcon source={icons.map} focused={focused} />
+            <TabIcon source={icons.search} focused={focused} />
           ),
         }}
       />

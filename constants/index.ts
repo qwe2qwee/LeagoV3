@@ -30,6 +30,7 @@ import HeartD from "../assets/icons/HeartD.png";
 import Time from "../assets/icons/Time.png";
 import docsImage from "../assets/icons/docsImage.png";
 import support from "../assets/icons/support.png";
+import point1 from "../assets/icons/point1.png";
 
 import camera from "../assets/icons/camera.png";
 import Illustration from "../assets/icons/Illustration.png";
@@ -63,6 +64,7 @@ export const icons = {
   backArrow,
   bills,
   hyundai,
+  search,
   camera,
   people,
   Illustration,
@@ -87,8 +89,9 @@ export const icons = {
   person,
   pin,
   point,
+  point1,
+
   profile,
-  search,
   star,
   target,
   to,

@@ -91,6 +91,9 @@ const useAuthStore = create<AuthState>((set) => ({
           details: [jsonUserDetails],
         }
       );
+
+      // Fetch the current user to update the state immediately
+      await useAuthStore.getState().getCurrentUser();
     } catch (error) {
       const errorMessage = (error as Error).message;
       console.error("Error creating user:", errorMessage);

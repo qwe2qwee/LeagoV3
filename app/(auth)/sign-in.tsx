@@ -17,14 +17,13 @@ import { icons, images, translationsLogin } from "@/constants";
 import OAuth from "@/components/Auth/OAuth";
 import { Link, router } from "expo-router";
 import LeagoMark from "@/components/Auth/LeagoMark";
-import { signIn } from "@/lib/appwrite/apit";
 import useAuthStore from "@/store/useAuthStore";
 
 // Define a type for the language
 type Language = "en" | "ar";
 
-const signUp = () => {
-  const { user, getCurrentUser, loading, error, language } = useAuthStore();
+const signIn = () => {
+  const { login, loading, error, language } = useAuthStore();
 
   const t = translationsLogin[language]; // Choose the right translation
 
@@ -46,9 +45,7 @@ const signUp = () => {
     }
 
     try {
-      await signIn(form.email, form.password, language);
-      // Handle successful sign-in if needed
-      await getCurrentUser();
+      await login(form.email, form.password);
       router.replace("/(root)/(tabs)/Home");
     } catch (error) {
       if (error instanceof Error) {
@@ -121,8 +118,8 @@ const signUp = () => {
                 title={t.signIn}
                 textStyle={`text-lg ${changelangS}`}
                 onPress={onSignInPress}
-                className="
-                mt-5"
+                loading={loading}
+                className="mt-5"
               />
               {/* Optional OAuth */}
               <OAuth />
@@ -145,4 +142,4 @@ const signUp = () => {
   );
 };
 
-export default signUp;
+export default signIn;
