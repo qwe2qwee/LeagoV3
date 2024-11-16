@@ -146,6 +146,7 @@ declare interface TouchableFeildWithIconProps {
   icon: any;
   title: string;
   pathName: any;
+  titleStyle?: string
 }
 
 // for parse the car

@@ -1,3 +1,14 @@
+import filePartial from "../../assets/icons/profile-icons/filePartial.png"
+import whatsapp from "../../assets/icons/profile-icons/whatsapp.png"
+import mail from "../../assets/icons/profile-icons/mail.png"
+
+export const icons = {
+  filePartial,
+  whatsapp,
+  mail
+}
+
+
 export const termsAndConditions = {
   en: {
     title: "Terms and Conditions",
@@ -195,3 +206,14 @@ export const termsAndConditions = {
 `,
   },
 };
+
+export const contactUs = {
+  en: {
+    whatsappChat: "Chat with our Customer Service",
+    email: "Email our Customer Service"
+  },
+  ar: {
+    whatsappChat: "للتحدث إلى خدمة العملاء",
+    email: "المراسلة عبر البريد الإلكتروني"
+  }
+}

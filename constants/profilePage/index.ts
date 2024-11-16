@@ -8,6 +8,7 @@ import wallet from "../../assets/icons/profile-icons/wallet-2.png";
 import calindar from "../../assets/icons/profile-icons/Calendar.png";
 import vector from "../../assets/icons/checkbox/Vector.png";
 import unchecked from "../../assets/icons/checkbox/unchecked.png"
+import Address from "@/app/screens/profilePage/Address";
 
 
 // radio button
@@ -191,5 +192,16 @@ export const logOutModal = {
     question: "هل أنت متأكد من تسجيل الخروج ؟!",
     yes: "نعم ، تسجيل خروج",
     cancel: "إلغاء"
+  }
+}
+
+export const companyAddress = {
+  en: {
+    companyName: "Basmat Tareeq Company",
+    Address: "Jeddah, Saudi Arabia"
+  },
+  ar: {
+    companyName: "شركة بسمة طريق",
+    Address: "جدة، المملكة العربية السعودية"
   }
 }

@@ -28,6 +28,11 @@ const profile = () => {
   const handleOnPress = () => {
     setOpen(!open);
   };
+
+  const handleLogOut = async() => {
+    await logout()
+    setOpen(false)
+  }
   
 
   console.log(user);
@@ -60,18 +65,6 @@ const profile = () => {
                   />
                 </View>
               </View>
-              <View className="itmes-center justify-center mt-4">
-                <Text className="text-sm pr-10 py-2.5 font-ZainBold">
-                  {SecTranslator.security}
-                </Text>
-                <View className="w-80 mx-10">
-                  <TouchableFeildWithIcon
-                    icon={fieldTranslator.changePass.icon}
-                    title={fieldTranslator.changePass.title}
-                    pathName="/(root)/Home"
-                  />
-                </View>
-              </View>
             </>
           )}
           <View className="itmes-center justify-center mt-4">
@@ -92,7 +85,7 @@ const profile = () => {
               <TouchableFeildWithIcon
                 icon={fieldTranslator.generalInfo.help.icon}
                 title={fieldTranslator.generalInfo.help.title}
-                pathName="/(root)/Home"
+                pathName="/screens/profilePage/ContactUs"
               />
             </View>
           </View>
@@ -114,7 +107,7 @@ const profile = () => {
                   </Text>
                 </View>
                 <View className="items-center justify-center">
-                  <TouchableOpacity onPress={logout} className="bg-primary-500 w-44 h-11 justify-center items-center rounded-md">
+                  <TouchableOpacity onPress={handleLogOut} className="bg-primary-500 w-44 h-11 justify-center items-center rounded-md">
                     <Text className="text-center text-white font-ZainBold"> {logOutTranslator.yes} </Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={handleOnPress} className="mt-4">

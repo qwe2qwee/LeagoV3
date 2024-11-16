@@ -1,6 +1,11 @@
 import { Image, Pressable, Text, TouchableOpacity, View } from "react-native";
 import { useState } from "react";
-import { pageTitle, personalInfoPage } from "@/constants/profilePage";
+import {
+  pageTitle,
+  personalInfoPage,
+  profilePage,
+  profileSections,
+} from "@/constants/profilePage";
 import DateTimePicker from "react-native-ui-datepicker";
 import InfoBoxWithTitle from "@/components/Profile/InfoBoxWithTitle";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,6 +22,8 @@ const PersonalInfo = () => {
 
   const pageTitleTranslator = pageTitle[language];
   const personalInfoPageTranslator = personalInfoPage[language];
+  const fieldTranslator = profilePage[language];
+  const SecTranslator = profileSections[language];
 
   const [open, setOpen] = useState(false);
   // const [date, setDate] = useState("351654");
@@ -40,16 +47,16 @@ const PersonalInfo = () => {
   return (
     <SafeAreaView className="bg-white  h-full">
       <View className="flex-row justify-between items-center p-6 ">
-      <Pressable
-        onPress={() => router.back()}
-        className="bg-white rounded-full shadow-md"
-      >
-        <Image
-          source={icons.backArrow}
-          resizeMode="contain"
-          className="w-6 h-6"
-        />
-      </Pressable>
+        <Pressable
+          onPress={() => router.back()}
+          className="bg-white rounded-full shadow-md"
+        >
+          <Image
+            source={icons.backArrow}
+            resizeMode="contain"
+            className="w-6 h-6"
+          />
+        </Pressable>
         <Text
           className={`${language === "ar" ? "font-ZainExtraBold" : "font-MontserratBold"} text-center text-[#272B3B] `}
         >
@@ -104,6 +111,19 @@ const PersonalInfo = () => {
         info={user?.email}
       />
       <RadioButton title="الجنس" />
+      <View className="itmes-center justify-center mt-4">
+        <Text className="text-sm pr-10 py-2.5 font-ZainBold text-[#9CA4AB]">
+          {SecTranslator.security}
+        </Text>
+        <View className="w-80 mx-10 pr-10">
+          <TouchableOpacity
+            className="flex flex-row-reverse w-full items-center justify-center border-b border-[#E9EBED] pb-5 pt-3"
+            onPress={() => router.push("./home")}
+          >
+            <Text className="pr-4 font-ZainBold text-red-500 text-center">{fieldTranslator.changePass.title}</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </SafeAreaView>
   );
 };
