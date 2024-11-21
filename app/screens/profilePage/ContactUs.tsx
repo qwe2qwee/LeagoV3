@@ -11,6 +11,9 @@ import useAuthStore from "@/store/useAuthStore";
 import { router } from "expo-router";
 import LeagoTag from "@/components/Profile/LeagoTag";
 import { companyAddress } from "@/constants/profilePage";
+import { Pressable } from "react-native";
+import { icons as backArrow}  from "@/constants";
+
 
 type ContactType = "whatsapp" | "email";
 
@@ -51,7 +54,24 @@ const ContactUs = () => {
 
   return (
     <SafeAreaView className="bg-white items-center justify-start h-full w-full">
-      <View className="border-[#FF7456] border-2 rounded-full mt-16 p-10">
+      <View className="flex-row justify-between items-center p-6 w-full">
+        <Pressable
+          onPress={() => router.back()}
+          className="bg-white rounded-full shadow-md"
+        >
+          <Image
+            source={backArrow.backArrow}
+            resizeMode="contain"
+            className="w-6 h-6"
+          />
+        </Pressable>
+        <Text
+          className={`${language === "ar" ? "font-ZainExtraBold" : "font-MontserratBold"} text-center text-[#272B3B] `}
+        >
+          {translator.pageTitle}
+        </Text>
+      </View>
+      <View className="border-[#FF7456] border-2 rounded-full p-10">
         <LeagoTag />
       </View>
       <View className="w-80 mx-10 mt-20">
@@ -67,14 +87,14 @@ const ContactUs = () => {
           <Text className="pr-4 font-ZainBold">{translator.whatsappChat}</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          className="flex flex-row-reverse w-full items-center justify-start border-b border-[#E9EBED] pb-5 pt-3"
+          className="flex flex-row-reverse w-full items-center justify-start border-b border-[#E9EBED] pb-5 pt-3 mt-4"
           onPress={() => contact("email", email, subject, body)}
         >
           <Image source={icons.mail} resizeMode="contain" className="w-7 h-7" />
           <Text className="pr-4 font-ZainBold">{translator.email}</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          className="p-6 mx-auto"
+          className="p-6 mx-auto mt-4"
           onPress={() => router.push("/screens/profilePage/TermsAndConditions")}
         >
           <Text

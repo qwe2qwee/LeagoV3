@@ -1,6 +1,7 @@
 import filePartial from "../../assets/icons/profile-icons/filePartial.png"
 import whatsapp from "../../assets/icons/profile-icons/whatsapp.png"
 import mail from "../../assets/icons/profile-icons/mail.png"
+import { pageTitle } from ".";
 
 export const icons = {
   filePartial,
@@ -209,10 +210,12 @@ export const termsAndConditions = {
 
 export const contactUs = {
   en: {
+    pageTitle: "Contact Us",
     whatsappChat: "Chat with our Customer Service",
     email: "Email our Customer Service"
   },
   ar: {
+    pageTitle: "تواصل معنا",
     whatsappChat: "للتحدث إلى خدمة العملاء",
     email: "المراسلة عبر البريد الإلكتروني"
   }
