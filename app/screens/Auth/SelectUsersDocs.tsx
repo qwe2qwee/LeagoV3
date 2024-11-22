@@ -46,7 +46,7 @@ const SelectUsersDocs: React.FC = () => {
   const { user, language } = useAuthStore();
   const isLastSlide = activeIndex === onboardingDocs.length - 1;
 
-  console.log(user?.details.name);
+  console.log(user?.details?.name);
 
   const toggleModal = () => {
     router.replace("/(root)/(tabs)/Profile");

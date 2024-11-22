@@ -70,42 +70,42 @@ const CarDetailsPage: React.FC = () => {
 
   const color = getColorHashCode(parsedCarDetails?.color as any);
 
-  useEffect(() => {
-    const fetchLikes = async () => {
-      try {
-        if (carId) {
-          const count = await getCarLikesCount(carId as string);
-          setLikesCount(count);
-        }
-      } catch (error) {
-        console.error("Error fetching likes count:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchLikes = async () => {
+  //     try {
+  //       if (carId) {
+  //         const count = await getCarLikesCount(carId as string);
+  //         setLikesCount(count);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching likes count:", error);
+  //     }
+  //   };
 
-    fetchLikes();
+  //   fetchLikes();
 
-    const documentSubscriptionPath = `databases.${appwriteConfig.databaseId}.collections.${appwriteConfig.likesCollectionId}.documents`;
+  //   const documentSubscriptionPath = `databases.${appwriteConfig.databaseId}.collections.${appwriteConfig.likesCollectionId}.documents`;
 
-    const unsubscribe = client.subscribe(
-      [documentSubscriptionPath, "files"],
-      (response: any) => {
-        if (response.payload.$id === carId) {
-          if (
-            response.events.includes("database.documents.delete") ||
-            response.events.includes("database.documents.create")
-          ) {
-            console.log("Document event detected:", response.events);
-            fetchLikes();
-          }
-        }
-        console.log("Subscription Response:", response); // Log specific response details for debugging
-      }
-    );
+  //   const unsubscribe = client.subscribe(
+  //     [documentSubscriptionPath, "files"],
+  //     (response: any) => {
+  //       if (response.payload.$id === carId) {
+  //         if (
+  //           response.events.includes("database.documents.delete") ||
+  //           response.events.includes("database.documents.create")
+  //         ) {
+  //           console.log("Document event detected:", response.events);
+  //           fetchLikes();
+  //         }
+  //       }
+  //       console.log("Subscription Response:", response); // Log specific response details for debugging
+  //     }
+  //   );
 
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
-  }, [carId]);
+  //   return () => {
+  //     if (unsubscribe) unsubscribe();
+  //   };
+  // }, [carId]);
 
   return (
     <SafeAreaView className="bg-white flex-1">
@@ -122,7 +122,6 @@ const CarDetailsPage: React.FC = () => {
               {translations[language].noImageAvailable}
             </Text>
           )}
-
           <View className="absolute top-2 left-2 right-2 flex-row justify-between p-2 z-10">
             <Pressable
               onPress={() => router.back()}
@@ -141,9 +140,6 @@ const CarDetailsPage: React.FC = () => {
                   resizeMode="contain"
                   className="w-8 h-8"
                 />
-                <Text className="absolute text-center text-[8px]">
-                  {likesCount}
-                </Text>
               </View>
             </Pressable>
           </View>

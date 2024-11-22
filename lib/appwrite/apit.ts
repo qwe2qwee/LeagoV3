@@ -591,12 +591,17 @@ export function parseDetails(details: any, lang: "en" | "ar" = "en") {
 }
 
 // Function to list car documents from the database
-export async function listCars(queries: any[] = [], lang: "en" | "ar" = "en") {
+export async function listCars(
+  queries?: any,
+  lang: "en" | "ar" = "en",
+  limit = 200,
+  offset = 0
+) {
   try {
     const response = await databases.listDocuments<CarDocument>(
       appwriteConfig.databaseId as string,
       appwriteConfig.carsCollectionId as string,
-      queries
+      [Query.offset(offset), Query.limit(limit), Query.orderDesc("$createdAt")]
     );
 
     return response.documents.map((car) => ({

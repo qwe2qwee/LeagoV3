@@ -8,7 +8,6 @@ import {
   Dimensions,
   StyleSheet,
 } from "react-native";
-import Icon from "react-native-vector-icons/FontAwesome";
 import {
   parseCarLocation,
   parseDetails,
@@ -21,12 +20,11 @@ import { router } from "expo-router";
 import { getColorHashCode } from "@/constants";
 import useAuthStore from "@/store/useAuthStore";
 
-const defaultLocation = { lat: 21.543333, lon: 39.172778 }; // Coordinates for Jeddah, SA
-
 interface CarGridProps {
   selectedBrand: string | null;
   userLocation: { lat: number | null; lon: number | null };
   language: "en" | "ar";
+  cars: CarDocument[];
 }
 
 const translations = {
@@ -44,87 +42,33 @@ const translations = {
   },
 };
 
-const calculateDistance = (
-  loc1: { lat: number | null; lon: number | null },
-  loc2: { lat: number; lon: number }
-): number => {
-  const safeLoc1 = {
-    lat: loc1.lat ?? defaultLocation.lat,
-    lon: loc1.lon ?? defaultLocation.lon,
-  };
-
-  return Math.sqrt(
-    Math.pow(loc2.lat - safeLoc1.lat, 2) + Math.pow(loc2.lon - safeLoc1.lon, 2)
-  );
-};
-
 const CarGrid: React.FC<CarGridProps> = ({
   selectedBrand,
   userLocation,
   language,
+  cars,
 }) => {
-  const [filteredCars, setFilteredCars] = useState<CarDocument[]>([]);
-  const [likedCars, setLikedCars] = useState<string[]>([]);
   const screenWidth = Dimensions.get("window").width;
   const { city, year, noCarsAvailable } = translations[language];
   const { user } = useAuthStore();
 
-  useEffect(() => {
-    const fetchAndFilterCars = async () => {
-      try {
-        const cars = await listCars();
-        let filteredList = cars.filter((car: any) => !car.isHidden);
+  // const toggleLike = async (carId: string) => {
+  //   if (!user?.$id) {
+  //     console.error("User not authenticated.");
+  //     return;
+  //   }
 
-        if (selectedBrand) {
-          filteredList = filteredList.filter(
-            (car: any) => car.brand === selectedBrand
-          );
-        }
-
-        filteredList.sort((a: any, b: any) => {
-          const carLocationA = parseCarLocation(a.carLocation);
-          const carLocationB = parseCarLocation(b.carLocation);
-          if (!carLocationA || !carLocationB) return 0;
-
-          const distanceA = calculateDistance(userLocation, carLocationA);
-          const distanceB = calculateDistance(userLocation, carLocationB);
-          return distanceA - distanceB;
-        });
-
-        setFilteredCars(filteredList);
-
-        // Check liked status for each car
-        const likedStatusPromises = filteredList.map(async (car: any) => {
-          const liked = await hasUserLikedCar(user?.$id ?? "", car.$id);
-          return liked ? car.$id : null;
-        });
-        const likedResults = await Promise.all(likedStatusPromises);
-        setLikedCars(likedResults.filter((id) => id !== null) as string[]);
-      } catch (error) {
-        console.error("Failed to fetch cars:", error);
-      }
-    };
-
-    fetchAndFilterCars();
-  }, [selectedBrand, userLocation, user?.$id]);
-
-  const toggleLike = async (carId: string) => {
-    if (!user?.$id) {
-      console.error("User not authenticated.");
-      return;
-    }
-
-    try {
-      await likeCar(user.$id, carId);
-      setLikedCars((prev) =>
-        prev.includes(carId)
-          ? prev.filter((id) => id !== carId)
-          : [...prev, carId]
-      );
-    } catch (error) {
-      console.error("Error toggling like status:", error);
-    }
-  };
+  //   try {
+  //     await likeCar(user.$id, carId);
+  //     setLikedCars((prev) =>
+  //       prev.includes(carId)
+  //         ? prev.filter((id) => id !== carId)
+  //         : [...prev, carId]
+  //     );
+  //   } catch (error) {
+  //     console.error("Error toggling like status:", error);
+  //   }
+  // };
 
   const renderItem = ({ item }: { item: CarDocument }) => {
     const carDetails = Array.isArray(item.details)
@@ -185,7 +129,7 @@ const CarGrid: React.FC<CarGridProps> = ({
             style={styles.carYear}
           >{`${year}: ${carInfo.year ?? "N/A"}`}</Text>
         </View>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => toggleLike(item.$id)}
           style={styles.likeIcon}
         >
@@ -194,18 +138,18 @@ const CarGrid: React.FC<CarGridProps> = ({
             size={24}
             color={likedCars.includes(item.$id) ? "red" : "gray"}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </TouchableOpacity>
     );
   };
 
-  if (filteredCars.length === 0) {
+  if (cars.length === 0) {
     return <Text style={styles.noCarsText}>{noCarsAvailable}</Text>;
   }
 
   return (
     <FlatList
-      data={filteredCars}
+      data={cars}
       scrollEnabled={false}
       numColumns={2}
       keyExtractor={(item) => item.$id}
