@@ -20,6 +20,27 @@ export interface AppwriteUser extends AppwriteDocument {
   details: string;
 }
 
+export interface Reservation {
+  reservationStart: string;
+  reservationEnd: string;
+  status: string;
+}
+
+export interface ReservationInfo {
+  id: string;
+  carName: string | null;
+  carYear: string | null;
+  carColor: string | null;
+  branchId: string | null;
+  carImage: string | null;
+  carLocation: any;
+  city: string | null;
+  reservationStart: string;
+  reservationEnd: string;
+  reservationDate: string;
+  status: string;
+}
+
 export interface AppwriteUserParse extends AppwriteDocument {
   email: string;
   userName: string;

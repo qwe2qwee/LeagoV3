@@ -4,10 +4,13 @@ import {
   CarDataProps,
   CarDocument,
   PhoneTokenResponse,
+  Reservation,
+  ReservationInfo,
   SessionResponse,
 } from "@/types/AppwriteTypes";
 import { ID, Query } from "react-native-appwrite";
 import { account, appwriteConfig, avatars, databases, storage } from "./config";
+import { fetchCarDetails } from "@/constants";
 
 // Error localization definition for English and Arabic
 type ErrorMessages = {
@@ -849,4 +852,50 @@ async function unlikeCar(
       error
     );
   }
+}
+export async function Reservations(userId: string): Promise<ReservationInfo[]> {
+  const reservations: ReservationInfo[] = [];
+  try {
+    // Fetch reservation documents from Appwrite
+    const response = await databases.listDocuments(
+      appwriteConfig.databaseId as string,
+      appwriteConfig.rentals as string,
+      [Query.equal("userId", userId)]
+    );
+
+    for (const reservation of response.documents) {
+      try {
+        // Parse the date JSON field
+        const parsedDate: Reservation = JSON.parse(reservation.date);
+
+        // Fetch car details for the current reservation
+        // Parse car details JSON object
+        const carDetailsArray = JSON.parse(reservation.carId.details);
+        const carDetails = carDetailsArray[0]; // Assuming `details` is an array with one object
+
+        // Build reservation info object
+        reservations.push({
+          id: reservation.$id,
+          carName: carDetails.name?.en || "Unknown", // English name fallback
+          carYear: carDetails.year || "Unknown",
+          carColor: carDetails.color || "Unknown",
+          carImage: carDetails.image || "Unknown",
+          branchId: reservation.branchId?.$id || null,
+          carLocation: reservation.carId.carLocation,
+          city: reservation.carId.city,
+          reservationStart: parsedDate.reservationStart,
+          reservationEnd: parsedDate.reservationEnd,
+          reservationDate: reservation.reservationDate,
+          status: reservation.status,
+        });
+        // Build reservation info object
+      } catch (error) {
+        console.error("Failed to parse reservation:", reservation, error);
+      }
+    }
+  } catch (error) {
+    console.error("Error listing reservations:", error);
+    throw new Error("Failed to fetch reservations");
+  }
+  return reservations;
 }

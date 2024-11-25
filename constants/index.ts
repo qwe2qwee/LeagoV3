@@ -350,4 +350,22 @@ export const bookingPage = {
   },
 };
 
+// Mock function to fetch car details (replace with actual Appwrite query)
+export async function fetchCarDetails(
+  carId: string
+): Promise<{ name: string | null; year: string | null; color: string | null }> {
+  try {
+    console.log(`Fetching car details for carId: ${carId}`);
+    // Replace the following line with actual Appwrite database query
+    return {
+      name: `CarName-${carId}`,
+      year: `Year-${carId}`,
+      color: `Color-${carId}`,
+    };
+  } catch (error) {
+    console.error("Error fetching car details:", error);
+    return { name: null, year: null, color: null };
+  }
+}
+
 export type TranslationSignUpKeys = keyof typeof translationsignUp;
