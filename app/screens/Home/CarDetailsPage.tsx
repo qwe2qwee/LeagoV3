@@ -133,15 +133,6 @@ const CarDetailsPage: React.FC = () => {
                 className="w-6 h-6"
               />
             </Pressable>
-            <Pressable className="bg-white rounded-full p-3 shadow-md relative w-12 h-12">
-              <View className="flex items-center justify-center">
-                <Image
-                  source={icons.HeartD}
-                  resizeMode="contain"
-                  className="w-8 h-8"
-                />
-              </View>
-            </Pressable>
           </View>
         </View>
 

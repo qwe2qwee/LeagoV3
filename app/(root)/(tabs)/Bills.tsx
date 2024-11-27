@@ -6,6 +6,7 @@ import useAuthStore from "@/store/useAuthStore";
 import { ReservationInfo } from "@/types/AppwriteTypes";
 import { icons } from "@/constants";
 import CustomButton from "@/components/ui/CustomButton";
+import { router } from "expo-router";
 
 // Utility to calculate the distance between two locations
 const calculateDistanceInKm = (
@@ -53,7 +54,6 @@ const Bills = () => {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView contentContainerStyle={{ paddingBottom: 98, paddingTop: 9 }}>
-        <Text className="text-lg font-bold mx-5">Bills</Text>
         {loading ? (
           <Text className="text-center mt-5">Loading reservations...</Text>
         ) : reservations.length > 0 ? (
@@ -87,9 +87,7 @@ const Bills = () => {
                   <View className="flex-row justify-center items-center">
                     <Image source={icons.point1} className="w-4 h-4 mx-1" />
                     <Text className="text-sm font-MontserratMedium text-[#868686]">
-                      {distance > 100
-                        ? `${reservation.city || "N/A"}`
-                        : `${distance.toFixed(1)} km`}
+                      {reservation.city || "N/A"}
                     </Text>
                   </View>
                 </View>
@@ -109,6 +107,12 @@ const Bills = () => {
                 <View className="flex-row-reverse items-center justify-between mt-2">
                   <CustomButton
                     title="Details"
+                    onPress={() => {
+                      router.push({
+                        pathname: "/screens/Bills/DetailsBill",
+                        params: { reservation: JSON.stringify(reservation) },
+                      });
+                    }}
                     className="w-28 h-9 p-1 rounded-md"
                     textStyle="text-[13px]"
                   />

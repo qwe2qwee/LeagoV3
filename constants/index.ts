@@ -27,6 +27,7 @@ import phone from "../assets/icons/Phone.png";
 import backHome from "../assets/icons/backHome.png";
 import hyundai from "../assets/icons/hyundai1.png";
 import HeartD from "../assets/icons/HeartD.png";
+import Danger from "../assets/icons/Danger.png";
 import Time from "../assets/icons/Time.png";
 import docsImage from "../assets/icons/docsImage.png";
 import support from "../assets/icons/support.png";
@@ -72,6 +73,7 @@ export const icons = {
   phone,
   Time,
   support,
+  Danger,
   close,
   docsImage,
   dollar,
