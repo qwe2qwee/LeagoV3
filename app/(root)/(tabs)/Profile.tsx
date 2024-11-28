@@ -35,8 +35,6 @@ const profile = () => {
   }
   
 
-  console.log(user);
-
   return (
     <SafeAreaView className="flex-1 rt bg-[#FEFEFE]">
       <ScrollView contentContainerStyle={{ paddingBottom: 100, paddingTop: 9 }}>

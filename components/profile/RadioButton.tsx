@@ -4,20 +4,28 @@ import { InfoBoxWithTitleProps } from "@/types/type";
 import { radioButton } from "@/constants/profilePage";
 import useAuthStore from "@/store/useAuthStore";
 
-type gender = "male" | "female"
+type Gender = "male" | "female"
 
-const RadioButton = ({ title }: {title: string}) => {
+// Define the props type for RadioButton 
+interface RadioButtonProps { onGenderChange: (gender: Gender) => void }
+
+const RadioButton = ( {onGenderChange} : RadioButtonProps ) => {
   const {language} = useAuthStore()
-  const translator = radioButton.sex[language]
-  const [gender, setGender] = useState< gender | undefined >(undefined);
+  const translator = radioButton.radio[language]
+  const [gender, setGender] = useState< Gender | undefined >(undefined);
+
+  const handleGenderChange = (newGender : Gender) => {
+    setGender(newGender);
+    onGenderChange(newGender)
+  }
 
   
 
   return (
     <View className="justify-center items-end p-6 pb-0">
-      <Text className="text-right font-ZainBold text-[#78828A]">{title}</Text>
+      <Text className="text-right font-ZainBold text-[#78828A]">{translator.gender}</Text>
       <View className="flex flex-row-reverse w-full justify-around items-center mt-6">
-        <TouchableOpacity className= "flex flex-row gap-2"  onPress={() => setGender("male")}>
+        <TouchableOpacity className= "flex flex-row gap-2"  onPress={() => handleGenderChange("male")}>
           <Text className="font-ZainBold text-primary-400">{translator.male}</Text>
           <View className="relative w-5 h-5">
             <Image
@@ -32,7 +40,7 @@ const RadioButton = ({ title }: {title: string}) => {
             />
           </View>
         </TouchableOpacity>
-        <TouchableOpacity className= "flex flex-row gap-2"  onPress={() => setGender("female")}>
+        <TouchableOpacity className= "flex flex-row gap-2"  onPress={() => handleGenderChange("female")}>
           <Text className="font-ZainBold text-primary-400">{translator.female}</Text>
           <View className="relative w-5 h-5">
             <Image

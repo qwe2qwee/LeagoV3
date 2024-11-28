@@ -1,6 +1,7 @@
 import { Image, Pressable, Text, TouchableOpacity, View } from "react-native";
 import { useState } from "react";
 import {
+  pageButton,
   pageTitle,
   personalInfoPage,
   profilePage,
@@ -17,6 +18,9 @@ import { router } from "expo-router";
 import { icons } from "@/constants";
 
 type DateType = any; // Adjust according to the actual type if you know it, or use 'any' for flexibility
+
+type Gender = "male" | "female";
+
 const PersonalInfo = () => {
   const { language, user } = useAuthStore();
 
@@ -24,10 +28,16 @@ const PersonalInfo = () => {
   const personalInfoPageTranslator = personalInfoPage[language];
   const fieldTranslator = profilePage[language];
   const SecTranslator = profileSections[language];
+  const pageButtonTranslator = pageButton[language];
 
   const [open, setOpen] = useState(false);
+  const [openSaveModal, setOpenSaveModal] = useState(false);
   // const [date, setDate] = useState("351654");
   const [date, setDate] = useState<DateType>(undefined);
+  const [selectedGender, setSelectedGender] = useState<Gender | undefined>(undefined);
+  const [userDetails, setUserDetails] = useState<any>(user?.details)
+  // const [userGender, setUserGender] = useState(user?.details.gender)
+  // const [userBirthday, setUserBirthday] = useState(user?.details.birthday)
 
   const handleChange = ({ date }: { date: DateType }) => {
     // Convert to JavaScript Date if it's a Day.js object
@@ -44,9 +54,26 @@ const PersonalInfo = () => {
     setOpen(!open);
   };
 
+  const handleSaveModal = () => {
+    setOpenSaveModal(!openSaveModal);
+  };
+
+  const handleOnSave = () => {
+    setUserDetails({
+      ...userDetails,
+      birthday: date,
+      gender: selectedGender
+    })
+    console.log(user?.details)
+  };
+
+  const handleGenderChange = (gender: Gender) => {
+    setSelectedGender(gender);
+  };
+
   return (
     <SafeAreaView className="bg-white  h-full">
-      <View className="flex-row justify-between items-center p-6 ">
+      <View className="flex-row justify-between items-center px-6 pt-6  ">
         <Pressable
           onPress={() => router.back()}
           className="bg-white rounded-full shadow-md"
@@ -94,7 +121,9 @@ const PersonalInfo = () => {
                     selectedItemColor="#FF5733"
                   />
                   <TouchableOpacity onPress={handleOnPress}>
-                    <Text className="font-ZainBold text-[#FF5C39]">موافق</Text>
+                    <Text className="font-ZainBold text-primary-400">
+                      {pageButtonTranslator.accept}
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -110,9 +139,9 @@ const PersonalInfo = () => {
         title={personalInfoPageTranslator.email}
         info={user?.email}
       />
-      <RadioButton title="الجنس" />
+      <RadioButton onGenderChange={handleGenderChange} />
       <View className="itmes-center justify-center mt-4">
-        <Text className="text-sm pr-10 py-2.5 font-ZainBold text-[#9CA4AB]">
+        <Text className="text-sm pr-10 py-2.5 font-ZainBold text-[#78828A]">
           {SecTranslator.security}
         </Text>
         <View className="w-80 mx-10 pr-10">
@@ -120,9 +149,47 @@ const PersonalInfo = () => {
             className="flex flex-row-reverse w-full items-center justify-center border-b border-[#E9EBED] pb-5 pt-3"
             onPress={() => router.push("./home")}
           >
-            <Text className="pr-4 font-ZainBold text-red-500 text-center">{fieldTranslator.changePass.title}</Text>
+            <Text className="pr-4 font-ZainBold text-red-500 text-center">
+              {fieldTranslator.changePass.title}
+            </Text>
           </TouchableOpacity>
         </View>
+      </View>
+      <View className="w-80 mx-10 pr-10 pt-4">
+        <TouchableOpacity
+          className="flex flex-row-reverse w-full items-center justify-center border-b border-[#E9EBED] pb-5 pt-3"
+          onPress={handleSaveModal}
+        >
+          <Text className="pr-4 font-ZainBold text-primary-500 text-center">
+            {pageButtonTranslator.saveChanges}
+          </Text>
+        </TouchableOpacity>
+        <Modal animationIn="slideInUp" coverScreen isVisible={openSaveModal}>
+          <View className="bg-white w-80 h-64 rounded-2xl">
+            <View className="p-16 pb-8">
+              <Text className="text-center text-lg font-ZainBold">
+                {pageButtonTranslator.agreementQuestion}
+              </Text>
+            </View>
+            <View className="items-center justify-center">
+              <TouchableOpacity
+                onPress={handleOnSave}
+                className="bg-primary-500 w-44 h-11 justify-center items-center rounded-md"
+              >
+                <Text className="text-center text-white font-ZainBold">
+                  {" "}
+                  {pageButtonTranslator.accept}{" "}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleSaveModal} className="mt-4">
+                <Text className="text-primary-500 font-ZainBold">
+                  {" "}
+                  {pageButtonTranslator.cancel}{" "}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </View>
     </SafeAreaView>
   );

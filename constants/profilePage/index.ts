@@ -7,26 +7,27 @@ import profileInfo from "../../assets/icons/profile-icons/profile.png";
 import wallet from "../../assets/icons/profile-icons/wallet-2.png";
 import calindar from "../../assets/icons/profile-icons/Calendar.png";
 import vector from "../../assets/icons/checkbox/Vector.png";
-import unchecked from "../../assets/icons/checkbox/unchecked.png"
+import unchecked from "../../assets/icons/checkbox/unchecked.png";
 import Address from "@/app/screens/profilePage/Address";
-
 
 // radio button
 
 export const radioButton = {
   vector,
   unchecked,
-  sex: {
-    en : {
+  radio: {
+    en: {
+      gender: "gender",
       male: "Male",
-      female: "Female"
+      female: "Female",
     },
-    ar : {
+    ar: {
+      gender: "الجنس",
       male: "ذكر",
-      female: "أنثى"
-    }
-  }
-}
+      female: "أنثى",
+    },
+  },
+};
 
 // Profile Page
 
@@ -171,37 +172,52 @@ export const address = {
 
 export const languageChoices = {
   en: {
-    title : "Language",
-    english : "English",
-    arabic : "Arabic"
+    title: "Language",
+    english: "English",
+    arabic: "Arabic",
   },
   ar: {
-    title : "اللغة",
-    english : "الإنقليزية",
-    arabic : "العربية"
-  }
-}
+    title: "اللغة",
+    english: "الإنقليزية",
+    arabic: "العربية",
+  },
+};
 
 export const logOutModal = {
   en: {
     question: "Are you sure want to Log Out ?",
     yes: "Log Out",
-    cancel: "Cancel"
+    cancel: "Cancel",
   },
   ar: {
     question: "هل أنت متأكد من تسجيل الخروج ؟!",
     yes: "نعم ، تسجيل خروج",
-    cancel: "إلغاء"
-  }
-}
+    cancel: "إلغاء",
+  },
+};
 
 export const companyAddress = {
   en: {
     companyName: "Basmat Tareeq Company",
-    Address: "Jeddah, Saudi Arabia"
+    Address: "Jeddah, Saudi Arabia",
   },
   ar: {
     companyName: "شركة بسمة طريق",
-    Address: "جدة، المملكة العربية السعودية"
-  }
-}
+    Address: "جدة، المملكة العربية السعودية",
+  },
+};
+
+export const pageButton = {
+  en: {
+    accept: "Accept",
+    cancel: "Cancel",
+    saveChanges: "Save Changes",
+    agreementQuestion: "Are you sure to save changes ?",
+  },
+  ar: {
+    accept: "موافق",
+    cancel: "إلغاء",
+    saveChanges: "حفظ التغييرات",
+    agreementQuestion: "هل تريد حفظ التغييرات ؟",
+  },
+};
