@@ -116,7 +116,7 @@ const Bills = () => {
                     className="w-28 h-9 p-1 rounded-md"
                     textStyle="text-[13px]"
                   />
-                  <Text>$248 / 3 Hours </Text>
+                  <Text>{reservation.bill} / 3 Hours </Text>
                 </View>
               </View>
             );

@@ -860,43 +860,64 @@ export async function Reservations(userId: string): Promise<ReservationInfo[]> {
     // Fetch reservation documents from Appwrite
     const response = await databases.listDocuments(
       appwriteConfig.databaseId as string,
-      appwriteConfig.rentals as string,
+      appwriteConfig.reservationsCollectionId as string,
       [Query.equal("userId", userId)]
     );
 
     for (const reservation of response.documents) {
       try {
-        // Parse the date JSON field safely
         const parsedDate =
           typeof reservation.date === "string"
             ? JSON.parse(reservation.date)
             : reservation.date;
 
-        // Ensure carId is an array and process the first element
-        const carDetailsArray = Array.isArray(reservation.carId)
-          ? reservation.carId
-          : [];
-        const carDetails = carDetailsArray.length > 0 ? carDetailsArray[0] : {};
+        // Parse car details if `carId` exists
+        const carInfo =
+          reservation.carId && typeof reservation.carId.details === "string"
+            ? JSON.parse(reservation.carId.details)[0] // Parse the first object in details array
+            : null;
 
-        // Parse car details JSON object if it exists
-        const carDetailsParsed =
-          typeof carDetails.details === "string"
-            ? JSON.parse(carDetails.details)[0] // Assuming details is an array with one object
-            : carDetails.details || {};
+        // Parse the pay JSON field
+        const parsedPay =
+          typeof reservation.pay === "string"
+            ? JSON.parse(reservation.pay)
+            : reservation.pay;
 
-        // Build reservation info object
+        // Parse branchId location
+        const branchLocation =
+          typeof reservation.branchId?.location === "string"
+            ? JSON.parse(reservation.branchId.location)
+            : reservation.branchId?.location;
+
+        function formatDate(isoDateString: string) {
+          try {
+            const date = new Date(isoDateString); // Parse the ISO date string
+            const options = { year: "numeric", month: "long", day: "numeric" };
+            return new Intl.DateTimeFormat("en-US", options).format(date); // Format the date
+          } catch (error) {
+            console.error("Invalid date format:", isoDateString, error);
+            return "Unknown";
+          }
+        }
+        console.log(parsedDate);
+
+        const date = formatDate(reservation.reservationDate);
         reservations.push({
           id: reservation.$id,
-          carName: carDetailsParsed.name?.en || "Unknown", // English name fallback
-          carYear: carDetailsParsed.year || "Unknown",
-          carColor: carDetailsParsed.color || "Unknown",
-          carImage: carDetailsParsed.image || "Unknown",
-          branchId: reservation.branchId?.$id || null,
-          carLocation: carDetails.carLocation || "Unknown",
-          city: carDetails.city || "Unknown",
+          carName: carInfo?.name?.en || "Unknown",
+          carYear: carInfo?.year || "Unknown",
+          carColor: carInfo?.color || "Unknown",
+          carImage: carInfo?.image || "Unknown",
+          branchId: reservation.branchId?.$id || "Unknown",
+          reservationDuration: parsedDate?.reservationDuration || "Unknown",
+          carLocation: carInfo?.carLocation || "Unknown",
+          city: reservation.carId?.city || "Unknown",
           reservationStart: parsedDate?.reservationStart || "Unknown",
           reservationEnd: parsedDate?.reservationEnd || "Unknown",
-          reservationDate: reservation.reservationDate || "Unknown",
+          reservationDate: date || "Unknown",
+          bill: parsedPay?.price || "Unknown",
+          payId: parsedPay?.payId || "Unknown",
+          payStatus: parsedPay?.done ? "Completed" : "Pending",
           status: reservation.status || "Unknown",
         });
       } catch (error) {

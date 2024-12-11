@@ -26,19 +26,35 @@ export interface Reservation {
   status: string;
 }
 
-export interface ReservationInfo {
+export interface ReservationInfo extends AppwriteDocument {
   id: string;
-  carName: string | null;
-  carYear: string | null;
-  carColor: string | null;
-  branchId: string | null;
-  carImage: string | null;
+  branchName: string;
+  branchCity: string;
+  carName: string;
+  carYear: string;
+  carColor: string;
+  carImage: string;
+  branchId: string;
   carLocation: any;
-  city: string | null;
+  city: string;
+  branchLocation: string;
   reservationStart: string;
   reservationEnd: string;
+  reservationDuration: string;
+  reservationStatus: string;
   reservationDate: string;
-  status: string;
+  userName: string;
+  userEmail: string;
+  userPhone: string;
+  carDetails: {
+    brand: string;
+    model: string;
+    carLocation: string;
+    image: string;
+  }[];
+  bill: string;
+  payId: string;
+  payStatus: string;
 }
 
 export interface AppwriteUserParse extends AppwriteDocument {
