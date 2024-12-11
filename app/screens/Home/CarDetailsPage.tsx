@@ -26,6 +26,7 @@ const CarDetailsPage: React.FC = () => {
     carName,
     carRentSalary,
     carImages,
+    ownerId,
     carImage,
     carCity,
   } = useLocalSearchParams();
@@ -198,7 +199,7 @@ const CarDetailsPage: React.FC = () => {
               if (carId) {
                 router.push({
                   pathname: "/screens/Home/BookingPage",
-                  params: { carId, carRentSalary },
+                  params: { carId, carRentSalary, ownerId },
                 });
               } else {
                 console.error("carId is missing.");

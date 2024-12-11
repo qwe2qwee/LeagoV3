@@ -855,6 +855,7 @@ async function unlikeCar(
 }
 export async function Reservations(userId: string): Promise<ReservationInfo[]> {
   const reservations: ReservationInfo[] = [];
+
   try {
     // Fetch reservation documents from Appwrite
     const response = await databases.listDocuments(
@@ -865,30 +866,39 @@ export async function Reservations(userId: string): Promise<ReservationInfo[]> {
 
     for (const reservation of response.documents) {
       try {
-        // Parse the date JSON field
-        const parsedDate: Reservation = JSON.parse(reservation.date);
+        // Parse the date JSON field safely
+        const parsedDate =
+          typeof reservation.date === "string"
+            ? JSON.parse(reservation.date)
+            : reservation.date;
 
-        // Fetch car details for the current reservation
-        // Parse car details JSON object
-        const carDetailsArray = JSON.parse(reservation.carId.details);
-        const carDetails = carDetailsArray[0]; // Assuming `details` is an array with one object
+        // Ensure carId is an array and process the first element
+        const carDetailsArray = Array.isArray(reservation.carId)
+          ? reservation.carId
+          : [];
+        const carDetails = carDetailsArray.length > 0 ? carDetailsArray[0] : {};
+
+        // Parse car details JSON object if it exists
+        const carDetailsParsed =
+          typeof carDetails.details === "string"
+            ? JSON.parse(carDetails.details)[0] // Assuming details is an array with one object
+            : carDetails.details || {};
 
         // Build reservation info object
         reservations.push({
           id: reservation.$id,
-          carName: carDetails.name?.en || "Unknown", // English name fallback
-          carYear: carDetails.year || "Unknown",
-          carColor: carDetails.color || "Unknown",
-          carImage: carDetails.image || "Unknown",
+          carName: carDetailsParsed.name?.en || "Unknown", // English name fallback
+          carYear: carDetailsParsed.year || "Unknown",
+          carColor: carDetailsParsed.color || "Unknown",
+          carImage: carDetailsParsed.image || "Unknown",
           branchId: reservation.branchId?.$id || null,
-          carLocation: reservation.carId.carLocation,
-          city: reservation.carId.city,
-          reservationStart: parsedDate.reservationStart,
-          reservationEnd: parsedDate.reservationEnd,
-          reservationDate: reservation.reservationDate,
-          status: reservation.status,
+          carLocation: carDetails.carLocation || "Unknown",
+          city: carDetails.city || "Unknown",
+          reservationStart: parsedDate?.reservationStart || "Unknown",
+          reservationEnd: parsedDate?.reservationEnd || "Unknown",
+          reservationDate: reservation.reservationDate || "Unknown",
+          status: reservation.status || "Unknown",
         });
-        // Build reservation info object
       } catch (error) {
         console.error("Failed to parse reservation:", reservation, error);
       }
@@ -897,5 +907,63 @@ export async function Reservations(userId: string): Promise<ReservationInfo[]> {
     console.error("Error listing reservations:", error);
     throw new Error("Failed to fetch reservations");
   }
+
   return reservations;
 }
+
+// Function to create a rent document
+export const createRent = async ({
+  branchId,
+  carId,
+  userId,
+  startDate,
+  endDate,
+  status,
+  bill,
+}: {
+  branchId: string | null;
+  carId: string | null;
+  userId: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  status: string | null;
+  bill: number | null;
+}) => {
+  if (
+    !branchId ||
+    !carId ||
+    !userId ||
+    !startDate ||
+    !endDate ||
+    !status ||
+    bill === null
+  ) {
+    throw new Error("Missing required field for creating rent document.");
+  }
+
+  console.log(branchId, "branchId");
+  console.log(carId, "carId");
+  console.log(userId, "userId");
+
+  try {
+    const response = await databases.createDocument(
+      appwriteConfig.databaseId as string,
+      appwriteConfig.rentals as string, // Replace with your collection ID
+      ID.unique(),
+      {
+        branchId: branchId, // Wrap branchId in an array
+        carId: [carId], // Wrap carId in an array
+        userId: userId, // Wrap userId in an array
+        startDate,
+        endDate,
+        status,
+        bill,
+      }
+    );
+
+    return response;
+  } catch (error) {
+    console.error("Failed to create rent document:", error);
+    throw new Error("Unable to create rent document.");
+  }
+};

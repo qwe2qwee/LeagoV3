@@ -13,11 +13,12 @@ import CustomButton from "@/components/ui/CustomButton";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { bookingPage } from "@/constants";
 import useAuthStore from "@/store/useAuthStore";
+import { createRent } from "@/lib/appwrite/apit";
 
 const BookingPage: React.FC = () => {
   const { language, user } = useAuthStore();
   const router = useRouter();
-  const { carId, carRentSalary } = useLocalSearchParams();
+  const { carId, carRentSalary, ownerId } = useLocalSearchParams();
 
   const translations: any = {
     en: {
@@ -92,8 +93,7 @@ const BookingPage: React.FC = () => {
       (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
     );
   };
-
-  const handleConfirmBooking = () => {
+  const handleConfirmBooking = async () => {
     if (!isBookingValid()) {
       Alert.alert(
         bookingPage[language].invalidBooking,
@@ -101,12 +101,34 @@ const BookingPage: React.FC = () => {
       );
       return;
     }
-    const totalPrice = calculateTotalPrice();
-    Alert.alert(
-      bookingPage[language].bookingConfirmed,
-      `${bookingPage[language].bookingSuccessMessage}${totalPrice}.`
-    );
-    router.back();
+
+    const totalPrice = calculateTotalPrice().toString();
+    const rentalStart = startDate?.toISOString();
+    const rentalEnd = endDate?.toISOString();
+
+    try {
+      // Create rent document
+      await createRent({
+        branchId: ownerId, // Replace with the actual branchId
+        carId: carId as string,
+        userId: user?.$id as string,
+        startDate: rentalStart!,
+        endDate: rentalEnd!,
+        status: "Pending", // Default status
+        bill: totalPrice,
+      });
+
+      Alert.alert(
+        bookingPage[language].bookingConfirmed,
+        `${bookingPage[language].bookingSuccessMessage}${totalPrice}.`
+      );
+      router.back();
+    } catch (error) {
+      Alert.alert(
+        bookingPage[language].error,
+        "Failed to create rent document. Please try again."
+      );
+    }
   };
 
   return (
