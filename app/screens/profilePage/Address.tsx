@@ -1,8 +1,8 @@
 import { View, Text, Pressable, Image } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import DropdownWithTitle from "@/components/Profile/DropdownWithTitle";
-import InputFieldAddress from "@/components/Profile/InputFieldAddress";
+import DropdownWithTitle from "@/components/profile/DropdownWithTitle";
+import InputFieldAddress from "@/components/profile/InputFieldAddress";
 import { address, pageTitle } from "@/constants/profilePage";
 import useAuthStore from "@/store/useAuthStore";
 import { router } from "expo-router";

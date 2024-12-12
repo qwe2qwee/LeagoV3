@@ -8,12 +8,12 @@ import {
   profileSections,
 } from "@/constants/profilePage";
 import DateTimePicker from "react-native-ui-datepicker";
-import InfoBoxWithTitle from "@/components/Profile/InfoBoxWithTitle";
+import InfoBoxWithTitle from "@/components/profile/InfoBoxWithTitle";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Modal from "react-native-modal";
 import dayjs from "dayjs";
 import useAuthStore from "@/store/useAuthStore";
-import RadioButton from "@/components/Profile/RadioButton";
+import RadioButton from "@/components/profile/RadioButton";
 import { router } from "expo-router";
 import { icons } from "@/constants";
 
