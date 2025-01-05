@@ -12,7 +12,7 @@ import {
   profilePage,
   profileSections,
 } from "@/constants/profilePage";
-import TouchableFeildWithIcon from "@/components/Profile/TouchableFeildWithIcon";
+import TouchableFeildWithIcon from "@/components/profile/TouchableFeildWithIcon";
 import useAuthStore from "@/store/useAuthStore";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Modal from "react-native-modal";

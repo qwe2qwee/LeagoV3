@@ -12,7 +12,7 @@ import {
 import { useState } from "react";
 import { pageTitle, personalInfoPage } from "@/constants/profilePage";
 import DateTimePicker from "react-native-ui-datepicker";
-import InfoBoxWithTitle from "@/components/Profile/InfoBoxWithTitle";
+import InfoBoxWithTitle from "@/components/profile/InfoBoxWithTitle";
 
 type Language = "en" | "ar";
 type DateType = any; // Adjust according to the actual type if you know it, or use 'any' for flexibility

@@ -9,7 +9,7 @@ import {
 } from "@/constants/profilePage/termsAndConditions";
 import useAuthStore from "@/store/useAuthStore";
 import { router } from "expo-router";
-import LeagoTag from "@/components/Profile/LeagoTag";
+import LeagoTag from "@/components/profile/LeagoTag";
 import { companyAddress } from "@/constants/profilePage";
 import { Pressable } from "react-native";
 import { icons as backArrow}  from "@/constants";
