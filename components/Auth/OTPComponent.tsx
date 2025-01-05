@@ -1,10 +1,13 @@
 import React, { useState, useRef } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import CustomButton from "../ui/CustomButton";
+import { Image } from "react-native";
+import { icons } from "@/constants";
 
 interface OTPComponentProps {
   onVerifyOTP: (otp: string) => void;
   onResendOTP: () => void;
+  closeModal?: () => void;
   otpLength?: number; // Default to 4
   language?: "en" | "ar";
   emailORPhoneNumber: string;
@@ -14,6 +17,7 @@ const OTPComponent: React.FC<OTPComponentProps> = ({
   onVerifyOTP,
   onResendOTP,
   otpLength = 4,
+  closeModal,
   language = "ar",
   emailORPhoneNumber,
 }) => {
@@ -110,7 +114,10 @@ const OTPComponent: React.FC<OTPComponentProps> = ({
   };
 
   return (
-    <View className="bg-secondary-white justify-center items-center p-4">
+    <View className="bg-secondary-white justify-center items-center p-4 relative">
+      <TouchableOpacity onPress={closeModal} className="absolute top-2 right-2">
+        <Image source={icons.close} resizeMode="contain" className="w-6 h-6" />
+      </TouchableOpacity>
       <Text
         className={`text-lg font-bold mb-4 ${language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold"}`}
       >

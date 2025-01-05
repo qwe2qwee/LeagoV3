@@ -113,6 +113,16 @@ const signIn = () => {
                   value={form.password}
                   onChangeText={(text) => handleInputChange("password", text)}
                 />
+                <View className="w-full px-2 flex-row-reverse justify-start items-center">
+                  <TouchableOpacity
+                    className="flex-row px-3"
+                    onPress={() => router.push("/(auth)/reset/email")}
+                  >
+                    <Text className="text-[#F61F1F] text-xs underline">
+                      {t.forgotPassword}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
               <CustomButton
                 title={t.signIn}

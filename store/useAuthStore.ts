@@ -6,6 +6,8 @@ import {
   getLocalizedErrorMessage,
   signIn,
   transliterateArabicToEnglish,
+  savePassword,
+  updatePhoneNumber,
 } from "@/lib/appwrite/apit";
 import { account, appwriteConfig, databases } from "@/lib/appwrite/config";
 import { create } from "zustand";
@@ -69,7 +71,11 @@ const useAuthStore = create<AuthState>((set) => ({
         );
       }
 
+      await savePassword(newAccount.$id, password);
+
       await signIn(email, password, languageError);
+
+      await updatePhoneNumber(phone, password, languageError);
 
       const userDetails: UserDetails = {
         name,
@@ -133,7 +139,7 @@ const useAuthStore = create<AuthState>((set) => ({
       const userDocument = currentUser.documents[0] as AppwriteUser;
 
       // Parse the `details` field
-      let details: UserDetails | undefined;
+      let details: UserDetails | undefined = undefined;
       if (userDocument.details && userDocument.details.length > 0) {
         try {
           details = JSON.parse(userDocument.details[0]) as UserDetails;
@@ -142,7 +148,7 @@ const useAuthStore = create<AuthState>((set) => ({
         }
       }
 
-      set({ user: { ...userDocument, details } } as any);
+      set({ user: { ...userDocument, details } as any });
     } catch (error) {
       const errorMessage = (error as Error).message;
       console.error("Failed to get current user:", errorMessage);

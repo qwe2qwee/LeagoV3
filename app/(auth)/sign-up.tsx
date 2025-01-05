@@ -9,7 +9,7 @@ import {
   Keyboard,
   TouchableOpacity,
   Alert,
-  ActivityIndicator, // Added for loading indication
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
 import ReactNativeModal from "react-native-modal";
@@ -28,8 +28,6 @@ import { UpdatePhoneNumberAndSendOTP } from "@/lib/UpdatePhoneNumberAndSendOTP";
 import OTPComponent from "@/components/Auth/OTPComponent";
 import useAuthStore from "@/store/useAuthStore";
 
-type Language = "en" | "ar";
-
 const signUp = () => {
   const { language, user, createUser } = useAuthStore();
   const t = translationsignUp[language];
@@ -41,9 +39,7 @@ const signUp = () => {
     phone: "",
   });
   const [loading, setLoading] = useState(false);
-
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [otpCode, setOtpCode] = useState("");
+  const [isModalVisible, setModalVisible] = useState(true);
 
   const birthday = "1999-01-01";
   const gender = "other";
@@ -156,11 +152,21 @@ const signUp = () => {
         <ScrollView className="flex-1 bg-white">
           <View className="flex-1 bg-white">
             {loading && (
-              <ActivityIndicator
-                size="large"
-                color="#0000ff"
-                style={{ marginTop: 20 }}
-              />
+              <View
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  zIndex: 10,
+                }}
+              >
+                <ActivityIndicator size="large" color="#fff" />
+              </View>
             )}
             <View className="relative w-full h-[250px]">
               <Image
@@ -227,7 +233,9 @@ const signUp = () => {
                 title={t.signUp}
                 textStyle={`text-lg ${changelangS}`}
                 onPress={onSignUpPress}
+                loading={loading}
                 className="mt-5"
+                disabled={loading}
               />
               <OAuth />
               <Link
@@ -245,11 +253,11 @@ const signUp = () => {
           </View>
           <ReactNativeModal
             isVisible={isModalVisible}
-            onBackdropPress={() => setModalVisible(false)}
             onBackButtonPress={() => setModalVisible(false)}
           >
             <View className="bg-white p-5 rounded-lg">
               <OTPComponent
+                closeModal={() => setModalVisible(false)}
                 onVerifyOTP={handleOtpSubmit}
                 onResendOTP={handleRsendOtp}
                 otpLength={4}

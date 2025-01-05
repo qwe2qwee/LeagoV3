@@ -8,7 +8,7 @@ import {
   ReservationInfo,
   SessionResponse,
 } from "@/types/AppwriteTypes";
-import { ID, Query } from "react-native-appwrite";
+import { ID, Models, Permission, Query, Role } from "react-native-appwrite";
 import { account, appwriteConfig, avatars, databases, storage } from "./config";
 import { fetchCarDetails } from "@/constants";
 
@@ -140,6 +140,48 @@ const transliterationMap: TransliterationMap = {
  * @returns The newly created user document
  */
 
+// Save the hashed password
+export async function savePassword(userId: string, password: string) {
+  // Define permissions so only this user can read/write
+
+  const response = await databases.createDocument(
+    appwriteConfig.databaseId as string,
+    appwriteConfig.usersPassword as string,
+    ID.unique(),
+    {
+      userId,
+      pass: password,
+    }
+  );
+
+  console.log("Password saved:", response);
+}
+
+// get the pass
+export async function getPassword(userId: string) {
+  try {
+    // Query the database for the document where userId matches
+    const response = await databases.listDocuments(
+      appwriteConfig.databaseId as string, // Your database ID
+      appwriteConfig.usersPassword as string, // Your collection ID
+      [Query.equal("userId", userId)] // Query to find the matching document
+    );
+
+    if (response.total > 0) {
+      // Return the first matching document (assuming 1-to-1 user-password mapping)
+      const passwordDocument = response.documents[0];
+      console.log("Password retrieved:", passwordDocument);
+      return passwordDocument.pass; // Return the hashed password
+    } else {
+      console.log("No password found for this user.");
+      return null; // No password document exists for this user
+    }
+  } catch (error) {
+    console.error("Error retrieving password:", error);
+    throw error;
+  }
+}
+
 // Create a new user function
 export async function createUser(
   email: string,
@@ -159,6 +201,9 @@ export async function createUser(
         getLocalizedErrorMessage("accountCreationFailed", languageError)
       );
     }
+
+    // Save the hashed password
+    await savePassword(newAccount.$id, password);
 
     // Sign in the user
     await signIn(email, password, languageError);
@@ -267,6 +312,58 @@ export async function isPhoneNumberExisting(phone: string): Promise<boolean> {
   }
 }
 
+// Function to reset the password
+export async function ResetPasswordN(
+  newPassword: string,
+  oldPassword: string
+): Promise<Models.User<Models.Preferences>> {
+  try {
+    const response = await account.updatePassword(newPassword, oldPassword);
+    return response;
+  } catch (error: any) {
+    console.error("Error resetting password:", error);
+    throw new Error(error.message);
+  }
+}
+
+export async function completePasswordReset(
+  userId?: any,
+  secret?: any,
+  newPassword?: string | null
+): Promise<void> {
+  if (!userId || !secret) {
+    throw new Error("Missing required parameter for password reset.");
+  }
+
+  console.log("Starting password reset process...");
+  console.log("Parameters:", { userId, secret, newPassword });
+
+  try {
+    // Attempt to complete the password reset
+    console.log("Attempting to update recovery...");
+    await account.updateMagicURLSession(userId, secret);
+    console.log("Password reset successfully.");
+  } catch (error: any) {
+    console.error("Error completing password reset:", error.message);
+
+    // Handle specific Appwrite errors
+    if (error.message?.includes("Invalid secret")) {
+      console.error("Invalid or expired secret key:", secret);
+      throw new Error(
+        "The secret key is invalid or has expired. Please request a new one."
+      );
+    }
+
+    // Handle other unexpected errors
+    if (error instanceof Error) {
+      throw error;
+    }
+
+    // Default error handler
+    throw new Error("Failed to reset password. Please try again.");
+  }
+}
+
 // Function to check if a username already exists in the database
 export async function isUserNameExisting(userName: string): Promise<boolean> {
   try {
@@ -298,13 +395,16 @@ export function transliterateArabicToEnglish(name: string): string {
 }
 
 // Function to send OTP to email
-export async function sendOtpToEmail(email: string): Promise<any> {
+export async function sendOtpToEmail(
+  email: string,
+  lang: string = "en"
+): Promise<Models.Token> {
   try {
-    const response = await account.createMagicURLToken(ID.unique(), email);
+    const response = await account.createEmailToken(ID.unique(), email);
     return response;
-  } catch (error) {
-    console.error("Failed to send OTP to email:", error);
-    throw error;
+  } catch (error: any) {
+    console.error("Error sending OTP to email:", error);
+    throw new Error(error.message);
   }
 }
 
@@ -329,6 +429,38 @@ export const getEmailByPhoneNumber = async (
     throw error;
   }
 };
+
+export async function getUserIdByPhoneOrEmail(
+  identifier: string,
+  lang: string = "en"
+): Promise<string | null> {
+  try {
+    // Determine the type of identifier (email or phone)
+    const isEmail = identifier.includes("@");
+    const fieldName = isEmail ? "email" : "phone";
+
+    // Query the database
+    const response = (await databases.listDocuments(
+      appwriteConfig.databaseId as string, // Replace with your database ID
+      appwriteConfig.usersCollectionId as string, // Replace with your users collection ID
+      [Query.equal(fieldName, identifier)]
+    )) as any;
+
+    if (response.documents.length > 0) {
+      return response.documents[0].$id; // Return the user ID
+    }
+
+    throw new Error(isEmail ? "emailNotFound" : "phoneNotFound");
+  } catch (error) {
+    console.error(
+      `Failed to fetch userId by ${
+        identifier.includes("@") ? "email" : "phone"
+      }:`,
+      error
+    );
+    return null;
+  }
+}
 
 // Function to generate a unique username based on an Arabic name without spaces
 export async function generateUniqueUserName(
@@ -364,12 +496,10 @@ export async function resetPassword(
 }
 
 // Function to send OTP to the user's phone
-export async function sendOtpToPhone(
-  phone: string
-): Promise<PhoneTokenResponse> {
+export async function sendOtpToPhone(phone: string): Promise<string> {
   try {
     const response = await account.createPhoneToken(ID.unique(), phone);
-    return response;
+    return response.userId;
   } catch (error) {
     console.error("Failed to send OTP to phone:", error);
     throw new Error("Unable to send OTP to the phone number provided.");
@@ -962,9 +1092,9 @@ export const createRent = async ({
     throw new Error("Missing required field for creating rent document.");
   }
 
-  console.log(branchId, "branchId");
-  console.log(carId, "carId");
-  console.log(userId, "userId");
+  // console.log(branchId, "branchId");
+  // console.log(carId, "carId");
+  // console.log(userId, "userId");
 
   try {
     const response = await databases.createDocument(

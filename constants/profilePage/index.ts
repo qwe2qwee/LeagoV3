@@ -6,6 +6,7 @@ import notification from "../../assets/icons/profile-icons/notification.png";
 import profileInfo from "../../assets/icons/profile-icons/profile.png";
 import wallet from "../../assets/icons/profile-icons/wallet-2.png";
 import calindar from "../../assets/icons/profile-icons/Calendar.png";
+import route from "../../assets/icons/route.png";
 import vector from "../../assets/icons/checkbox/Vector.png";
 import unchecked from "../../assets/icons/checkbox/unchecked.png";
 import Address from "@/app/screens/profilePage/Address";
@@ -67,9 +68,9 @@ export const profilePage = {
       title: "Change Password",
     },
     generalInfo: {
-      notification: {
-        icon: notification,
-        title: "Notification",
+      location: {
+        icon: route,
+        title: "Location",
       },
       languages: {
         icon: global,
@@ -99,9 +100,9 @@ export const profilePage = {
       title: "تغيير كلمة المرور",
     },
     generalInfo: {
-      notification: {
-        icon: notification,
-        title: "التنبيهات",
+      location: {
+        icon: route,
+        title: "موقعك",
       },
       languages: {
         icon: global,

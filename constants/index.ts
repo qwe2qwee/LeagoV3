@@ -5,6 +5,11 @@ import bills from "../assets/icons/bills.png";
 import checkmark from "../assets/icons/check.png";
 import close from "../assets/icons/close.png";
 import dollar from "../assets/icons/dollar.png";
+import sendpassLogo from "../assets/icons/sendpassLogo.png";
+import smartphone from "../assets/icons/smartphone.png";
+
+import route from "../assets/icons/route.png";
+
 import email from "../assets/icons/email.png";
 import eyecross from "../assets/icons/eyecross.png";
 import google from "../assets/icons/google.png";
@@ -85,7 +90,10 @@ export const icons = {
   home,
   list,
   lock,
+  sendpassLogo,
   map,
+  smartphone,
+  route,
   marker,
   out,
   person,
@@ -351,6 +359,112 @@ export const bookingPage = {
     bookingSuccessMessage: "تم حجز الإيجار بنجاح! السعر الإجمالي: $",
   },
 };
+
+export const translationReset = {
+  en: {
+    title: "Reset Password",
+    newPasswordPlaceholder: "New Password",
+    confirmPasswordPlaceholder: "Confirm Password",
+    successToastTitle: "Done",
+    successToastMessage: "Password reset successfully. 👋",
+    errorEmptyFields:
+      "Please enter the new password and confirmation password.",
+    errorMismatch: "Passwords do not match.",
+    errorShortPassword: "Password must be longer than 6 characters.",
+    errorOldPasswordMissing: "Old password is missing. Please try again later.",
+    errorResetFailed: "Failed to reset password. Please try again.",
+    confirmButton: "Confirm",
+  },
+  ar: {
+    title: "إعادة تعيين كلمة المرور",
+    newPasswordPlaceholder: "كلمة المرور الجديدة",
+    confirmPasswordPlaceholder: "تأكيد كلمة المرور",
+    successToastTitle: "تم",
+    successToastMessage: "تم تغيير كلمة المرور بنجاح.👋",
+    errorEmptyFields: "يرجى إدخال كلمة المرور وكلمة المرور الجديدة.",
+    errorMismatch: "كلمات المرور غير متطابقة.",
+    errorShortPassword: "كلمة المرور يجب أن تكون أطول من 6 أحرف.",
+    errorOldPasswordMissing:
+      "كلمة المرور القديمة غير موجودة. الرجاء المحاولة لاحقًا.",
+    errorResetFailed: "فشل في تغيير كلمة المرور. حاول مرة أخرى.",
+    confirmButton: "تأكيد",
+  },
+} as any;
+
+// Forget Password
+
+export const translationForget = {
+  ar: {
+    enterPhone: "ادخل رقم جوالك",
+    enterEmail: "ادخل بريدك الإلكتروني",
+    phoneLabel: "رقم الجوال",
+    emailLabel: "البريد الإلكتروني",
+    errorEmptyField: "يرجى إدخال رقم الجوال أو البريد الإلكتروني",
+    errorPhoneNotFound: "رقم الجوال غير موجود في التطبيق.",
+    errorEmailNotFound: "البريد الإلكتروني غير موجود في التطبيق.",
+    sendOtpError: "حدث خطأ أثناء إرسال OTP. حاول مرة أخرى.",
+    backButton: "رجوع",
+    continue: "متابعة",
+  },
+  en: {
+    enterPhone: "Enter your phone number",
+    enterEmail: "Enter your email address",
+    phoneLabel: "Phone Number",
+    emailLabel: "Email Address",
+    errorEmptyField: "Please enter your phone number or email address",
+    errorPhoneNotFound: "Phone number not found in the app.",
+    errorEmailNotFound: "Email not found in the app.",
+    sendOtpError: "An error occurred while sending OTP. Please try again.",
+    backButton: "Back",
+    continue: "Continue",
+  },
+} as any;
+
+export const translationsVerificationForgot = {
+  ar: {
+    verifyPhone: "التحقق من رقم الجوال",
+    verifyEmail: "التحقق من البريد الإلكتروني",
+    otpPromptPhone: "ادخل رمز التحقق المرسل على رقمك",
+    otpPromptEmail: "ادخل رمز التحقق المرسل على بريدك الإلكتروني",
+    resendCode: "إعادة إرسال الكود",
+    codeResent: "تم إعادة إرسال الكود",
+    continue: "متابعة",
+    fullOtpRequired: "يرجى إدخال رمز التحقق الكامل.",
+    otpSuccess: "تم التحقق بنجاح.",
+    otpError: "فشل في التحقق من الرمز.",
+    resendOtpError: "حدث خطأ أثناء إعادة إرسال رمز التحقق.",
+    userNotFound: "فشل في العثور على المستخدم.",
+  },
+  en: {
+    verifyPhone: "Verify Phone Number",
+    verifyEmail: "Verify Email Address",
+    otpPromptPhone: "Enter the verification code sent to your number",
+    otpPromptEmail: "Enter the verification code sent to your email",
+    resendCode: "Resend Code",
+    codeResent: "Code Resent",
+    continue: "Continue",
+    fullOtpRequired: "Please enter the full verification code.",
+    otpSuccess: "Verification successful.",
+    otpError: "Failed to verify the code.",
+    resendOtpError: "An error occurred while resending the code.",
+    userNotFound: "Failed to find the user.",
+  },
+} as any;
+
+// Error Modal reset
+
+export const translationModalReset = {
+  ar: {
+    successTitle: "نجاح",
+    errorTitle: "خطاء",
+    buttonText: "موافق",
+  },
+  en: {
+    successTitle: "Success",
+    errorTitle: "Error",
+    buttonText: "OK",
+  },
+} as any;
 
 // Mock function to fetch car details (replace with actual Appwrite query)
 export async function fetchCarDetails(

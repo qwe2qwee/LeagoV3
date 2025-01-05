@@ -11,7 +11,6 @@ module.exports = {
         MontserratLight: ["Montserrat-Light", "sans-serif"], // Light Montserrat
         MontserratMedium: ["Montserrat-Medium", "sans-serif"], // Medium Montserrat
         MontserratSemiBold: ["Montserrat-SemiBold", "sans-serif"], // Semi Bold Montserrat
-
         ZainBold: ["Zain-Bold", "sans-serif"], // Bold ZAIN
         ZainExtraBold: ["Zain-ExtraBold", "sans-serif"], // Extra Bold ZAIN
         ZainExtraLight: ["Zain-ExtraLight", "sans-serif"], // Extra Light ZAIN

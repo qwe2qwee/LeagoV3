@@ -1,5 +1,5 @@
 import { Image, Pressable, Text, TouchableOpacity, View } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   pageButton,
   pageTitle,
@@ -16,13 +16,22 @@ import useAuthStore from "@/store/useAuthStore";
 import RadioButton from "@/components/Profile/RadioButton";
 import { router } from "expo-router";
 import { icons } from "@/constants";
+import { useUserDetailsStore } from "@/store/UserDetailsStore";
 
 type DateType = any; // Adjust according to the actual type if you know it, or use 'any' for flexibility
 
-type Gender = "male" | "female";
-
 const PersonalInfo = () => {
-  const { language, user } = useAuthStore();
+  const { language, user, updateUserDetails } = useAuthStore();
+  const { details, setDetails } = useUserDetailsStore();
+
+  useEffect(() => {
+    setDetails({
+      address: user?.details?.address,
+      birthday: user?.details?.birthday,
+      gender: user?.details?.gender,
+      name: user?.details?.name,
+    });
+  }, []);
 
   const pageTitleTranslator = pageTitle[language];
   const personalInfoPageTranslator = personalInfoPage[language];
@@ -32,23 +41,17 @@ const PersonalInfo = () => {
 
   const [open, setOpen] = useState(false);
   const [openSaveModal, setOpenSaveModal] = useState(false);
-  // const [date, setDate] = useState("351654");
-  const [date, setDate] = useState<DateType>(undefined);
-  const [selectedGender, setSelectedGender] = useState<Gender | undefined>(undefined);
-  const [userDetails, setUserDetails] = useState<any>(user?.details)
-  // const [userGender, setUserGender] = useState(user?.details.gender)
-  // const [userBirthday, setUserBirthday] = useState(user?.details.birthday)
+  const [date, setDate] = useState<DateType>(details.birthday);
 
   const handleChange = ({ date }: { date: DateType }) => {
     // Convert to JavaScript Date if it's a Day.js object
     if (date && typeof date.toDate === "function") {
       const dateConvert = date.toString();
       setDate(dayjs(dateConvert).format("YYYY-MM-DD")); // Convert Day.js to JavaScript String
+      setDetails({ birthday: dayjs(dateConvert).format("YYYY-MM-DD") });
     } else {
       setDate(date); // If it's already a Date object, use it as-is
     }
-
-    console.log(date);
   };
   const handleOnPress = () => {
     setOpen(!open);
@@ -59,16 +62,7 @@ const PersonalInfo = () => {
   };
 
   const handleOnSave = () => {
-    setUserDetails({
-      ...userDetails,
-      birthday: date,
-      gender: selectedGender
-    })
-    console.log(user?.details)
-  };
-
-  const handleGenderChange = (gender: Gender) => {
-    setSelectedGender(gender);
+    updateUserDetails(details);
   };
 
   return (
@@ -92,7 +86,7 @@ const PersonalInfo = () => {
       </View>
       <InfoBoxWithTitle
         title={personalInfoPageTranslator.fullName}
-        info={user?.details?.name || "احمد يونس"}
+        info={user?.details?.name || "الاسم"}
       />
       <View className="justify-center items-end p-6 pb-0">
         <Text className="text-right font-ZainBold text-[#78828A]">
@@ -116,7 +110,7 @@ const PersonalInfo = () => {
                   </Text>
                   <DateTimePicker
                     mode="single"
-                    date={date}
+                    date={details.birthday}
                     onChange={handleChange}
                     selectedItemColor="#FF5733"
                   />
@@ -139,7 +133,7 @@ const PersonalInfo = () => {
         title={personalInfoPageTranslator.email}
         info={user?.email}
       />
-      <RadioButton onGenderChange={handleGenderChange} />
+      <RadioButton />
       <View className="itmes-center justify-center mt-4">
         <Text className="text-sm pr-10 py-2.5 font-ZainBold text-[#78828A]">
           {SecTranslator.security}
@@ -183,7 +177,6 @@ const PersonalInfo = () => {
               </TouchableOpacity>
               <TouchableOpacity onPress={handleSaveModal} className="mt-4">
                 <Text className="text-primary-500 font-ZainBold">
-                  {" "}
                   {pageButtonTranslator.cancel}{" "}
                 </Text>
               </TouchableOpacity>

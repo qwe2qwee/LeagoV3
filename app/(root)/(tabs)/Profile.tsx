@@ -29,11 +29,10 @@ const profile = () => {
     setOpen(!open);
   };
 
-  const handleLogOut = async() => {
-    await logout()
-    setOpen(false)
-  }
-  
+  const handleLogOut = async () => {
+    await logout();
+    setOpen(false);
+  };
 
   return (
     <SafeAreaView className="flex-1 rt bg-[#FEFEFE]">
@@ -61,6 +60,12 @@ const profile = () => {
                     title={fieldTranslator.address.title}
                     pathName="/screens/profilePage/Address"
                   />
+                  <TouchableOpacity
+                    className="flex flex-row-reverse w-full items-center justify-start border-b border-[#E9EBED] pb-5 pt-3"
+                    onPress={() => router.push("/(auth)/ResetPassword" as any)}
+                  >
+                    <Text className="pr-4 font-ZainBold">to ResetPassword</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             </>
@@ -71,9 +76,9 @@ const profile = () => {
             </Text>
             <View className="w-80 mx-10">
               <TouchableFeildWithIcon
-                icon={fieldTranslator.generalInfo.notification.icon}
-                title={fieldTranslator.generalInfo.notification.title}
-                pathName="/(root)/Home"
+                icon={fieldTranslator.generalInfo.location.icon}
+                title={fieldTranslator.generalInfo.location.title}
+                pathName="/screens/profilePage/AddressSelectionPage"
               />
               <TouchableFeildWithIcon
                 icon={fieldTranslator.generalInfo.languages.icon}
@@ -105,11 +110,20 @@ const profile = () => {
                   </Text>
                 </View>
                 <View className="items-center justify-center">
-                  <TouchableOpacity onPress={handleLogOut} className="bg-primary-500 w-44 h-11 justify-center items-center rounded-md">
-                    <Text className="text-center text-white font-ZainBold"> {logOutTranslator.yes} </Text>
+                  <TouchableOpacity
+                    onPress={handleLogOut}
+                    className="bg-primary-500 w-44 h-11 justify-center items-center rounded-md"
+                  >
+                    <Text className="text-center text-white font-ZainBold">
+                      {" "}
+                      {logOutTranslator.yes}{" "}
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={handleOnPress} className="mt-4">
-                    <Text className="text-primary-500 font-ZainBold"> {logOutTranslator.cancel} </Text>
+                    <Text className="text-primary-500 font-ZainBold">
+                      {" "}
+                      {logOutTranslator.cancel}{" "}
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
