@@ -25,8 +25,6 @@ import {
   getEnglishModelName,
 } from "@/constants/modelToBrandMap";
 
-const defaultLocation = { lat: 21.543333, lon: 39.172778 };
-
 // Function to calculate the distance in kilometers between two points
 const calculateDistanceInKm = (loc1: any, loc2: any) => {
   const toRad = (value: any) => (value * Math.PI) / 180;

@@ -28,7 +28,7 @@ const TopBar: React.FC<TopBarProps> = ({ title }) => {
 
         {/* Support Page Button */}
         <TouchableOpacity
-          onPress={() => router.push("/")}
+          onPress={() => router.push("/screens/profilePage/ContactUs")}
           className="rounded-full bg-white p-2"
           style={{
             shadowColor: "#000",

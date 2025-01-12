@@ -67,7 +67,7 @@ const PersonalInfo = () => {
   };
 
   return (
-    <SafeAreaView className="bg-white  h-full">
+    <SafeAreaView className="bg-white  h-full ">
       <View className="flex-row justify-between items-center px-6 pt-6  ">
         <Pressable
           onPress={() => router.back()}
@@ -139,18 +139,8 @@ const PersonalInfo = () => {
         <Text className="text-sm pr-10 py-2.5 font-ZainBold text-[#78828A]">
           {SecTranslator.security}
         </Text>
-        <View className="w-80 mx-10 pr-10">
-          <TouchableOpacity
-            className="flex flex-row-reverse w-full items-center justify-center border-b border-[#E9EBED] pb-5 pt-3"
-            onPress={() => router.push("./home")}
-          >
-            <Text className="pr-4 font-ZainBold text-red-500 text-center">
-              {fieldTranslator.changePass.title}
-            </Text>
-          </TouchableOpacity>
-        </View>
       </View>
-      <View className="w-80 mx-10 pr-10 pt-4">
+      <View className="w-80 mx-10 pt-4 justify-center items-center ">
         <TouchableOpacity
           className="flex flex-row-reverse w-full items-center justify-center border-b border-[#E9EBED] pb-5 pt-3"
           onPress={handleSaveModal}

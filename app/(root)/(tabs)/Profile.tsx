@@ -49,17 +49,11 @@ const profile = () => {
                     title={fieldTranslator.documents.title}
                     pathName="/screens/Auth/SelectUsersDocs"
                   />
-                  <TouchableFeildWithIcon
+                  {/* <TouchableFeildWithIcon
                     icon={fieldTranslator.address.icon}
                     title={fieldTranslator.address.title}
                     pathName="/screens/profilePage/Address"
-                  />
-                  <TouchableOpacity
-                    className="flex flex-row-reverse w-full items-center justify-start border-b border-[#E9EBED] pb-5 pt-3"
-                    onPress={() => router.push("/(auth)/ResetPassword" as any)}
-                  >
-                    <Text className="pr-4 font-ZainBold">to ResetPassword</Text>
-                  </TouchableOpacity>
+                  /> */}
                 </View>
               </View>
             </>
@@ -74,11 +68,11 @@ const profile = () => {
                 title={fieldTranslator.generalInfo.location.title}
                 pathName="/screens/profilePage/AddressSelectionPage"
               />
-              <TouchableFeildWithIcon
+              {/* <TouchableFeildWithIcon
                 icon={fieldTranslator.generalInfo.languages.icon}
                 title={fieldTranslator.generalInfo.languages.title}
                 pathName="/screens/profilePage/TermsAndConditions"
-              />
+              /> */}
               <TouchableFeildWithIcon
                 icon={fieldTranslator.generalInfo.help.icon}
                 title={fieldTranslator.generalInfo.help.title}
