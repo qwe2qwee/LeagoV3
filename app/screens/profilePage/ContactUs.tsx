@@ -9,11 +9,10 @@ import {
 } from "@/constants/profilePage/termsAndConditions";
 import useAuthStore from "@/store/useAuthStore";
 import { router } from "expo-router";
-import LeagoTag from "@/components/profile/LeagoTag";
 import { companyAddress } from "@/constants/profilePage";
 import { Pressable } from "react-native";
-import { icons as backArrow}  from "@/constants";
-
+import { icons as backArrow } from "@/constants";
+import LeagoTag from "@/components/Profile/LeagoTag";
 
 type ContactType = "whatsapp" | "email";
 
@@ -103,14 +102,14 @@ const ContactUs = () => {
             {termsAndConditions[language].title}
           </Text>
         </TouchableOpacity>
-      <View className=" w-80 border-b border-[#E9EBED] mt-10">
-        <Text className="font-ZainBold">
-          {companyAddressTranslator.companyName}
-        </Text>
-        <Text className="font-ZainRegular">
-          {companyAddressTranslator.Address}
-        </Text>
-      </View>
+        <View className=" w-80 border-b border-[#E9EBED] mt-10">
+          <Text className="font-ZainBold">
+            {companyAddressTranslator.companyName}
+          </Text>
+          <Text className="font-ZainRegular">
+            {companyAddressTranslator.Address}
+          </Text>
+        </View>
       </View>
     </SafeAreaView>
   );

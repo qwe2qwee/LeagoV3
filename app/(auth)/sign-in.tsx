@@ -23,7 +23,7 @@ import useAuthStore from "@/store/useAuthStore";
 type Language = "en" | "ar";
 
 const signIn = () => {
-  const { login, loading, error, language } = useAuthStore();
+  const { login, loading, language } = useAuthStore();
 
   const t = translationsLogin[language]; // Choose the right translation
 

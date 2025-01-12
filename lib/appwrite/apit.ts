@@ -11,6 +11,7 @@ import {
 import { ID, Models, Permission, Query, Role } from "react-native-appwrite";
 import { account, appwriteConfig, avatars, databases, storage } from "./config";
 import { fetchCarDetails } from "@/constants";
+import { Alert } from "react-native";
 
 // Error localization definition for English and Arabic
 type ErrorMessages = {
@@ -996,70 +997,113 @@ export async function Reservations(userId: string): Promise<ReservationInfo[]> {
 
     for (const reservation of response.documents) {
       try {
-        const parsedDate =
-          typeof reservation.date === "string"
-            ? JSON.parse(reservation.date)
-            : reservation.date;
-
-        // Parse car details if `carId` exists
-        const carInfo =
-          reservation.carId && typeof reservation.carId.details === "string"
-            ? JSON.parse(reservation.carId.details)[0] // Parse the first object in details array
-            : null;
-
-        // Parse the pay JSON field
-        const parsedPay =
-          typeof reservation.pay === "string"
-            ? JSON.parse(reservation.pay)
-            : reservation.pay;
-
-        // Parse branchId location
-        const branchLocation =
-          typeof reservation.branchId?.location === "string"
-            ? JSON.parse(reservation.branchId.location)
-            : reservation.branchId?.location;
-
-        function formatDate(isoDateString: string) {
+        // Helper function to safely parse JSON
+        const safeParse = <T>(data: any): T | null => {
           try {
-            const date = new Date(isoDateString); // Parse the ISO date string
-            const options = { year: "numeric", month: "long", day: "numeric" };
-            return new Intl.DateTimeFormat("en-US", options).format(date); // Format the date
-          } catch (error) {
-            console.error("Invalid date format:", isoDateString, error);
+            return typeof data === "string" ? JSON.parse(data) : data;
+          } catch {
+            return null;
+          }
+        };
+
+        // Parse required fields
+        const parsedDate = safeParse<{
+          reservationDuration: string;
+          reservationStart: string;
+          reservationEnd: string;
+        }>(reservation.date);
+
+        const parsedPay = safeParse<{
+          price: string;
+          payId: string;
+          done: boolean;
+        }>(reservation.pay);
+
+        const carDetails = safeParse<
+          { name: { en: string }; year: string; color: string; image: string }[]
+        >(reservation.carId?.details);
+
+        const branchLocation = safeParse<{ lat: number; lon: number }>(
+          reservation.branchId?.location
+        );
+
+        console.log(parsedPay);
+
+        // Format date with fallback
+        const formatDate = (isoDateString: string): string => {
+          try {
+            const date = new Date(isoDateString);
+            const options: Intl.DateTimeFormatOptions = {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            };
+            return new Intl.DateTimeFormat("en-US", options).format(date);
+          } catch {
             return "Unknown";
           }
-        }
-        console.log(parsedDate);
+        };
 
-        const date = formatDate(reservation.reservationDate);
+        // Push the parsed reservation into the result array
         reservations.push({
           id: reservation.$id,
-          carName: carInfo?.name?.en || "Unknown",
-          carYear: carInfo?.year || "Unknown",
-          carColor: carInfo?.color || "Unknown",
-          carImage: carInfo?.image || "Unknown",
+          carName: carDetails?.[0]?.name?.en || "Unknown",
+          carYear: carDetails?.[0]?.year || "Unknown",
+          carColor: carDetails?.[0]?.color || "Unknown",
+          carImage: carDetails?.[0]?.image || "Unknown",
           branchId: reservation.branchId?.$id || "Unknown",
           reservationDuration: parsedDate?.reservationDuration || "Unknown",
-          carLocation: carInfo?.carLocation || "Unknown",
+          carLocation: branchLocation || { lat: 0, lon: 0 },
           city: reservation.carId?.city || "Unknown",
           reservationStart: parsedDate?.reservationStart || "Unknown",
           reservationEnd: parsedDate?.reservationEnd || "Unknown",
-          reservationDate: date || "Unknown",
+          reservationDate: formatDate(reservation.reservationDate || ""),
           bill: parsedPay?.price || "Unknown",
           payId: parsedPay?.payId || "Unknown",
           payStatus: parsedPay?.done ? "Completed" : "Pending",
           status: reservation.status || "Unknown",
         });
       } catch (error) {
-        console.error("Failed to parse reservation:", reservation, error);
+        console.error("Failed to parse a reservation:", reservation, error);
       }
     }
   } catch (error) {
-    console.error("Error listing reservations:", error);
+    console.error("Error fetching reservations from the database:", error);
     throw new Error("Failed to fetch reservations");
   }
 
   return reservations;
+}
+
+// udate reservation status
+
+export async function updatePayStatusInAppwrite(
+  reservationId: string,
+  pay: object
+): Promise<void> {
+  try {
+    // Convert the pay object into a string
+
+    const payString = JSON.stringify(pay);
+
+    // Update the reservation document's pay field in Appwrite
+    await databases.updateDocument(
+      appwriteConfig.databaseId as string,
+      appwriteConfig.reservationsCollectionId as string,
+      reservationId,
+      { pay: payString } // Update the `pay` field with the JSON string
+    );
+
+    // Show success feedback
+    Alert.alert(
+      "🎉 Payment Successful!",
+      "Your payment status has been updated."
+    );
+  } catch (error: any) {
+    console.error("Error updating pay status in Appwrite:", error);
+    Alert.alert("Error", "Failed to update payment status. Please try again.");
+    throw error;
+  }
 }
 
 // Function to create a rent document

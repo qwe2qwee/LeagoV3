@@ -5,8 +5,6 @@ import CustomButton from "@/components/ui/CustomButton";
 import { getColorHashCode, icons } from "@/constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 import useAuthStore from "@/store/useAuthStore";
-import { getCarLikesCount } from "@/lib/appwrite/apit";
-import { appwriteConfig, client } from "@/lib/appwrite/config";
 
 interface CarDetails {
   name: { [key: string]: string };

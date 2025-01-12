@@ -11,8 +11,7 @@ import {
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import useAuthStore from "@/store/useAuthStore";
-import { router, useRouter } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 
 interface Neighborhood {
   name: {

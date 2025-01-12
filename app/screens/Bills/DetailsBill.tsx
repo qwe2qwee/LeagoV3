@@ -1,9 +1,18 @@
 import React from "react";
-import { View, Text, ScrollView, Image, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  Image,
+  Pressable,
+  Linking,
+  Alert,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import CustomButton from "@/components/ui/CustomButton";
 import { icons } from "@/constants";
+import MapView, { Marker } from "react-native-maps";
 
 // Localization support
 const translations = {
@@ -46,7 +55,13 @@ const DetailsBill = () => {
   const router = useRouter();
 
   // Parse the reservation JSON string into an object
-  const reservation = reservationString ? JSON.parse(reservationString) : null;
+  const reservation = reservationString
+    ? JSON.parse(reservationString as any)
+    : null;
+
+  console.log(reservation);
+
+  const defaultLocation = { lat: 21.543333, lon: 39.172778 }; // Coordinates for Jeddah, SA
 
   if (!reservation) {
     return (
@@ -90,8 +105,9 @@ const DetailsBill = () => {
             </View>
           </Pressable>
         </View>
-        <Text className="text-lg font-bold mb-4 text-right">
-          {reservation.carName}:رقم الطلب
+        <Text className="text-sm font-bold mb-4 text-right">
+          {reservation.payId ? reservation.payId : reservation.carName} : رقم
+          الطلب
         </Text>
         <Text className="text-sm mb-2">
           {t.year}: {reservation.carYear || t.unknown}
@@ -118,6 +134,46 @@ const DetailsBill = () => {
             : t.na}
         </Text>
         <View className="w-full h-[1px] bg-textColor-200"></View>
+
+        <View className="items-center justify-center mt-4 h-40 w-full bg-black">
+          {/* Map Section */}
+          <View className="h-40 w-full">
+            {reservation?.carLocation &&
+            reservation.payStatus === "Completed" ? (
+              <Pressable
+                onPress={() => {
+                  const { lat, lon } = reservation.carLocation;
+                  const url = `https://www.google.com/maps?q=${lat},${lon}`;
+                  Linking.openURL(url).catch((err) =>
+                    Alert.alert("Error", "Failed to open Google Maps")
+                  );
+                }}
+                className="h-full w-full rounded-lg overflow-hidden"
+              >
+                <MapView
+                  style={{ height: "100%", borderRadius: 8 }}
+                  initialRegion={{
+                    latitude: reservation.carLocation.lat,
+                    longitude: reservation.carLocation.lon,
+                    latitudeDelta: 0.05,
+                    longitudeDelta: 0.05,
+                  }}
+                >
+                  <Marker
+                    coordinate={{
+                      latitude: reservation.carLocation.lat,
+                      longitude: reservation.carLocation.lon,
+                    }}
+                  />
+                </MapView>
+              </Pressable>
+            ) : (
+              <View className="items-center justify-center h-full w-full bg-gray-200 rounded-lg">
+                <Text>{t.noDetails}</Text>
+              </View>
+            )}
+          </View>
+        </View>
       </ScrollView>
       <View
         className="absolute bottom-0 w-full items-center justify-center py-4 bg-white"
@@ -131,7 +187,15 @@ const DetailsBill = () => {
       >
         <CustomButton
           title={t.backToBills}
-          onPress={() => router.push("/screens/Bills")}
+          onPress={() => {
+            router.push({
+              pathname: "/screens/Bills/PaymentScreen",
+              params: {
+                total: reservation.bill,
+                reservationId: reservation.id,
+              },
+            });
+          }}
           className="w-3/4 h-12"
         />
       </View>

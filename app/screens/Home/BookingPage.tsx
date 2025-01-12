@@ -109,7 +109,7 @@ const BookingPage: React.FC = () => {
     try {
       // Create rent document
       await createRent({
-        branchId: ownerId, // Replace with the actual branchId
+        branchId: ownerId as string, // Replace with the actual branchId
         carId: carId as string,
         userId: user?.$id as string,
         startDate: rentalStart!,
@@ -125,7 +125,7 @@ const BookingPage: React.FC = () => {
       router.back();
     } catch (error) {
       Alert.alert(
-        bookingPage[language].error,
+        bookingPage[language].invalidBookingMessage,
         "Failed to create rent document. Please try again."
       );
     }

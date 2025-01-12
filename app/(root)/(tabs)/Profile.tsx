@@ -1,10 +1,4 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import { router } from "expo-router";
 import {
@@ -12,10 +6,10 @@ import {
   profilePage,
   profileSections,
 } from "@/constants/profilePage";
-import TouchableFeildWithIcon from "@/components/profile/TouchableFeildWithIcon";
 import useAuthStore from "@/store/useAuthStore";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Modal from "react-native-modal";
+import TouchableFeildWithIcon from "@/components/Profile/TouchableFeildWithIcon";
 
 const profile = () => {
   const { language, logout, user } = useAuthStore();
