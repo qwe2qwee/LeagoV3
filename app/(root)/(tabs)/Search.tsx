@@ -24,6 +24,8 @@ import {
   findBrandByPartialModel,
   getEnglishModelName,
 } from "@/constants/modelToBrandMap";
+import CarList from "@/components/Search/carList";
+import { useSearchStore } from "@/store/SearchState";
 
 // Function to calculate the distance in kilometers between two points
 const calculateDistanceInKm = (loc1: any, loc2: any) => {
@@ -45,7 +47,8 @@ const calculateDistanceInKm = (loc1: any, loc2: any) => {
 const Search = () => {
   const [cars, setCars] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [query, setQuery] = useState("");
+  const { query, clearQuery } = useSearchStore();
+
   const [offset, setOffset] = useState(0);
   const [isEndReached, setIsEndReached] = useState(true);
   const { latitude, longitude } = useAuthStore();
@@ -137,6 +140,12 @@ const Search = () => {
     loadAllCars();
   }, []);
 
+  const handleClear = async () => {
+    clearQuery();
+    setCars([]);
+    await loadAllCars();
+  };
+
   // Trigger search on button press
   const handleSearch = () => {
     setCars([]);
@@ -145,71 +154,40 @@ const Search = () => {
   const renderItem = ({ item }: any) => {
     const carInfo = parseDetails(item.details)?.[0];
     if (!carInfo) return null;
+    const handlePress = () => {
+      router.push({
+        pathname: "/screens/Home/CarDetailsPage",
+        params: {
+          carId: item.$id,
+          carDetails: JSON.stringify(carInfo),
+          carName: item.brand || "Unknown",
+          carImages: JSON.stringify(carInfo.image),
+          carImage: carInfo.image,
+          carCity: item.city || "N/A",
+          carRentSalary: JSON.stringify(carInfo.rentType),
+        },
+      });
+    };
 
     const color = getColorHashCode(carInfo.color || "unknown");
     const distanceText =
       item.distance > 100 ? `${item.city || "N/A"}` : `${item.distance} km`; // Display city if distance > 100 km
     return (
-      <TouchableOpacity
-        className="flex-row w-auto h-28 bg-white m-2 p-2 px-3 rounded-lg shadow-md"
-        onPress={() => {
-          router.push({
-            pathname: "/screens/Home/CarDetailsPage",
-            params: {
-              carId: item.$id,
-              carDetails: JSON.stringify(carInfo),
-              carName: item.brand || "Unknown",
-              carImages: JSON.stringify(carInfo.image),
-              carImage: carInfo.image,
-              carCity: item.city || "N/A",
-              carRentSalary: JSON.stringify(carInfo.rentType),
-            },
-          });
-        }}
-      >
-        <View className="items-center justify-center bg-[#EBEBEF] p-2 mr-4 rounded-xl">
-          <Image
-            source={{ uri: carInfo.image }}
-            resizeMode="contain"
-            className="h-20 w-20 rounded-lg "
-          />
-        </View>
-
-        <View className="flex-1 justify-between flex-row items-center ">
-          <View className="flex-col h-4/5 justify-between">
-            <Text className="text-lg font-bold">
-              {carInfo.name?.ar || "N/A"}
-            </Text>
-            <View>
-              <View
-                className={`w-3 h-3 rounded-full border border-gray-400 my-1`}
-                style={{ backgroundColor: color }}
-              ></View>
-              <Text className="text-gray-600">{carInfo.year || "N/A"}</Text>
-            </View>
-          </View>
-          <View className="flex-col justify-between items-end h-4/5">
-            <View className="flex-row-reverse justify-center items-center">
-              <Image source={icons.point1} className="w-4 h-4" />
-              <Text className="text-[#868686] text-sm">{distanceText}</Text>
-            </View>
-            <View className="">
-              <Text className="text-green-600">
-                {carInfo.rentType?.monthly?.price || "N/A"}/month
-              </Text>
-            </View>
-          </View>
-        </View>
-      </TouchableOpacity>
+      <CarList
+        carInfo={carInfo}
+        distanceText={distanceText}
+        color={color}
+        handlePress={handlePress}
+      />
     );
   };
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
       <SearchBar
-        query={query}
-        setQuery={setQuery}
         handleSearch={handleSearch}
+        loading={loading}
+        reest={handleClear}
       />
       <FlatList
         data={cars}

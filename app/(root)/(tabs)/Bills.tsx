@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { parseCarLocation, Reservations } from "@/lib/appwrite/apit";
+import { parseCarLocation, ReservationsRelative } from "@/lib/appwrite/apit";
 import useAuthStore from "@/store/useAuthStore";
 import { ReservationInfo } from "@/types/AppwriteTypes";
 import { icons } from "@/constants";
@@ -33,13 +33,15 @@ const Bills = () => {
   const { user, latitude, longitude } = useAuthStore();
   const [reservations, setReservations] = useState<ReservationInfo[]>([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchReservations = async () => {
       try {
         if (user?.$id) {
-          const data = await Reservations(user.$id);
-          setReservations(data);
+          const unsubscribe = await ReservationsRelative(
+            user.$id,
+            setReservations
+          );
+          return unsubscribe; // Return the unsubscribe function for cleanup
         }
       } catch (error) {
         console.error("Failed to load reservations:", error);
@@ -48,7 +50,17 @@ const Bills = () => {
       }
     };
 
-    fetchReservations();
+    let unsubscribeFn: (() => void) | undefined;
+
+    fetchReservations().then((unsubscribe) => {
+      unsubscribeFn = unsubscribe;
+    });
+
+    return () => {
+      if (unsubscribeFn) {
+        unsubscribeFn(); // Cleanup the subscription on unmount
+      }
+    };
   }, [user]);
 
   return (

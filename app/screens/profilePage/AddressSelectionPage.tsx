@@ -33,104 +33,104 @@ const cities: City[] = [
     neighborhoods: [
       {
         name: { en: "Al Safa", ar: "الصّفا" },
-        latitude: 21.584873,
-        longitude: 39.205959,
+        latitude: 21.583301,
+        longitude: 39.205425,
       },
       {
         name: { en: "Al Salamah", ar: "السلامة" },
-        latitude: 21.584873,
-        longitude: 39.205959,
+        latitude: 21.584546,
+        longitude: 39.157053,
       },
       {
         name: { en: "Al Rawdah", ar: "الروضة" },
-        latitude: 21.584873,
-        longitude: 39.205959,
+        latitude: 21.568743,
+        longitude: 39.15774,
       },
       {
         name: { en: "Al Faisaliyah", ar: "الفيصلية" },
-        latitude: 21.584873,
-        longitude: 39.205959,
+        latitude: 21.565765,
+        longitude: 39.182146,
       },
       {
         name: { en: "Al Hamra", ar: "الحمراء" },
-        latitude: 21.584873,
-        longitude: 39.205959,
+        latitude: 21.62487,
+        longitude: 39.125568,
       },
-      {
-        name: { en: "Al Aziziyah", ar: "العزيزية" },
-        latitude: 21.584873,
-        longitude: 39.205959,
-      },
-      {
-        name: { en: "Al Rehab", ar: "الرحاب" },
-        latitude: 21.584873,
-        longitude: 39.205959,
-      },
-      {
-        name: { en: "Al Khalidiyah", ar: "الخالدية" },
-        latitude: 21.584873,
-        longitude: 39.205959,
-      },
+      // {
+      //   name: { en: "Al Aziziyah", ar: "العزيزية" },
+      //   latitude: 21.584873,
+      //   longitude: 39.205959,
+      // },
+      // {
+      //   name: { en: "Al Rehab", ar: "الرحاب" },
+      //   latitude: 21.584873,
+      //   longitude: 39.205959,
+      // },
+      // {
+      //   name: { en: "Al Khalidiyah", ar: "الخالدية" },
+      //   latitude: 21.584873,
+      //   longitude: 39.205959,
+      // },
       {
         name: { en: "Al Bawadi", ar: "البوادي" },
-        latitude: 21.584873,
-        longitude: 39.205959,
+        latitude: 21.592001,
+        longitude: 39.165386,
       },
-      {
-        name: { en: "Al Zahra", ar: "الزهراء" },
-        latitude: 21.584873,
-        longitude: 39.205959,
-      },
-      {
-        name: { en: "Al Shati", ar: "الشاطئ" },
-        latitude: 21.584873,
-        longitude: 39.205959,
-      },
-      {
-        name: { en: "Al Naseem", ar: "النسيم" },
-        latitude: 21.584873,
-        longitude: 39.205959,
-      },
-      {
-        name: { en: "Al Andalous", ar: "الأندلس" },
-        latitude: 21.584873,
-        longitude: 39.205959,
-      },
+      // {
+      //   name: { en: "Al Zahra", ar: "الزهراء" },
+      //   latitude: 21.584873,
+      //   longitude: 39.205959,
+      // },
+      // {
+      //   name: { en: "Al Shati", ar: "الشاطئ" },
+      //   latitude: 21.584873,
+      //   longitude: 39.205959,
+      // },
+      // {
+      //   name: { en: "Al Naseem", ar: "النسيم" },
+      //   latitude: 21.584873,
+      //   longitude: 39.205959,
+      // },
+      // {
+      //   name: { en: "Al Andalous", ar: "الأندلس" },
+      //   latitude: 21.584873,
+      //   longitude: 39.205959,
+      // },
       {
         name: { en: "Al Balad", ar: "البلد" },
-        latitude: 21.584873,
-        longitude: 39.205959,
+        latitude: 21.493005,
+        longitude: 39.190122,
       },
-      {
-        name: { en: "Al Mohamadiyah", ar: "المحمدية" },
-        latitude: 21.584873,
-        longitude: 39.205959,
-      },
-      {
-        name: { en: "Al Marwah", ar: "المروة" },
-        latitude: 21.584873,
-        longitude: 39.205959,
-      },
-      {
-        name: { en: "Al Naeem", ar: "النعيم" },
-        latitude: 21.584873,
-        longitude: 39.205959,
-      },
-      {
-        name: { en: "Al Sharafiyah", ar: "الشرفية" },
-        latitude: 21.584873,
-        longitude: 39.205959,
-      },
-      {
-        name: { en: "Al Thagher", ar: "الثغر" },
-        latitude: 21.584873,
-        longitude: 39.205959,
-      },
-      {
-        name: { en: "Prince Fawaz", ar: "الأمير فواز" },
-        latitude: 21.584873,
-        longitude: 39.205959,
-      },
+      // {
+      //   name: { en: "Al Mohamadiyah", ar: "المحمدية" },
+      //   latitude: 21.641282,
+      //   longitude: 39.135186,
+      // },
+      // {
+      //   name: { en: "Al Marwah", ar: "المروة" },
+      //   latitude: 21.584873,
+      //   longitude: 39.205959,
+      // },
+      // {
+      //   name: { en: "Al Naeem", ar: "النعيم" },
+      //   latitude: 21.584873,
+      //   longitude: 39.205959,
+      // },
+      // {
+      //   name: { en: "Al Sharafiyah", ar: "الشرفية" },
+      //   latitude: 21.584873,
+      //   longitude: 39.205959,
+      // },
+      // {
+      //   name: { en: "Al Thagher", ar: "الثغر" },
+      //   latitude: 21.584873,
+      //   longitude: 39.205959,
+      // },
+      // {
+      //   name: { en: "Prince Fawaz", ar: "الأمير فواز" },
+      //   latitude: 21.584873,
+      //   longitude: 39.205959,
+      // },
     ],
   },
 ];

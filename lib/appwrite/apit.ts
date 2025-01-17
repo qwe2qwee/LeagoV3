@@ -8,7 +8,14 @@ import {
   ReservationInfo,
   SessionResponse,
 } from "@/types/AppwriteTypes";
-import { ID, Models, Permission, Query, Role } from "react-native-appwrite";
+import {
+  ID,
+  Models,
+  Permission,
+  Query,
+  RealtimeResponseEvent,
+  Role,
+} from "react-native-appwrite";
 import { account, appwriteConfig, avatars, databases, storage } from "./config";
 import { fetchCarDetails } from "@/constants";
 import { Alert } from "react-native";
@@ -1061,7 +1068,7 @@ export async function Reservations(userId: string): Promise<ReservationInfo[]> {
           bill: parsedPay?.price || "Unknown",
           payId: parsedPay?.payId || "Unknown",
           payStatus: parsedPay?.done ? "Completed" : "Pending",
-          status: reservation.status || "Unknown",
+          status: reservation?.status || "Unknown",
         });
       } catch (error) {
         console.error("Failed to parse a reservation:", reservation, error);
@@ -1073,6 +1080,136 @@ export async function Reservations(userId: string): Promise<ReservationInfo[]> {
   }
 
   return reservations;
+}
+
+export async function ReservationsRelative(
+  userId: string,
+  onUpdate: (reservations: ReservationInfo[]) => void
+): Promise<() => void> {
+  const reservations: ReservationInfo[] = [];
+
+  // Helper function to safely parse JSON
+  const safeParse = <T>(data: any): T | null => {
+    try {
+      return typeof data === "string" ? JSON.parse(data) : data;
+    } catch {
+      return null;
+    }
+  };
+
+  // Function to format dates
+  const formatDate = (isoDateString: string): string => {
+    try {
+      const date = new Date(isoDateString);
+      const options: Intl.DateTimeFormatOptions = {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      };
+      return new Intl.DateTimeFormat("en-US", options).format(date);
+    } catch {
+      return "Unknown";
+    }
+  };
+
+  const parseReservation = (reservation: any): ReservationInfo | null => {
+    try {
+      const parsedDate = safeParse<{
+        reservationDuration: string;
+        reservationStart: string;
+        reservationEnd: string;
+      }>(reservation.date);
+
+      const parsedPay = safeParse<{
+        price: string;
+        payId: string;
+        done: boolean;
+      }>(reservation.pay);
+
+      const carDetails = safeParse<
+        { name: { en: string }; year: string; color: string; image: string }[]
+      >(reservation.carId?.details);
+
+      const branchLocation = safeParse<{ lat: number; lon: number }>(
+        reservation.branchId?.location
+      );
+
+      return {
+        id: reservation.$id,
+        carName: carDetails?.[0]?.name?.en || "Unknown",
+        carYear: carDetails?.[0]?.year || "Unknown",
+        carColor: carDetails?.[0]?.color || "Unknown",
+        carImage: carDetails?.[0]?.image || "Unknown",
+        branchId: reservation.branchId?.$id || "Unknown",
+        reservationDuration: parsedDate?.reservationDuration || "Unknown",
+        carLocation: branchLocation || { lat: 0, lon: 0 },
+        city: reservation.carId?.city || "Unknown",
+        reservationStart: parsedDate?.reservationStart || "Unknown",
+        reservationEnd: parsedDate?.reservationEnd || "Unknown",
+        reservationDate: formatDate(reservation.reservationDate || ""),
+        bill: parsedPay?.price || "Unknown",
+        payId: parsedPay?.payId || "Unknown",
+        payStatus: parsedPay?.done ? "Completed" : "Pending",
+        status: reservation?.status || "Unknown",
+      };
+    } catch (error) {
+      console.error("Failed to parse a reservation:", reservation, error);
+      return null;
+    }
+  };
+
+  // Fetch initial reservations
+  try {
+    const response = await databases.listDocuments(
+      appwriteConfig.databaseId as string,
+      appwriteConfig.reservationsCollectionId as string,
+      [Query.equal("userId", userId)]
+    );
+
+    const initialReservations = response.documents
+      .map(parseReservation)
+      .filter(Boolean) as ReservationInfo[];
+
+    reservations.push(...initialReservations);
+    onUpdate(reservations); // Update the UI with the initial reservations
+  } catch (error) {
+    console.error("Error fetching reservations from the database:", error);
+    throw new Error("Failed to fetch reservations");
+  }
+
+  // Listen for real-time changes
+  const unsubscribe = databases.client.subscribe(
+    `databases.${appwriteConfig.databaseId}.collections.${appwriteConfig.reservationsCollectionId}.documents`,
+    (response: RealtimeResponseEvent<any>) => {
+      const updatedReservation = parseReservation(response.payload);
+
+      if (!updatedReservation) return;
+
+      if (
+        response.events.includes("databases.*.collections.*.documents.*.create")
+      ) {
+        reservations.push(updatedReservation);
+      } else if (
+        response.events.includes("databases.*.collections.*.documents.*.update")
+      ) {
+        const index = reservations.findIndex(
+          (reservation) => reservation.id === updatedReservation.id
+        );
+        if (index > -1) reservations[index] = updatedReservation;
+      } else if (
+        response.events.includes("databases.*.collections.*.documents.*.delete")
+      ) {
+        const index = reservations.findIndex(
+          (reservation) => reservation.id === updatedReservation.id
+        );
+        if (index > -1) reservations.splice(index, 1);
+      }
+
+      onUpdate([...reservations]); // Send the updated list to the UI
+    }
+  );
+
+  return unsubscribe; // Return the unsubscribe function to stop listening
 }
 
 // udate reservation status
