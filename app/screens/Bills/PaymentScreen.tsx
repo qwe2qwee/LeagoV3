@@ -104,38 +104,27 @@ const PaymentScreen: React.FC = () => {
             <Ionicons name="arrow-back-outline" size={25} color="gray" />
           </Pressable>
 
-          <View className="w-full h-3/4 py-5 justify-center items-center">
+          <View className="w-full h-3/4 py-5 justify-center items-center  ">
             <View
               style={styles.shadowBox}
-              className="w-full bg-[#F5F5F5] flex-row items-center justify-between px-5 rounded-lg mt-5"
+              className="w-full bg-primary-400 flex-row items-center justify-around px-5 rounded-lg my-5"
             >
-              <View className="flex-row items-center">
-                <Image
-                  source={require("../../../assets/images/VISA.png")}
-                  className="my-4 mr-3 h-10 w-11"
-                  resizeMode="contain"
-                />
-                <Image
-                  source={require("../../../assets/images/MASTERCARD.png")}
-                  className="my-4 mr-4 h-10 w-11"
-                  resizeMode="contain"
-                />
-                <Image
-                  source={require("../../../assets/images/MADA.png")}
-                  className="my-4 mr-4 h-10 w-11"
-                  resizeMode="contain"
-                />
-              </View>
-              <Text className="text-textColor text-lg font-zainBold">
-                الدفع بالبطاقة
-              </Text>
+              <Image
+                source={require("../../../assets/images/VISA.png")}
+                className="my-4 mr-3 h-10 w-11"
+                resizeMode="contain"
+              />
+              <Image
+                source={require("../../../assets/images/MASTERCARD.png")}
+                className="my-4 mr-4 h-10 w-11"
+                resizeMode="contain"
+              />
+              <Image
+                source={require("../../../assets/images/MADA.png")}
+                className="my-4 mr-4 h-10 w-11"
+                resizeMode="contain"
+              />
             </View>
-
-            <Image
-              source={require("../../../assets/images/Cardd.png")}
-              className="w-50 h-32 my-4"
-              resizeMode="contain"
-            />
 
             <CustomTextInput
               placeholder="الاسم"
@@ -149,13 +138,13 @@ const PaymentScreen: React.FC = () => {
               keyboardType="numeric"
             />
 
-            <View className="flex-row justify-between w-full mb-4">
+            <View className="flex-row justify-between w-full mb-4 ">
               <CustomTextInput
                 placeholder="MM/YY"
                 value={expiry}
                 onChangeText={setExpiry}
                 keyboardType="numbers-and-punctuation"
-                containerStyle={"w-[45%]"}
+                containerStyle={"w-[45%] "}
               />
               <CustomTextInput
                 placeholder="CVC"
@@ -173,7 +162,7 @@ const PaymentScreen: React.FC = () => {
                 title="ادفع الان"
                 onPress={createPayment}
                 loading={isLoading}
-                className="w-full my-3 py-1 bg-primary h-[30px]"
+                className="w-full my-3 py-1 bg-primary "
               />
             </View>
             <View className="w-[50%] px-1 justify-center items-center py-10">

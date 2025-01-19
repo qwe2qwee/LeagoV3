@@ -1,24 +1,29 @@
 // File: components/AdCardSection.tsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, Dimensions } from "react-native";
 import AdCard from "./AdCard";
-
-const adData = [
-  {
-    id: "1",
-    title: "Special Offer 1",
-    uri: "https://www.assayyarat.com/wp-content/uploads/2020/11/EmLKnaGWkAwtfv0.jpg",
-  },
-  {
-    id: "2",
-    title: "Special Offer 2",
-    uri: "https://th.bing.com/th/id/OIP.Cy262jKs-yVdJJDEnv5EAgHaHa?w=1080&h=1080&rs=1&pid=ImgDetMain",
-  },
-];
+import { appwriteConfig, databases } from "@/lib/appwrite/config";
 
 const { width } = Dimensions.get("window");
 
 const AdCardSection: React.FC = () => {
+  const [adData, setAds] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchAds = async () => {
+      try {
+        const response = await databases.listDocuments(
+          appwriteConfig.databaseId as string,
+          appwriteConfig.cardsCol as string
+        );
+        setAds(response.documents);
+      } catch (error) {
+        console.error("Error fetching ads:", error);
+      }
+    };
+
+    fetchAds();
+  }, []);
   return (
     <FlatList
       data={adData}

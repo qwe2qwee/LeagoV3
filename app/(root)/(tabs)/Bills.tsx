@@ -115,7 +115,7 @@ const Bills = () => {
                 <Text className="text-sm">
                   End: {new Date(reservation.reservationEnd).toLocaleString()}
                 </Text> */}
-                <Text className="text-sm">Status: {reservation.payStatus}</Text>
+                <Text className="text-sm">Status: {reservation.status}</Text>
                 <View className="flex-row-reverse items-center justify-between mt-2">
                   <CustomButton
                     title="Details"

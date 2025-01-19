@@ -1015,7 +1015,7 @@ export async function Reservations(userId: string): Promise<ReservationInfo[]> {
 
         // Parse required fields
         const parsedDate = safeParse<{
-          reservationDuration: string;
+          duration: string;
           reservationStart: string;
           reservationEnd: string;
         }>(reservation.date);
@@ -1033,8 +1033,6 @@ export async function Reservations(userId: string): Promise<ReservationInfo[]> {
         const branchLocation = safeParse<{ lat: number; lon: number }>(
           reservation.branchId?.location
         );
-
-        console.log(parsedPay);
 
         // Format date with fallback
         const formatDate = (isoDateString: string): string => {
@@ -1059,7 +1057,7 @@ export async function Reservations(userId: string): Promise<ReservationInfo[]> {
           carColor: carDetails?.[0]?.color || "Unknown",
           carImage: carDetails?.[0]?.image || "Unknown",
           branchId: reservation.branchId?.$id || "Unknown",
-          reservationDuration: parsedDate?.reservationDuration || "Unknown",
+          reservationDuration: parsedDate?.duration || "Unknown",
           carLocation: branchLocation || { lat: 0, lon: 0 },
           city: reservation.carId?.city || "Unknown",
           reservationStart: parsedDate?.reservationStart || "Unknown",
@@ -1115,7 +1113,7 @@ export async function ReservationsRelative(
   const parseReservation = (reservation: any): ReservationInfo | null => {
     try {
       const parsedDate = safeParse<{
-        reservationDuration: string;
+        duration: string;
         reservationStart: string;
         reservationEnd: string;
       }>(reservation.date);
@@ -1141,7 +1139,7 @@ export async function ReservationsRelative(
         carColor: carDetails?.[0]?.color || "Unknown",
         carImage: carDetails?.[0]?.image || "Unknown",
         branchId: reservation.branchId?.$id || "Unknown",
-        reservationDuration: parsedDate?.reservationDuration || "Unknown",
+        reservationDuration: parsedDate?.duration || "Unknown",
         carLocation: branchLocation || { lat: 0, lon: 0 },
         city: reservation.carId?.city || "Unknown",
         reservationStart: parsedDate?.reservationStart || "Unknown",

@@ -26,7 +26,7 @@ const translations = {
     reservationDate: "Reservation Date",
     start: "Start",
     end: "End",
-    backToBills: "Back to Bills",
+    backToBills: "Pay",
     unknown: "Unknown",
     na: "N/A",
   },
@@ -37,10 +37,10 @@ const translations = {
     year: "السنة",
     city: "المدينة",
     status: "الحالة",
-    reservationDate: "تاريخ الحجز",
+    reservationDate: "بداية الحجز",
     start: "بداية",
     end: "نهاية",
-    backToBills: "العودة إلى الفواتير",
+    backToBills: "الدفع",
     unknown: "غير معروف",
     na: "غير متوفر",
   },
@@ -50,6 +50,24 @@ const translations = {
 const locale = "ar"; // Change to "en" for English
 const t = translations[locale];
 
+const formatDateLocalized = (isoDate: string, locale: "ar" | "en"): string => {
+  try {
+    const date = new Date(isoDate);
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    };
+    return new Intl.DateTimeFormat(locale, options).format(date);
+  } catch (error) {
+    console.error("Invalid date format:", isoDate);
+    return locale === "ar" ? "تاريخ غير صالح" : "Invalid Date";
+  }
+};
+
 const DetailsBill = () => {
   const { reservation: reservationString } = useLocalSearchParams(); // Get the serialized reservation
   const router = useRouter();
@@ -58,8 +76,6 @@ const DetailsBill = () => {
   const reservation = reservationString
     ? JSON.parse(reservationString as any)
     : null;
-
-  console.log(reservation);
 
   const defaultLocation = { lat: 21.543333, lon: 39.172778 }; // Coordinates for Jeddah, SA
 
@@ -107,7 +123,7 @@ const DetailsBill = () => {
         </View>
         <Text className="text-sm font-bold mb-4 text-right">
           {reservation.payId ? reservation.payId : reservation.carName} : رقم
-          الطلب
+          الفاتورة
         </Text>
         <Text className="text-sm mb-2">
           {t.year}: {reservation.carYear || t.unknown}
@@ -124,18 +140,18 @@ const DetailsBill = () => {
         <Text className="text-sm mb-2">
           {t.start}:{" "}
           {reservation.reservationStart
-            ? new Date(reservation.reservationStart).toLocaleString(locale)
+            ? formatDateLocalized(reservation.reservationStart, "ar")
             : t.na}
         </Text>
         <Text className="text-sm mb-4 ">
           {t.end}:{" "}
           {reservation.reservationEnd
-            ? new Date(reservation.reservationEnd).toLocaleString(locale)
+            ? formatDateLocalized(reservation.reservationEnd, "ar")
             : t.na}
         </Text>
         <View className="w-full h-[1px] bg-textColor-200"></View>
 
-        <View className="items-center justify-center mt-4 h-40 w-full bg-black">
+        <View className="items-center justify-center mt-4 h-40 w-full ">
           {/* Map Section */}
           <View className="h-40 w-full">
             {reservation?.carLocation &&
