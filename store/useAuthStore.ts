@@ -1,5 +1,4 @@
 // store/useAuthStore.ts
-import { ID, Query } from "appwrite";
 import { AppwriteUser, UserDetails } from "@/types/AppwriteTypes";
 import {
   createUser as registerUser,
@@ -11,6 +10,7 @@ import {
 } from "@/lib/appwrite/apit";
 import { account, appwriteConfig, databases } from "@/lib/appwrite/config";
 import { create } from "zustand";
+import { ID, Query } from "react-native-appwrite";
 
 interface AuthState {
   user: (AppwriteUser & { details?: UserDetails }) | null;
@@ -128,7 +128,9 @@ const useAuthStore = create<AuthState>((set) => ({
     set({ loading: true, error: null });
     try {
       const currentAccount = await account.get();
-      if (!currentAccount) throw new Error("No current account found");
+      if (!currentAccount) {
+        throw new Error("No current account found");
+      }
 
       const currentUser = await databases.listDocuments(
         appwriteConfig.databaseId as string,
@@ -136,23 +138,25 @@ const useAuthStore = create<AuthState>((set) => ({
         [Query.equal("$id", currentAccount.$id)]
       );
 
+      if (currentUser.documents.length === 0) {
+        throw new Error("No user document found in the database");
+      }
+
       const userDocument = currentUser.documents[0] as AppwriteUser;
 
-      // Parse the `details` field
-      let details: UserDetails | undefined = undefined;
-      if (userDocument.details && userDocument.details.length > 0) {
-        try {
-          details = JSON.parse(userDocument.details[0]) as UserDetails;
-        } catch (error) {
-          console.error("Error parsing user details:", error);
+      let details: UserDetails | undefined;
+      try {
+        if (userDocument.details && userDocument.details.length > 0) {
+          details = JSON.parse(userDocument.details[0]);
         }
+      } catch (error) {
+        console.error("Failed to parse user details:", error);
       }
 
       set({ user: { ...userDocument, details } as any });
     } catch (error) {
-      const errorMessage = (error as Error).message;
-      console.error("Failed to get current user:", errorMessage);
-      set({ error: errorMessage, user: null });
+      console.error("Failed to get current user:", error);
+      set({ error: (error as Error).message, user: null });
     } finally {
       set({ loading: false });
     }

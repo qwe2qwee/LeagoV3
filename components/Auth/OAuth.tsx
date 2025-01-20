@@ -14,7 +14,7 @@ const OAuth = () => {
         </Text>
         <View className="flex-1 h-[1px] bg-slate-400" />
       </View>
-      <CustomButton
+      {/* <CustomButton
         className="mt-5  w-16 mx-auto bg-textColor-50 shadow-none"
         IconLeft={() => (
           <Image
@@ -26,7 +26,7 @@ const OAuth = () => {
         bgVariant="outline"
         textVariant="primary"
         onPress={() => console.log("Sign in with Google")}
-      />
+      /> */}
     </View>
   );
 };

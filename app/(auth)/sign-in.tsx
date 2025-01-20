@@ -46,7 +46,7 @@ const signIn = () => {
 
     try {
       await login(form.email, form.password);
-      router.replace("/(root)/(tabs)/Home");
+      router.replace("/(tabs)");
     } catch (error) {
       if (error instanceof Error) {
         Alert.alert(t.error, error.message);
@@ -72,7 +72,7 @@ const signIn = () => {
               <LeagoMark />
               <TouchableOpacity
                 className="absolute top-14 right-8 z-40"
-                onPress={() => router.replace("/(root)/(tabs)/Home")}
+                onPress={() => router.replace("/(tabs)")}
               >
                 <Image source={icons.backHome} className="w-8 h-8" />
               </TouchableOpacity>

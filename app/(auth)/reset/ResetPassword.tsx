@@ -67,7 +67,7 @@ const ResetPassword = () => {
 
       showToast();
 
-      router.replace("/(tabs)/Home");
+      router.replace("/(tabs)");
     } catch (error: any) {
       console.error("Password reset failed:", error.message || error);
       showError(error.message || t.errorResetFailed);

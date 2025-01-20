@@ -4,7 +4,7 @@ import { FlatList, Text, TouchableOpacity, Image, View } from "react-native";
 
 interface CarFilterProps {
   selectedBrand: string | null;
-  onSelectBrand: (brand: string) => void;
+  onSelectBrand: (brand: string | null) => void;
 }
 
 // Define car brands and corresponding logos
@@ -59,7 +59,9 @@ const CarFilter: React.FC<CarFilterProps> = ({
       keyExtractor={(item) => item.name}
       renderItem={({ item }) => (
         <TouchableOpacity
-          onPress={() => onSelectBrand(item.name)}
+          onPress={() =>
+            onSelectBrand(selectedBrand === item.name ? null : item.name)
+          }
           className={`flex-row items-center px-4 py-2 rounded-lg mr-2 ${
             selectedBrand === item.name ? "bg-textColor-800" : "bg-gray-200"
           }`}
