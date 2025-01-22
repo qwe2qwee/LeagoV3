@@ -15,7 +15,12 @@ import React, { useState } from "react";
 import ReactNativeModal from "react-native-modal";
 import CustomButton from "@/components/ui/CustomButton";
 import InputField from "@/components/Auth/InputField";
-import { icons, images, translationsignUp } from "@/constants";
+import {
+  generateRandomPassword,
+  icons,
+  images,
+  translationsignUp,
+} from "@/constants";
 import OAuth from "@/components/Auth/OAuth";
 import { Link, router } from "expo-router";
 import LeagoMark from "@/components/Auth/LeagoMark";
@@ -52,12 +57,14 @@ const signUp = () => {
   };
 
   const handleOtpSubmit = async (verify: string) => {
+    const password = generateRandomPassword(16, true, true, true);
+
     if (verify === "ok") {
       try {
         setLoading(true);
         const newUser = await createUser(
           form.email,
-          form.password,
+          password,
           form.name,
           form.phone,
           birthday,
@@ -97,7 +104,7 @@ const signUp = () => {
   };
 
   const validateForm = () => {
-    if (!form.name || !form.email || !form.password || !form.phone) {
+    if (!form.name || !form.email || !form.phone) {
       Alert.alert(t.error, t.missingFields);
       return false;
     }
@@ -109,10 +116,7 @@ const signUp = () => {
       Alert.alert(t.error, t.invalidPhone);
       return false;
     }
-    if (form.password.length < 8) {
-      Alert.alert(t.error, t.weakPassword); // Add this translation to handle weak password
-      return false;
-    }
+
     return true;
   };
 
@@ -149,7 +153,7 @@ const signUp = () => {
       style={{ flex: 1 }}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView className="flex-1 bg-white">
+        <ScrollView className="flex-1 bg-white h-screen">
           <View className="flex-1 bg-white">
             {loading && (
               <View
@@ -219,14 +223,6 @@ const signUp = () => {
                   onChangeText={(text) =>
                     handleInputChange("phone", `+966${text.trim()}`)
                   }
-                />
-                <InputField
-                  label={t.password}
-                  placeholder={t.password}
-                  labelStyle={`text-black ${changelangS}`}
-                  icon={icons.lock}
-                  value={form.password}
-                  onChangeText={(text) => handleInputChange("password", text)}
                 />
               </View>
               <CustomButton

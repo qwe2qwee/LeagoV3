@@ -63,7 +63,7 @@ const ForgetReset: React.FC<ForgetResetProps> = ({
   };
 
   const handleBackPress = () => {
-    router.replace("/(auth)");
+    router.replace("/(auth)/sign-in");
     setErrorModalVisible(false);
   };
 
@@ -108,7 +108,7 @@ const ForgetReset: React.FC<ForgetResetProps> = ({
   const handleOtpSuccess = () => {
     setIsOtpModalVisible(false);
     setErrorModalVisible(true);
-    router.replace("/(root)/(tabs)/Home");
+    router.replace("/(tabs)");
   };
 
   return (

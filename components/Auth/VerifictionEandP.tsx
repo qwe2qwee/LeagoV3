@@ -130,16 +130,8 @@ const VerifictionEandP: React.FC<VerificationProps> = ({
       backdropTransitionOutTiming={0}
     >
       <ScrollView>
-        <View className="w-full h-3/4 justify-start items-center bg-white">
-          <View
-            style={{
-              width: "100%",
-              alignItems: "flex-end",
-              paddingHorizontal: 20,
-              paddingBottom: 10,
-              paddingTop: 20,
-            }}
-          >
+        <View className="w-full h-auto justify-start items-center bg-white rounded-lg p-6 shadow-lg">
+          <View className="w-full flex flex-row justify-between items-center mb-4">
             <TouchableOpacity onPress={onClose} disabled={isSubmitting}>
               <Image source={icons.close} className="w-6 h-6" />
             </TouchableOpacity>
@@ -148,15 +140,18 @@ const VerifictionEandP: React.FC<VerificationProps> = ({
           <Image
             source={icons.sendpassLogo}
             resizeMode="contain"
-            className="w-36 h-48"
+            className="w-36 h-48 mb-6"
           />
-          <Text className="mb-5 mt-4 text-primary font-sans-arabic-semibold text-base">
+
+          <Text className="text-xl text-primary font-bold text-center mb-2">
             {isphone ? t.verifyPhone : t.verifyEmail}
           </Text>
-          <Text className="mb-5 text-textLight font-bold text-base">
+
+          <Text className="text-base text-textLight text-center mb-2">
             {isphone ? t.otpPromptPhone : t.otpPromptEmail}
           </Text>
-          <Text className="mb-5 text-textLight font-bold text-base">
+
+          <Text className="text-base text-textLight font-semibold text-center mb-4">
             {identifier}
           </Text>
 
@@ -167,22 +162,27 @@ const VerifictionEandP: React.FC<VerificationProps> = ({
 
           <CustomButton
             title={t.continue}
-            className="w-40 my-4 py-1 bg-primary mb-5"
+            className="w-full py-3 bg-primary rounded-lg shadow-md mb-4"
             onPress={handleVerifyOtp}
-            textStyle="text-white"
+            textStyle="text-white text-lg font-semibold"
             loading={isSubmitting}
           />
 
           <TouchableOpacity
             disabled={hasResentOtp}
             onPress={handleResendOtp}
-            className="mt-2"
+            className="mt-4"
           >
-            <Text className={hasResentOtp ? "text-red-500" : ""}>
+            <Text
+              className={`text-center text-base ${
+                hasResentOtp ? "text-gray-500" : "text-primary underline"
+              }`}
+            >
               {hasResentOtp ? t.codeResent : t.resendCode}
             </Text>
           </TouchableOpacity>
         </View>
+
         <StatusBar backgroundColor="#fff" style="dark" />
 
         <ErrorModal

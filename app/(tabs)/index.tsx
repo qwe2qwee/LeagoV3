@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { StyleSheet, View } from "react-native";
 
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import AdCardSection from "@/components/Home/AdCardSection";

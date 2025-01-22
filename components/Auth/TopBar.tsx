@@ -1,8 +1,7 @@
 import React from "react";
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import { View, Text, TouchableOpacity, Image, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons"; // or use an icon library of your choice
 import { icons } from "@/constants";
 
 // Custom TopBar Component
@@ -17,9 +16,16 @@ const TopBar: React.FC<TopBarProps> = ({ title }) => {
     <SafeAreaView>
       <View className="flex flex-row justify-between items-center px-4 py-2 w-5/6 mt-0  ">
         {/* Back Button */}
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
+        <Pressable
+          onPress={() => router.back()}
+          className="bg-white rounded-full shadow-md p-3"
+        >
+          <Image
+            source={icons.backArrow}
+            resizeMode="contain"
+            className="w-6 h-6"
+          />
+        </Pressable>
 
         {/* Title */}
         <Text className="text-lg font-bold text-black  w-9/12 text-center">

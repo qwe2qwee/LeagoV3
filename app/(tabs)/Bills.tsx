@@ -8,6 +8,7 @@ import { icons } from "@/constants";
 import { router } from "expo-router";
 import CustomButton from "@/components/ui/CustomButton";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
+import CustombillBtton from "@/components/Bills/CustombillBtton";
 
 // Utility to calculate the distance between two locations
 const calculateDistanceInKm = (
@@ -71,7 +72,7 @@ const Bills = () => {
       {loading ? (
         <Text className="text-center mt-5">Loading reservations...</Text>
       ) : reservations.length > 0 ? (
-        reservations.map((reservation) => {
+        reservations.map((reservation: any) => {
           const carLocation = parseCarLocation(reservation.carLocation as any);
           const userLocation = { lat: latitude, lon: longitude };
           const distance = calculateDistanceInKm(
@@ -115,9 +116,9 @@ const Bills = () => {
                 <Text className="text-sm">
                   End: {new Date(reservation.reservationEnd).toLocaleString()}
                 </Text> */}
-              <Text className="text-sm">Status: {reservation.status}</Text>
+              <Text className="text-sm">Status: {reservation?.status}</Text>
               <View className="flex-row-reverse items-center justify-between mt-2">
-                <CustomButton
+                <CustombillBtton
                   title="Details"
                   onPress={() => {
                     router.push({
@@ -125,8 +126,8 @@ const Bills = () => {
                       params: { reservation: JSON.stringify(reservation) },
                     });
                   }}
-                  className="w-28 h-9 p-1 rounded-md"
-                  textStyle="text-[13px]"
+                  className="w-20 h-11 p-1 rounded-md"
+                  textStyle="text-[12px]"
                 />
                 <Text>{reservation.bill} / 3 Hours </Text>
               </View>

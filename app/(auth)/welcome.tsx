@@ -6,6 +6,7 @@ import Swiper from "react-native-swiper";
 import { buttonTitles, onboarding } from "@/constants";
 import CustomButton from "@/components/ui/CustomButton";
 import useAuthStore from "@/store/useAuthStore";
+import CustomButtonAuth from "@/components/Auth/CustomButtonAuth";
 
 // Define a type for the language
 type Language = "en" | "ar";
@@ -46,19 +47,29 @@ const Onboarding: React.FC = () => {
 
             <Image
               source={item.image[language]} // Dynamically select the image based on language
-              className={`w-full h-[300px] ${item.skip ? "" : " h-[370px] w-full"}`}
+              className={`w-full h-[300px] ${
+                item.skip ? "" : " h-[370px] w-full"
+              }`}
               resizeMode="contain"
             />
             <View className="flex flex-row items-center justify-center mt-5">
               <Text
-                className={`text-black text-3xl mx-10 text-center ${(language as any) === "en" ? "font-MontserratBold" : "font-ZainBold"}`}
+                className={`text-black text-3xl mx-10 text-center ${
+                  (language as any) === "en"
+                    ? "font-MontserratBold"
+                    : "font-ZainBold"
+                }`}
               >
                 {item.title[language]}{" "}
                 {/* Display title in the selected language */}
               </Text>
             </View>
             <Text
-              className={`text-[#858585] text-base font-JakartaSemiBold text-center mx-10 mt-3 ${(language as any) === "en" ? "font-MontserratRegular" : "font-ZainRegular"}`}
+              className={`text-[#858585] text-base font-JakartaSemiBold text-center mx-10 mt-3 ${
+                (language as any) === "en"
+                  ? "font-MontserratRegular"
+                  : "font-ZainRegular"
+              }`}
             >
               {item.description[language]}{" "}
               {/* Display description in the selected language */}
@@ -68,7 +79,7 @@ const Onboarding: React.FC = () => {
       </Swiper>
 
       {/* Next or Get Started Button */}
-      <CustomButton
+      <CustomButtonAuth
         title={
           isLastSlide
             ? buttonTitles[language].getStarted

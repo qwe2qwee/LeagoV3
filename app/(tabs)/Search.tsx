@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, Text, ActivityIndicator } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import useAuthStore from "@/store/useAuthStore";
 import {
@@ -186,6 +185,7 @@ const Search = () => {
       <FlatList
         data={cars}
         renderItem={renderItem}
+        scrollEnabled={false}
         keyExtractor={(item) => item.$id}
         onEndReached={() => fetchCars()}
         showsVerticalScrollIndicator={false}

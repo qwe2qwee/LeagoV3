@@ -485,3 +485,37 @@ export async function fetchCarDetails(
 }
 
 export type TranslationSignUpKeys = keyof typeof translationsignUp;
+
+export function generateRandomPassword(
+  length: number = 12, // Default password length
+  includeUppercase: boolean = true,
+  includeNumbers: boolean = true,
+  includeSymbols: boolean = true
+): string {
+  const lowercaseChars = "abcdefghijklmnopqrstuvwxyz";
+  const uppercaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const numberChars = "0123456789";
+  const symbolChars = "!@#$%^&*()_+[]{}|;:,.<>?";
+
+  let characterPool = lowercaseChars;
+
+  if (includeUppercase) characterPool += uppercaseChars;
+  if (includeNumbers) characterPool += numberChars;
+  if (includeSymbols) characterPool += symbolChars;
+
+  if (characterPool.length === 0) {
+    throw new Error("At least one character type must be selected.");
+  }
+
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characterPool.length);
+    password += characterPool[randomIndex];
+  }
+
+  return password;
+}
+
+// Example Usage:
+const password = generateRandomPassword(16, true, true, true);
+console.log("Generated Password:", password);

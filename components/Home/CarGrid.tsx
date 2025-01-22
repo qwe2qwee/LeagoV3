@@ -111,7 +111,7 @@ const CarGrid: React.FC<CarGridProps> = ({
         <View
           style={{
             display: "flex",
-            direction: language === "ar" ? "rtl" : "ltr",
+            direction: language === "en" ? "rtl" : "ltr",
             justifyContent: "space-between",
             alignItems: language === "ar" ? "flex-end" : "flex-start",
           }}
@@ -125,9 +125,9 @@ const CarGrid: React.FC<CarGridProps> = ({
             {carInfo.rentType?.monthly?.price ?? "N/A"}
           </Text>
           <Text style={styles.carCity}>{`${city}: ${item.city ?? "N/A"}`}</Text>
-          <Text
-            style={styles.carYear}
-          >{`${year}: ${carInfo.year ?? "N/A"}`}</Text>
+          <Text style={styles.carYear}>{`${year}: ${
+            carInfo.year ?? "N/A"
+          }`}</Text>
         </View>
         {/* <TouchableOpacity
           onPress={() => toggleLike(item.$id)}

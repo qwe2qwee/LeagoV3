@@ -1,11 +1,11 @@
 {
   "expo": {
     "name": "Leago",
-    "slug": "leago",
+    "slug": "leagoV3",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "leago",
+    "scheme": "leagoV3",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -14,7 +14,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#FF5C39"
       },
       "package": "com.qwe2qwe.leagoV3",
       "versionCode": "6"
@@ -29,15 +29,23 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#FF5C39"
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "b4cd9731-6fc4-48a2-8321-5216ef8499a6"
+      }
     }
   }
 }

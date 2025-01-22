@@ -13,48 +13,112 @@ import {
 import React, { useState } from "react";
 import CustomButton from "@/components/ui/CustomButton";
 import InputField from "@/components/Auth/InputField";
-import { icons, images, translationsLogin } from "@/constants";
+import {
+  icons,
+  images,
+  translationForget,
+  translationsignUp,
+  translationsLogin,
+} from "@/constants";
 import OAuth from "@/components/Auth/OAuth";
 import { Link, router } from "expo-router";
 import LeagoMark from "@/components/Auth/LeagoMark";
 import useAuthStore from "@/store/useAuthStore";
+import {
+  isEmailExisting,
+  isPhoneNumberExisting,
+  sendOtpToEmail,
+  sendOtpToPhone,
+} from "@/lib/appwrite/apit";
+import VerifictionEandP from "@/components/Auth/VerifictionEandP";
+import ErrorModal from "@/components/ui/ErrorModal";
 
 // Define a type for the language
 type Language = "en" | "ar";
 
 const signIn = () => {
   const { login, loading, language } = useAuthStore();
-
+  const [form, setForm] = useState({ value: "" });
+  const [isLoading, setIsLoading] = useState(false);
+  const [isOtpModalVisible, setIsOtpModalVisible] = useState(false);
+  const [userId, setUserId] = useState("");
   const t = translationsLogin[language]; // Choose the right translation
+  const tt = translationsignUp[language];
 
-  const [form, setForm] = useState({
-    email: "" as any,
-    password: "" as any,
-  });
+  const ttt = translationForget[language]; // Get translations based on current language
 
-  const handleInputChange = (field: string, value: string) => {
-    setForm({ ...form, [field]: value });
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleChangeText = (value: string) => {
+    setForm({ value });
+  };
+
+  const isPhone = true;
+
+  const showError = (message: string, success: boolean) => {
+    setErrorMessage(message);
+    setIsSuccess(success);
+    setErrorModalVisible(true);
+  };
+
+  const handleErrorModalClose = () => {
+    setErrorModalVisible(false);
+    setErrorMessage("");
+  };
+
+  const handleBackPress = () => {
+    router.replace("/(auth)/sign-in");
+    setErrorModalVisible(false);
+  };
+
+  const handleSendOtp = async () => {
+    if (!form.value.trim()) {
+      showError(ttt.errorEmptyField, false);
+      return;
+    }
+
+    setIsLoading(true);
+    const formattedValue = `+966${form.value.trim()}`;
+
+    console.log(formattedValue);
+
+    try {
+      if (isPhone) {
+        const phoneExists = await isPhoneNumberExisting(formattedValue);
+        if (!phoneExists) {
+          showError(ttt.errorPhoneNotFound, false);
+          return;
+        }
+        const userIdFromPhone = await sendOtpToPhone(formattedValue);
+        setUserId(userIdFromPhone);
+      } else {
+        const emailExists = await isEmailExisting(formattedValue);
+        if (!emailExists) {
+          showError(ttt.errorEmailNotFound, false);
+          return;
+        }
+        await sendOtpToEmail(formattedValue);
+      }
+
+      setIsOtpModalVisible(true);
+    } catch (error) {
+      console.error("Failed to send OTP:", error);
+      showError(ttt.sendOtpError, false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOtpSuccess = () => {
+    setIsOtpModalVisible(false);
+    setErrorModalVisible(true);
+    router.replace("/(tabs)");
   };
 
   let changelangS =
     language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold";
-  const onSignInPress = async () => {
-    if (!form.email || !form.password) {
-      Alert.alert(t.error, t.missingFields);
-      return;
-    }
-
-    try {
-      await login(form.email, form.password);
-      router.replace("/(tabs)");
-    } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(t.error, error.message);
-      } else {
-        Alert.alert(t.error, "Error during sign-in");
-      }
-    }
-  };
 
   return (
     <KeyboardAvoidingView
@@ -90,28 +154,13 @@ const signIn = () => {
             <View className="p-5">
               <View className="flex flex-1 w-full">
                 <InputField
-                  label={t.email}
-                  placeholder={t.email}
-                  labelStyle={`text-black ${changelangS}`}
-                  icon={icons.email}
-                  value={form.email}
-                  onChangeText={(text) => handleInputChange("email", text)}
-                />
-                {/* <InputField
-                  label={t.phone}
-                  placeholder={t.phone}
+                  label={"Phone"}
+                  placeholder={tt.placeHol}
                   labelStyle={`text-black ${changelangS}`}
                   icon={icons.phone}
-                  value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e })}
-                /> */}
-                <InputField
-                  label={t.password}
-                  placeholder={t.password}
-                  labelStyle={`text-black ${changelangS}`}
-                  icon={icons.lock}
-                  value={form.password}
-                  onChangeText={(text) => handleInputChange("password", text)}
+                  value={form.value}
+                  onChangeText={handleChangeText}
+                  maxLength={9}
                 />
                 <View className="w-full px-2 flex-row-reverse justify-start items-center">
                   <TouchableOpacity
@@ -127,12 +176,23 @@ const signIn = () => {
               <CustomButton
                 title={t.signIn}
                 textStyle={`text-lg ${changelangS}`}
-                onPress={onSignInPress}
+                onPress={handleSendOtp}
                 loading={loading}
                 className="mt-5"
               />
-              {/* Optional OAuth */}
+              {/* OTP Verification Modal */}
+              {isOtpModalVisible && (
+                <VerifictionEandP
+                  ismodal={true}
+                  form={{ value: form.value }}
+                  userId={userId}
+                  close={() => setIsOtpModalVisible(false)}
+                  onSuccess={handleOtpSuccess}
+                  isphone={isPhone}
+                />
+              )}
               <OAuth />
+
               <Link
                 href="/(auth)/sign-up"
                 className=" mx-auto flex justify-center items-center mt-3"
@@ -146,6 +206,12 @@ const signIn = () => {
               </Link>
             </View>
           </View>
+          <ErrorModal
+            isVisible={errorModalVisible}
+            message={errorMessage}
+            onClose={handleErrorModalClose}
+            isSecuss={isSuccess}
+          />
         </ScrollView>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

@@ -114,17 +114,21 @@ const OTPComponent: React.FC<OTPComponentProps> = ({
   };
 
   return (
-    <View className="bg-secondary-white justify-center items-center p-4 relative">
+    <View className="bg-secondary-white justify-center items-center p-4 relative  ">
       <TouchableOpacity onPress={closeModal} className="absolute top-2 right-2">
         <Image source={icons.close} resizeMode="contain" className="w-6 h-6" />
       </TouchableOpacity>
       <Text
-        className={`text-lg font-bold mb-4 ${language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold"}`}
+        className={`text-lg font-bold mb-4 ${
+          language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold"
+        }`}
       >
         {language === "ar" ? "أدخل رمز التحقق" : "Enter OTP"}
       </Text>
       <View
-        className={`text-sm mb-4 flex justify-center items-center  ${language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold"}`}
+        className={`text-sm mb-4 flex justify-center items-center  ${
+          language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold"
+        }`}
       >
         <Text numberOfLines={1}>
           {language === "ar" ? (
@@ -150,7 +154,9 @@ const OTPComponent: React.FC<OTPComponentProps> = ({
             onKeyPress={(event) => handleKeyPress(event, index)}
             keyboardType="number-pad"
             maxLength={1}
-            className={`border rounded-md p-3 mx-2 w-12 h-12 text-center text-primary-400 border-primary-400 ${language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold"}`}
+            className={`border rounded-md p-3 mx-2 w-12 h-12 text-center text-primary-400 border-primary-400 ${
+              language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold"
+            }`}
             ref={(ref) => (inputRefs.current[index] = ref)}
           />
         ))}
@@ -158,7 +164,9 @@ const OTPComponent: React.FC<OTPComponentProps> = ({
 
       {error && (
         <Text
-          className={`text-red-500 mb-2 ${language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold"}`}
+          className={`text-red-500 mb-2 ${
+            language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold"
+          }`}
         >
           {error}
         </Text>
@@ -167,12 +175,16 @@ const OTPComponent: React.FC<OTPComponentProps> = ({
       <CustomButton
         title={language === "ar" ? "تحقق" : "Verify"}
         onPress={() => handleVerify(otp.join(""))}
-        className={`mt-8 ${language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold"}`}
+        className={`mt-8 ${
+          language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold"
+        }`}
       />
 
       <TouchableOpacity onPress={onResendOTP} className="mt-4">
         <Text
-          className={`text-primary-300 underline ${language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold"}`}
+          className={`text-primary-300 underline ${
+            language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold"
+          }`}
         >
           {language === "ar" ? "إعادة إرسال رمز التحقق" : "Resend OTP"}
         </Text>

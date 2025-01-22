@@ -65,7 +65,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           }}
         />
         <TextInput
-          className="ml-2 p-2 flex-1 text-gray-700"
+          className="ml-2 p-3 flex-1 text-gray-700"
           placeholder={placeholderText}
           placeholderTextColor="gray"
           value={query}

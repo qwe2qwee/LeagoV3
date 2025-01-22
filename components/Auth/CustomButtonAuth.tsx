@@ -32,7 +32,7 @@ const getTextVariantStyle = (variant: ButtonProps["textVariant"]) => {
   }
 };
 
-const CustomButton = ({
+const CustomButtonAuth = ({
   onPress,
   title,
   bgVariant = "primary",
@@ -47,7 +47,7 @@ const CustomButton = ({
   return (
     <TouchableOpacity
       onPress={onPress}
-      className={`w-full rounded-xl p-3 flex flex-row justify-center items-center shadow-md shadow-neutral-400/70 ${getBgVariantStyle(
+      className={` p-3 flex flex-row justify-center items-center shadow-md shadow-neutral-400/70  w-11/12 mt-4 mb-8 rounded-xl ${getBgVariantStyle(
         bgVariant
       )} ${className} ${loading == true ? "h-14" : ""}
       `}
@@ -73,4 +73,4 @@ const CustomButton = ({
   );
 };
 
-export default CustomButton;
+export default CustomButtonAuth;

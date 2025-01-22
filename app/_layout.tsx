@@ -13,7 +13,7 @@ import "react-native-reanimated";
 import "../global.css";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { I18nManager } from "react-native";
+import { ActivityIndicator, I18nManager, Text, View } from "react-native";
 import useAuthStore from "@/store/useAuthStore";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -83,9 +83,23 @@ export default function RootLayout() {
     }
   }, [appReady, user]);
 
+  if (!fontsLoaded) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+        <Text className="text-2xl text-black">Loading fonts...</Text>
+      </View>
+    );
+  }
+
   // Render nothing until fonts and app are ready.
   if (!appReady) {
-    return null;
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+        <Text className="text-2xl text-black"> not ready</Text>
+      </View>
+    );
   }
 
   return (
@@ -93,6 +107,7 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="screens" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="inverted" />

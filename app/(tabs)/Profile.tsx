@@ -16,6 +16,7 @@ const profile = () => {
   const fieldTranslator = profilePage[language];
   const SecTranslator = profileSections[language];
   const logOutTranslator = logOutModal[language];
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const [open, setOpen] = useState(false);
 
@@ -24,19 +25,29 @@ const profile = () => {
   };
 
   const handleLogOut = async () => {
-    await logout();
-    setOpen(false);
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      setOpen(false);
+    } catch (error) {
+      console.error("Error logging out:", error);
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
     >
-      <View className="items-center justify-center h-full w-full">
+      <View className="items-center justify-center h-full w-full bg-[#f3f4f6] ">
         {user && (
           <>
             <View className="itmes-center justify-center">
-              <Text className="text-sm pr-10 py-2.5 font-ZainBold">
+              <Text
+                className="text-sm pr-10 py-2.5 font-ZainBold"
+                style={{ textAlign: language === "ar" ? "right" : "left" }}
+              >
                 {SecTranslator.account}
               </Text>
               <View className="w-80 mx-10">
@@ -60,7 +71,10 @@ const profile = () => {
           </>
         )}
         <View className="itmes-center justify-center mt-4">
-          <Text className="text-sm pr-10 py-2.5 font-ZainBold">
+          <Text
+            className="text-sm pr-10 py-2.5 font-ZainBold"
+            style={{ textAlign: language === "ar" ? "right" : "left" }}
+          >
             {SecTranslator.general}
           </Text>
           <View className="w-80 mx-10">
@@ -93,8 +107,13 @@ const profile = () => {
               {profileSections[language].buttonT}
             </Text>
           </TouchableOpacity>
-          <Modal animationIn="slideInUp" coverScreen isVisible={open}>
-            <View className="bg-white w-80 h-64 rounded-2xl">
+          <Modal
+            animationIn="slideInUp"
+            coverScreen
+            isVisible={open}
+            className="flex justify-center items-center"
+          >
+            <View className="bg-white w-80 h-64 rounded-2xl justify-center items-center">
               <View className="p-16 pb-8">
                 <Text className="text-center text-lg font-ZainBold">
                   {logOutTranslator.question}
@@ -123,15 +142,14 @@ const profile = () => {
       )}
       {!user && (
         <TouchableOpacity
-          className="p-2 mx-auto"
-          onPress={() => router.replace("/(auth)/sign-in")}
+          onPress={handleLogOut}
+          disabled={isLoggingOut}
+          className={`flex-1 ${
+            isLoggingOut ? "bg-primary-300" : "bg-primary-500"
+          } h-12 justify-center items-center rounded-md mr-2`}
         >
-          <Text
-            className={`text-primary-400 ${
-              language == "ar" ? "font-ZainRegular" : "font-MontserratMedium"
-            }`}
-          >
-            {profileSections[language].usernull}
+          <Text className="text-white text-base font-ZainBold">
+            {isLoggingOut ? "Logging Out..." : logOutTranslator.yes}
           </Text>
         </TouchableOpacity>
       )}

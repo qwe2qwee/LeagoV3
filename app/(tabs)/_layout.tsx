@@ -100,7 +100,6 @@ export default function TabLayout() {
         options={{
           title: "Profile",
           headerShown: false,
-
           tabBarIcon: ({ focused }) => (
             <TabIcon source={icons.people} focused={focused} />
           ),
