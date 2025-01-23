@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import {
   parseCarLocation,
@@ -23,8 +24,11 @@ import useAuthStore from "@/store/useAuthStore";
 interface CarGridProps {
   selectedBrand: string | null;
   userLocation: { lat: number | null; lon: number | null };
+  isLoadingMore: boolean;
+  isRefreshing: boolean;
   language: "en" | "ar";
   cars: CarDocument[];
+  isLoading: boolean; // Add isLoading prop
 }
 
 const translations = {
@@ -33,42 +37,20 @@ const translations = {
     year: "Year",
     dailyRate: "/day",
     noCarsAvailable: "No cars available",
+    loading: "Loading cars...", // Translation for loading
   },
   ar: {
     city: "المدينة",
     year: "السنة",
     dailyRate: "/اليوم",
     noCarsAvailable: "لا توجد سيارات متاحة",
+    loading: "جاري تحميل السيارات...", // Arabic translation
   },
 };
 
-const CarGrid: React.FC<CarGridProps> = ({
-  selectedBrand,
-  userLocation,
-  language,
-  cars,
-}) => {
+const CarGrid: React.FC<CarGridProps> = ({ language, cars, isLoading }) => {
   const screenWidth = Dimensions.get("window").width;
-  const { city, year, noCarsAvailable } = translations[language];
-  const { user } = useAuthStore();
-
-  // const toggleLike = async (carId: string) => {
-  //   if (!user?.$id) {
-  //     console.error("User not authenticated.");
-  //     return;
-  //   }
-
-  //   try {
-  //     await likeCar(user.$id, carId);
-  //     setLikedCars((prev) =>
-  //       prev.includes(carId)
-  //         ? prev.filter((id) => id !== carId)
-  //         : [...prev, carId]
-  //     );
-  //   } catch (error) {
-  //     console.error("Error toggling like status:", error);
-  //   }
-  // };
+  const { city, year, noCarsAvailable, loading } = translations[language];
 
   const renderItem = ({ item }: { item: CarDocument }) => {
     const carDetails = Array.isArray(item.details)
@@ -129,21 +111,21 @@ const CarGrid: React.FC<CarGridProps> = ({
             carInfo.year ?? "N/A"
           }`}</Text>
         </View>
-        {/* <TouchableOpacity
-          onPress={() => toggleLike(item.$id)}
-          style={styles.likeIcon}
-        >
-          <Icon
-            name={likedCars.includes(item.$id) ? "heart" : "heart-o"}
-            size={24}
-            color={likedCars.includes(item.$id) ? "red" : "gray"}
-          />
-        </TouchableOpacity> */}
       </TouchableOpacity>
     );
   };
 
+  if (isLoading) {
+    // Show loading indicator when loading
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>{loading}</Text>
+      </View>
+    );
+  }
+
   if (cars.length === 0) {
+    // Show no cars available when no data is present
     return <Text style={styles.noCarsText}>{noCarsAvailable}</Text>;
   }
 
@@ -199,6 +181,17 @@ const styles = StyleSheet.create({
   noCarsText: {
     textAlign: "center",
     marginTop: 20,
+    fontSize: 16,
+    color: "gray",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  loadingText: {
+    marginTop: 10,
     fontSize: 16,
     color: "gray",
   },

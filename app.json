@@ -16,8 +16,9 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#FF5C39"
       },
+
       "package": "com.qwe2qwe.leagoV3",
-      "versionCode": "6"
+      "versionCode": "8"
     },
     "web": {
       "bundler": "metro",

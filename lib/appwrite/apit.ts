@@ -669,7 +669,9 @@ export async function getFilePreview(
   } catch (error) {
     console.error("Failed to get file preview:", error);
     throw new Error(
-      `Failed to get file preview: ${error instanceof Error ? error.message : String(error)}`
+      `Failed to get file preview: ${
+        error instanceof Error ? error.message : String(error)
+      }`
     );
   }
 }

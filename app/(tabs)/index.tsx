@@ -7,6 +7,7 @@ import useAuthStore from "@/store/useAuthStore";
 import { listCars, parseCarLocation } from "@/lib/appwrite/apit";
 import CarFilter from "@/components/Home/CarFilter";
 import CarGrid from "@/components/Home/CarGrid";
+import { Text } from "react-native";
 
 const defaultLocation = { lat: 21.543333, lon: 39.172778 }; // Coordinates for Jeddah, SA
 
@@ -28,6 +29,7 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const { language, user, latitude, longitude } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
   const [cars, setCars] = useState<CarDocument[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -37,18 +39,14 @@ export default function HomeScreen() {
     () => ({ lat: latitude, lon: longitude }),
     [latitude, longitude]
   );
-
   const fetchAndFilterCars = useCallback(
     async (reset: boolean = false) => {
-      if (reset) {
-        setIsRefreshing(true);
-      } else {
-        setIsLoadingMore(true);
-      }
+      reset ? setIsRefreshing(true) : setIsLoadingMore(true);
 
       try {
+        setIsLoading(true);
         const currentPage = reset ? 1 : page;
-        const offset = (currentPage - 1) * 2; // Adjust offset dynamically
+        const offset = (currentPage - 1) * 2;
 
         const fetchedCars = await listCars({
           queries: [],
@@ -65,31 +63,36 @@ export default function HomeScreen() {
           );
         }
 
-        filteredList.sort((a, b) => {
-          const carLocationA = parseCarLocation(a.carLocation as any);
-          const carLocationB = parseCarLocation(b.carLocation as any);
-          if (!carLocationA || !carLocationB) return 0;
+        const sortedCars = filteredList.sort((a, b) => {
+          const locA = parseCarLocation(a.carLocation as any);
+          const locB = parseCarLocation(b.carLocation as any);
+          if (!locA || !locB) return 0;
 
-          const distanceA = calculateDistance(userLocation, carLocationA);
-          const distanceB = calculateDistance(userLocation, carLocationB);
-          return distanceA - distanceB;
+          const distA = calculateDistance(userLocation, locA);
+          const distB = calculateDistance(userLocation, locB);
+          return distA - distB;
         });
 
-        setCars((prevCars: any) => {
-          const newCars = reset ? filteredList : [...prevCars, ...filteredList];
+        // Take only the first 6 cars
+        const limitedCars = sortedCars.slice(0, 6);
 
-          // Remove duplicates based on `$id`
-          return Array.from(
-            new Map(newCars.map((car) => [car.$id, car])).values()
-          );
-        });
+        setCars((prevCars: any) =>
+          Array.from(
+            new Map(
+              (reset ? limitedCars : [...prevCars, ...limitedCars]).map(
+                (car) => [car.$id, car]
+              )
+            ).values()
+          )
+        );
 
-        setPage((prevPage) => (reset ? 2 : prevPage + 1)); // Reset to page 2 after refresh
+        setPage(reset ? 2 : currentPage + 1);
       } catch (error) {
         console.error("Failed to fetch cars:", error);
       } finally {
         setIsRefreshing(false);
         setIsLoadingMore(false);
+        setIsLoading(false);
       }
     },
     [language, page, selectedBrand, userLocation]
@@ -127,6 +130,9 @@ export default function HomeScreen() {
       {/* Car Grid Section */}
       <CarGrid
         cars={cars}
+        isLoading={isLoading}
+        isLoadingMore={isLoadingMore}
+        isRefreshing={isRefreshing}
         userLocation={userLocation}
         selectedBrand={selectedBrand}
         language={language}

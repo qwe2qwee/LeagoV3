@@ -141,17 +141,16 @@ const profile = () => {
         </>
       )}
       {!user && (
-        <TouchableOpacity
-          onPress={handleLogOut}
-          disabled={isLoggingOut}
-          className={`flex-1 ${
-            isLoggingOut ? "bg-primary-300" : "bg-primary-500"
-          } h-12 justify-center items-center rounded-md mr-2`}
-        >
-          <Text className="text-white text-base font-ZainBold">
-            {isLoggingOut ? "Logging Out..." : logOutTranslator.yes}
-          </Text>
-        </TouchableOpacity>
+        <View className="items-center justify-center">
+          <TouchableOpacity
+            onPress={() => router.replace("/(auth)/sign-in")}
+            className="bg-primary-500 w-44 h-11 justify-center items-center rounded-md"
+          >
+            <Text className="text-white text-base font-ZainBold">
+              تسجيل الدخول
+            </Text>
+          </TouchableOpacity>
+        </View>
       )}
     </ParallaxScrollView>
   );

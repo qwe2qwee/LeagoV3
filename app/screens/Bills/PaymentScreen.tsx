@@ -17,6 +17,7 @@ import CustomTextInput from "@/components/Bills/CustomTextInput";
 import CustomButton from "@/components/ui/CustomButton";
 import { updatePayStatusInAppwrite } from "@/lib/appwrite/apit";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
+import { moyasarConfig } from "@/lib/appwrite/config";
 
 interface PaymentScreenParams {
   total: number; // Total amount to be paid
@@ -32,8 +33,8 @@ const PaymentScreen: React.FC = () => {
   const { total, reservationId } = useLocalSearchParams() as any;
 
   const createPayment = async () => {
-    const url = process.env.EXPO_PUBLIC_MOYASAR_URL || "";
-    const username = process.env.EXPO_PUBLIC_MOYASAR_KEY || "";
+    const url = moyasarConfig.url || "";
+    const username = moyasarConfig.key || "";
     const password = "";
     const credentials = `${username}:${password}`;
     const encodedCredentials = btoa(credentials);
