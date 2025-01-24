@@ -37,7 +37,7 @@ import ErrorModal from "@/components/ui/ErrorModal";
 type Language = "en" | "ar";
 
 const signIn = () => {
-  const { login, loading, language } = useAuthStore();
+  const { loading, language } = useAuthStore();
   const [form, setForm] = useState({ value: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [isOtpModalVisible, setIsOtpModalVisible] = useState(false);
@@ -81,8 +81,6 @@ const signIn = () => {
 
     setIsLoading(true);
     const formattedValue = `+966${form.value.trim()}`;
-
-    console.log(formattedValue);
 
     try {
       if (isPhone) {
@@ -177,7 +175,7 @@ const signIn = () => {
                 title={t.signIn}
                 textStyle={`text-lg ${changelangS}`}
                 onPress={handleSendOtp}
-                loading={loading}
+                loading={isLoading || loading}
                 className="mt-5"
               />
               {/* OTP Verification Modal */}

@@ -8,20 +8,15 @@ import {
   StyleSheet,
   Platform,
   KeyboardAvoidingView,
-  ScrollView,
 } from "react-native";
 import { encode as btoa } from "base-64";
-import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import CustomTextInput from "@/components/Bills/CustomTextInput";
 import CustomButton from "@/components/ui/CustomButton";
 import { updatePayStatusInAppwrite } from "@/lib/appwrite/apit";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { moyasarConfig } from "@/lib/appwrite/config";
-
-interface PaymentScreenParams {
-  total: number; // Total amount to be paid
-}
+import { icons } from "@/constants";
 
 const PaymentScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -95,16 +90,24 @@ const PaymentScreen: React.FC = () => {
     <ParallaxScrollView
       headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
     >
-      {" "}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-        <Pressable className="w-full pb-5" onPress={() => router.back()}>
-          <Ionicons name="arrow-back-outline" size={25} color="gray" />
-        </Pressable>
+        <View className="absolute top-2 left-2 right-2 flex-row justify-between p-2 z-10">
+          <Pressable
+            onPress={() => router.back()}
+            className="bg-white rounded-full p-3 shadow-md"
+          >
+            <Image
+              source={icons.backArrow}
+              resizeMode="contain"
+              className="w-6 h-6"
+            />
+          </Pressable>
+        </View>
 
-        <View className="w-full h-3/4 py-5 justify-center items-center  ">
+        <View className=" h-3/4 pt-5 px-6 mt-12 justify-center items-center ">
           <View
             style={styles.shadowBox}
             className="w-full bg-primary-400 flex-row items-center justify-around px-5 rounded-lg my-5"
@@ -130,39 +133,41 @@ const PaymentScreen: React.FC = () => {
             placeholder="الاسم"
             value={name}
             onChangeText={setName}
+            containerStyle="w-[98%] px-0"
           />
           <CustomTextInput
             placeholder="رقم البطاقة"
             value={number}
             onChangeText={setNumber}
             keyboardType="numeric"
+            containerStyle="w-[98%]"
           />
 
-          <View className="flex-row justify-between w-full mb-4 ">
+          <View className="flex-row justify-between  mb-4 max-w-[100vw] ">
             <CustomTextInput
               placeholder="MM/YY"
               value={expiry}
               onChangeText={setExpiry}
               keyboardType="numbers-and-punctuation"
-              containerStyle={"w-[45%] "}
+              containerStyle={"w-[45%] mr-3"}
             />
             <CustomTextInput
               placeholder="CVC"
               value={cvc}
               onChangeText={setCvc}
               keyboardType="numeric"
-              containerStyle={"w-[45%]"}
+              containerStyle={"w-[45%] ml-3"}
             />
           </View>
         </View>
 
-        <View className="w-full h-1/5 flex-row justify-center">
+        <View className="w-full h-2/5 px-6  flex-col-reverse justify-center items-center">
           <View className="w-[50%] px-1 justify-center items-center">
             <CustomButton
               title="ادفع الان"
               onPress={createPayment}
               loading={isLoading}
-              className="w-full my-3 py-1 bg-primary "
+              className="w-full my-2 p-3 bg-primary "
             />
           </View>
           <View className="w-[50%] px-1 justify-center items-center py-10">

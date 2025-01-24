@@ -42,9 +42,30 @@ const Search = () => {
 
   const [offset, setOffset] = useState(0);
   const [isEndReached, setIsEndReached] = useState(true);
-  const { latitude, longitude } = useAuthStore();
+  const { latitude, longitude, language } = useAuthStore();
   const LIMIT = 2;
   let debounceTimeout: any;
+
+  const translations = {
+    en: {
+      search: "Search",
+      clear: "Clear",
+      noCarsAvailable: "No cars available",
+      errorLoadingCars: "Error loading cars. Please try again.",
+      distance: "{{distance}} km",
+      city: "{{city}}",
+    },
+    ar: {
+      search: "بحث",
+      clear: "مسح",
+      noCarsAvailable: "لا توجد سيارات متاحة",
+      errorLoadingCars: "حدث خطأ أثناء تحميل السيارات. يرجى المحاولة مرة أخرى.",
+      distance: "{{distance}} كم",
+      city: "{{city}}",
+    },
+  };
+
+  const t = translations[language];
 
   // Function to load all cars initially using listCars
   const loadAllCars = async () => {
@@ -180,6 +201,7 @@ const Search = () => {
       <SearchBar
         handleSearch={handleSearch}
         loading={loading}
+        isArabic={language === "ar"}
         reest={handleClear}
       />
       <FlatList
@@ -196,7 +218,7 @@ const Search = () => {
         ListEmptyComponent={() =>
           !loading && (
             <Text className="text-center mt-5 text-gray-600">
-              No cars available
+              {t.noCarsAvailable}
             </Text>
           )
         }

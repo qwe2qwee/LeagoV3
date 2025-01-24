@@ -16,11 +16,9 @@ const CustomTextInput: FC<CustomTextInputProps> = ({
   inputStyle = "",
 }) => {
   return (
-    <View
-      className={`w-full bg-[#F5F5F5] rounded-full   my-3 ${containerStyle}`}
-    >
+    <View className={`bg-[#Fff] rounded-full my-3 w-auto  ${containerStyle} `}>
       <TextInput
-        className={` m-auto p-3 rounded w-full ${inputStyle}`}
+        className={` m-auto p-4 rounded w-full ${inputStyle}`}
         value={value}
         placeholder={placeholder}
         onChangeText={onChangeText}

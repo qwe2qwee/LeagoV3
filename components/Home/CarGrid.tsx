@@ -18,8 +18,13 @@ import {
 } from "@/lib/appwrite/apit";
 import { CarDocument } from "@/types/AppwriteTypes";
 import { router } from "expo-router";
-import { getColorHashCode } from "@/constants";
+import {
+  cityTranslations,
+  getAvailableRentType,
+  getColorHashCode,
+} from "@/constants";
 import useAuthStore from "@/store/useAuthStore";
+import AvailableRentType from "../ui/AvailableRentType";
 
 interface CarGridProps {
   selectedBrand: string | null;
@@ -48,9 +53,36 @@ const translations = {
   },
 };
 
+const translationss = {
+  en: {
+    daily: "daily",
+    weekly: "weekly",
+    monthly: "monthly",
+    notAvailable: "Not Available",
+    n: "N/A",
+  },
+  ar: {
+    daily: "يومي",
+    weekly: "أسبوعي",
+    monthly: "شهري",
+    notAvailable: "غير متوفر",
+    n: "غير متاح",
+  },
+} as any;
+
+const translateCity = (
+  city: string | undefined,
+  language: "en" | "ar"
+): string => {
+  if (!city) return language === "ar" ? "غير معروف" : "Unknown"; // Default to "Unknown"
+  const translation = cityTranslations[city];
+  return translation ? translation[language] : city; // Fallback to the original if not found
+};
+
 const CarGrid: React.FC<CarGridProps> = ({ language, cars, isLoading }) => {
   const screenWidth = Dimensions.get("window").width;
   const { city, year, noCarsAvailable, loading } = translations[language];
+  const t = translationss[language]; // Select translation based on language
 
   const renderItem = ({ item }: { item: CarDocument }) => {
     const carDetails = Array.isArray(item.details)
@@ -103,10 +135,17 @@ const CarGrid: React.FC<CarGridProps> = ({ language, cars, isLoading }) => {
             style={{ backgroundColor: color }}
             className={`w-2 h-2 rounded-full border-[1px]`}
           ></View>
-          <Text style={styles.carPrice}>
-            {carInfo.rentType?.monthly?.price ?? "N/A"}
-          </Text>
-          <Text style={styles.carCity}>{`${city}: ${item.city ?? "N/A"}`}</Text>
+
+          <AvailableRentType
+            rentType={carInfo.rentType} // Pass rentType from carInfo
+            containerStyle={{ marginVertical: 1 }} // Optional container style
+            textStyle={{ fontSize: 14, fontWeight: "" }} // Optional text style
+          />
+
+          <Text style={styles.carCity}>{`${city}: ${translateCity(
+            item.city,
+            language
+          )}`}</Text>
           <Text style={styles.carYear}>{`${year}: ${
             carInfo.year ?? "N/A"
           }`}</Text>
@@ -168,10 +207,12 @@ const styles = StyleSheet.create({
   carCity: {
     fontSize: 12,
     color: "gray",
+    marginVertical: 1,
   },
   carYear: {
     fontSize: 12,
     color: "gray",
+    marginVertical: 1,
   },
   likeIcon: {
     position: "absolute",

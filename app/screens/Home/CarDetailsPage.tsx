@@ -6,6 +6,7 @@ import { getColorHashCode, icons } from "@/constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 import useAuthStore from "@/store/useAuthStore";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
+import AvailableRentType from "@/components/ui/AvailableRentType";
 
 interface CarDetails {
   name: { [key: string]: string };
@@ -15,7 +16,9 @@ interface CarDetails {
 }
 
 interface RentSalary {
-  daily?: { price: number };
+  daily?: { availability: boolean; price: number };
+  weekly?: { availability: boolean; price: number };
+  monthly?: { availability: boolean; price: number };
 }
 
 const CarDetailsPage: React.FC = () => {
@@ -32,7 +35,6 @@ const CarDetailsPage: React.FC = () => {
   const router = useRouter();
   const bookingTime = "Today, 01:00 PM - 02:00 PM";
   const { language = "en", user } = useAuthStore();
-  const [likesCount, setLikesCount] = useState<number>(0);
 
   const translations = {
     en: {
@@ -70,43 +72,6 @@ const CarDetailsPage: React.FC = () => {
 
   const color = getColorHashCode(parsedCarDetails?.color as any);
 
-  // useEffect(() => {
-  //   const fetchLikes = async () => {
-  //     try {
-  //       if (carId) {
-  //         const count = await getCarLikesCount(carId as string);
-  //         setLikesCount(count);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching likes count:", error);
-  //     }
-  //   };
-
-  //   fetchLikes();
-
-  //   const documentSubscriptionPath = `databases.${appwriteConfig.databaseId}.collections.${appwriteConfig.likesCollectionId}.documents`;
-
-  //   const unsubscribe = client.subscribe(
-  //     [documentSubscriptionPath, "files"],
-  //     (response: any) => {
-  //       if (response.payload.$id === carId) {
-  //         if (
-  //           response.events.includes("database.documents.delete") ||
-  //           response.events.includes("database.documents.create")
-  //         ) {
-  //           console.log("Document event detected:", response.events);
-  //           fetchLikes();
-  //         }
-  //       }
-  //       console.log("Subscription Response:", response); // Log specific response details for debugging
-  //     }
-  //   );
-
-  //   return () => {
-  //     if (unsubscribe) unsubscribe();
-  //   };
-  // }, [carId]);
-
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
@@ -142,9 +107,11 @@ const CarDetailsPage: React.FC = () => {
           <Text className="text-2xl font-bold">
             {parsedCarDetails.name[language]}
           </Text>
-          <Text className="text-xl text-black">
-            ${parsedRentSalary?.daily?.price || "N/A"}/day
-          </Text>
+          <AvailableRentType
+            rentType={parsedRentSalary} // Pass rentType from carInfo
+            containerStyle={{ marginVertical: 10 }} // Optional container style
+            textStyle={{ fontSize: 14, fontWeight: "bold" }} // Optional text style
+          />
         </View>
         <View className="flex-row items-center justify-between my-3">
           <View className="flex-row items-center">
@@ -196,6 +163,12 @@ const CarDetailsPage: React.FC = () => {
           title={translations[language].bookNow}
           className="rounded-lg mt-6 p-4"
           onPress={() => {
+            if (!user) {
+              router.replace({
+                pathname: "/(auth)/sign-in",
+              });
+              return;
+            }
             if (carId) {
               router.push({
                 pathname: "/screens/Home/BookingPage",

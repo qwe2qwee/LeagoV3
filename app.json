@@ -18,7 +18,7 @@
       },
 
       "package": "com.qwe2qwe.leagoV3",
-      "versionCode": "8"
+      "versionCode": "10"
     },
     "web": {
       "bundler": "metro",

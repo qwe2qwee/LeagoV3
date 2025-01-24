@@ -66,11 +66,10 @@ const PaymentCompletePage = () => {
         </View>
         <CustomButton
           title=" العودة للصفحة الرئيسية"
-          className="mt-7 bg-primary"
-          onPress={() => router.push("/(root)/(tabs)/Home")}
+          className="mt-7 bg-primary w-4/5"
+          onPress={() => router.push("/(tabs)/Bills")}
         />
       </View>
-      <StatusBar backgroundColor="#FF5C39" style="light" />
     </SafeAreaView>
   );
 };

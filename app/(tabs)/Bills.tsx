@@ -1,40 +1,44 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, Image } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { parseCarLocation, ReservationsRelative } from "@/lib/appwrite/apit";
+import { View, Text, Image } from "react-native";
+import { ReservationsRelative } from "@/lib/appwrite/apit";
 import useAuthStore from "@/store/useAuthStore";
 import { ReservationInfo } from "@/types/AppwriteTypes";
 import { icons } from "@/constants";
 import { router } from "expo-router";
-import CustomButton from "@/components/ui/CustomButton";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import CustombillBtton from "@/components/Bills/CustombillBtton";
 
-// Utility to calculate the distance between two locations
-const calculateDistanceInKm = (
-  loc1: { lat: number; lon: number },
-  loc2: { lat: number; lon: number }
-): number => {
-  if (!loc1 || !loc2) return 0;
-  const toRad = (value: number) => (value * Math.PI) / 180;
-
-  const R = 6371; // Radius of the Earth in kilometers
-  const dLat = toRad(loc2.lat - loc1.lat);
-  const dLon = toRad(loc2.lon - loc1.lon);
-  const lat1 = toRad(loc1.lat);
-  const lat2 = toRad(loc2.lat);
-
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return parseFloat((R * c).toFixed(1)); // Distance rounded to 1 decimal place
+const translations = {
+  en: {
+    loading: "Loading reservations...",
+    noReservations: "No reservations found.",
+    status: "Status:",
+    details: "Details",
+    bill: "/ bill",
+    completed: "Completed",
+    unknown: "Unknown",
+    pending: "Pending",
+    active: "Active",
+  },
+  ar: {
+    loading: "جارٍ تحميل الحجوزات...",
+    noReservations: "لا توجد حجوزات.",
+    status: "الحالة:",
+    details: "التفاصيل",
+    bill: "/ الفاتورة",
+    completed: "مكتمل",
+    unknown: "غير معروف",
+    pending: "قيد الانتظار",
+    active: "نشط",
+  },
 };
 
 const Bills = () => {
-  const { user, latitude, longitude } = useAuthStore();
+  const { user, language } = useAuthStore();
   const [reservations, setReservations] = useState<ReservationInfo[]>([]);
   const [loading, setLoading] = useState(true);
+  const t = translations[language]; // Get translations based on the language
+
   useEffect(() => {
     const fetchReservations = async () => {
       try {
@@ -65,21 +69,30 @@ const Bills = () => {
     };
   }, [user]);
 
+  // Translate the status
+  const translateStatus = (status: string) => {
+    switch (status) {
+      case "Completed":
+        return t.completed;
+      case "Unknown":
+        return t.unknown;
+      case "Pending":
+        return t.pending;
+      case "Active":
+        return t.active;
+      default:
+        return t.unknown; // Default to "Unknown"
+    }
+  };
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
     >
       {loading ? (
-        <Text className="text-center mt-5">Loading reservations...</Text>
+        <Text className="text-center mt-5">{t.loading}</Text>
       ) : reservations.length > 0 ? (
         reservations.map((reservation: any) => {
-          const carLocation = parseCarLocation(reservation.carLocation as any);
-          const userLocation = { lat: latitude, lon: longitude };
-          const distance = calculateDistanceInKm(
-            userLocation as any,
-            carLocation as any
-          );
-
           return (
             <View
               key={reservation.id}
@@ -95,7 +108,7 @@ const Bills = () => {
               </View>
               <View className="flex-row items-center gap-x-2 mb-2">
                 <Text className="text-sm font-MontserratMedium text-[#868686]">
-                  {reservation.carYear || "Unknown"}
+                  {reservation.carYear || t.unknown}
                 </Text>
                 <View className="flex-row justify-center items-center">
                   <Image source={icons.point1} className="w-4 h-4 mx-1" />
@@ -109,17 +122,12 @@ const Bills = () => {
                 resizeMode="contain"
                 className="w-full h-36 rounded-lg"
               />
-              {/* <Text className="text-sm">
-                  Start:{" "}
-                  {new Date(reservation.reservationStart).toLocaleString()}
-                </Text>
-                <Text className="text-sm">
-                  End: {new Date(reservation.reservationEnd).toLocaleString()}
-                </Text> */}
-              <Text className="text-sm">Status: {reservation?.status}</Text>
+              <Text className="text-sm">
+                {t.status} {translateStatus(reservation?.status)}
+              </Text>
               <View className="flex-row-reverse items-center justify-between mt-2">
                 <CustombillBtton
-                  title="Details"
+                  title={t.details}
                   onPress={() => {
                     router.push({
                       pathname: "/screens/Bills/DetailsBill",
@@ -129,13 +137,15 @@ const Bills = () => {
                   className="w-20 h-11 p-1 rounded-md"
                   textStyle="text-[12px]"
                 />
-                <Text>{reservation.bill} / 3 Hours </Text>
+                <Text>
+                  {reservation.bill} {t.bill}
+                </Text>
               </View>
             </View>
           );
         })
       ) : (
-        <Text className="text-center mt-5">No reservations found.</Text>
+        <Text className="text-center mt-5">{t.noReservations}</Text>
       )}
     </ParallaxScrollView>
   );

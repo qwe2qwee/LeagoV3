@@ -1,6 +1,7 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import React from "react";
 import { icons } from "@/constants";
+import AvailableRentType from "../ui/AvailableRentType";
 
 const CarList = ({ carInfo, distanceText, color, handlePress }: any) => {
   return (
@@ -32,11 +33,11 @@ const CarList = ({ carInfo, distanceText, color, handlePress }: any) => {
             <Image source={icons.point1} className="w-4 h-4" />
             <Text className="text-[#868686] text-sm">{distanceText}</Text>
           </View>
-          <View className="">
-            <Text className="text-green-600">
-              {carInfo.rentType?.monthly?.price || "N/A"}/month
-            </Text>
-          </View>
+          <AvailableRentType
+            rentType={carInfo.rentType} // Pass rentType from carInfo
+            containerStyle={{ marginVertical: 0 }} // Optional container style
+            textStyle={{ fontSize: 14, fontWeight: "bold" }} // Optional text style
+          />
         </View>
       </View>
     </TouchableOpacity>

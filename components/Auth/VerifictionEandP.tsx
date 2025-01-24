@@ -49,6 +49,7 @@ const VerifictionEandP: React.FC<VerificationProps> = ({
 }) => {
   const [otp, setOtp] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSecuss, setIsSecuss] = useState(false);
   const [hasResentOtp, setHasResentOtp] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -70,16 +71,20 @@ const VerifictionEandP: React.FC<VerificationProps> = ({
         await sendOtpToEmail(identifier!);
       }
       setHasResentOtp(true);
+      setIsSecuss(true);
       showError(t.codeResent);
     } catch (error) {
       console.error("Error resending OTP:", error);
+      setIsSecuss(false);
       showError(t.resendOtpError);
     }
   };
 
   const handleVerifyOtp = async () => {
     if (otp.length < 6) {
+      setIsSecuss(false);
       showError(t.fullOtpRequired);
+
       return;
     }
 
@@ -93,6 +98,7 @@ const VerifictionEandP: React.FC<VerificationProps> = ({
       if (!userIdToVerify) {
         userIdToVerify = await getUserIdByPhoneOrEmail(identifier!);
         if (!userIdToVerify) {
+          setIsSecuss(false);
           showError(t.userNotFound);
           return;
         }
@@ -104,15 +110,19 @@ const VerifictionEandP: React.FC<VerificationProps> = ({
         await completePasswordReset(userIdToVerify, otp);
       }
 
+      setIsSecuss(true);
       showError(t.otpSuccess);
       await getCurrentUser();
 
       if (onSuccess) onSuccess();
     } catch (error) {
       console.error("Error verifying OTP:", error);
+      setIsSecuss(false);
       showError(t.otpError);
     } finally {
       setIsSubmitting(false);
+      setHasResentOtp(false);
+      setOtp("");
     }
   };
 
@@ -189,7 +199,7 @@ const VerifictionEandP: React.FC<VerificationProps> = ({
           isVisible={!!error}
           message={error || ""}
           onClose={clearError}
-          isSecuss={false}
+          isSecuss={isSecuss}
           language={language}
         />
       </ScrollView>

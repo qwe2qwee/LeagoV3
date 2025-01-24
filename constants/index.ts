@@ -518,4 +518,90 @@ export function generateRandomPassword(
 
 // Example Usage:
 const password = generateRandomPassword(16, true, true, true);
-console.log("Generated Password:", password);
+
+export const getAvailableRentType = (rentType: any, t: any) => {
+  if (rentType?.monthly?.availability) {
+    return { type: t.monthly, price: rentType.monthly.price };
+  } else if (rentType?.weekly?.availability) {
+    return { type: t.weekly, price: rentType.weekly.price };
+  } else if (rentType?.daily?.availability) {
+    return { type: t.daily, price: rentType.daily.price };
+  } else {
+    return { type: t.notAvailable, price: t.n }; // Fallback
+  }
+};
+
+export const cityTranslations = {
+  Riyadh: { en: "Riyadh", ar: "الرياض" },
+  Jeddah: { en: "Jeddah", ar: "جدة" },
+  Dammam: { en: "Dammam", ar: "الدمام" },
+  Mecca: { en: "Mecca", ar: "مكة" },
+  Medina: { en: "Medina", ar: "المدينة" },
+  Khobar: { en: "Khobar", ar: "الخبر" },
+  Abha: { en: "Abha", ar: "أبها" },
+  Taif: { en: "Taif", ar: "الطائف" },
+  Jubail: { en: "Jubail", ar: "الجبيل" },
+  Tabuk: { en: "Tabuk", ar: "تبوك" },
+  Yanbu: { en: "Yanbu", ar: "ينبع" },
+} as any;
+
+export const getTranslations = (language: "en" | "ar", page: string) => {
+  const translations: any = {
+    bookingPage: {
+      en: {
+        bookingDetails: "Booking Details",
+        selectRentalPeriod: "Select Rental Period",
+        daily: "Daily",
+        weekly: "Weekly",
+        monthly: "Monthly",
+        startDate: "Start Date",
+        endDate: "End Date",
+        selectStartDate: "Select Start Date",
+        selectEndDate: "Select End Date",
+        totalDays: "Total Days",
+        totalPrice: "Total Price",
+        confirmBooking: "Confirm Booking",
+        invalidBooking: "Invalid Booking",
+        invalidBookingMessage: "Please select valid dates for booking.",
+        bookingConfirmed: "Booking Confirmed",
+        bookingSuccessMessage: "Your booking was successful. Total cost is $",
+        errorTitle: "Error",
+        errorMessage:
+          "An error occurred while creating your booking. Please try again.",
+      },
+      ar: {
+        bookingDetails: "تفاصيل الحجز",
+        selectRentalPeriod: "اختر مدة الإيجار",
+        daily: "يومي",
+        weekly: "أسبوعي",
+        monthly: "شهري",
+        startDate: "تاريخ البدء",
+        endDate: "تاريخ الانتهاء",
+        selectStartDate: "حدد تاريخ البدء",
+        selectEndDate: "حدد تاريخ الانتهاء",
+        totalDays: "إجمالي الأيام",
+        totalPrice: "إجمالي السعر",
+        confirmBooking: "تأكيد الحجز",
+        invalidBooking: "الحجز غير صالح",
+        invalidBookingMessage: "يرجى اختيار تواريخ صالحة للحجز.",
+        bookingConfirmed: "تم تأكيد الحجز",
+        bookingSuccessMessage: "تم حجزك بنجاح. التكلفة الإجمالية هي $",
+        errorTitle: "خطأ",
+        errorMessage: "حدث خطأ أثناء إنشاء الحجز. يرجى المحاولة مرة أخرى.",
+      },
+    },
+  };
+
+  return translations[page]?.[language] || {};
+};
+
+export const calculateDays = (
+  startDate: Date | null,
+  endDate: Date | null
+): number => {
+  if (!startDate || !endDate) return 0;
+
+  const diffTime = endDate.getTime() - startDate.getTime(); // Time difference in milliseconds
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convert to days
+  return diffDays;
+};

@@ -4,11 +4,8 @@ import {
   pageButton,
   pageTitle,
   personalInfoPage,
-  profilePage,
-  profileSections,
 } from "@/constants/profilePage";
 import DateTimePicker from "react-native-ui-datepicker";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Modal from "react-native-modal";
 import dayjs from "dayjs";
 import useAuthStore from "@/store/useAuthStore";
@@ -37,8 +34,6 @@ const PersonalInfo = () => {
 
   const pageTitleTranslator = pageTitle[language];
   const personalInfoPageTranslator = personalInfoPage[language];
-  const fieldTranslator = profilePage[language];
-  const SecTranslator = profileSections[language];
   const pageButtonTranslator = pageButton[language];
 
   const [open, setOpen] = useState(false);
@@ -71,7 +66,7 @@ const PersonalInfo = () => {
     <ParallaxScrollView
       headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
     >
-      <View className="flex-row justify-between items-center px-6 pt-6  ">
+      <View className="flex-row justify-between items-center px-6 pt-6   ">
         <Pressable
           onPress={() => router.back()}
           className="bg-white rounded-full shadow-md p-2"
@@ -98,7 +93,10 @@ const PersonalInfo = () => {
         <Text className="text-right  w-full font-ZainBold text-[#78828A]">
           {personalInfoPageTranslator.dateOfBirth}
         </Text>
-        <View className="flex flex-row-reverse items-center justify-between w-80 h-12 mt-3 rounded-xl bg-[#F7F7F7]">
+        <View
+          className="flex flex-row-reverse items-center justify-between  h-12 mt-3 rounded-xl bg-[#fff] w-11/12"
+          style={{ borderWidth: 1, borderColor: "#E5E5E5" }}
+        >
           <Text className="pr-4 font-ZainRegular text-[#9CA4AB]">{date}</Text>
           <View>
             <TouchableOpacity onPress={handleOnPress}>
@@ -109,8 +107,8 @@ const PersonalInfo = () => {
               />
             </TouchableOpacity>
             <Modal animationIn="slideInUp" coverScreen isVisible={open}>
-              <View className="flex justify-center items-center mt-6">
-                <View className="m-5 bg-white rounded-2xl w-[90%] p-9 items-center justify-center shadow-lg shadow-slate-600">
+              <View className=" justify-center items-center mt-6 ">
+                <View className=" bg-white rounded-2xl w-[90%] p-9 items-center justify-center shadow-lg shadow-slate-600">
                   <Text className="text-lg font-ZainBold pb-2">
                     {personalInfoPageTranslator.dateOfBirth}
                   </Text>
@@ -141,9 +139,9 @@ const PersonalInfo = () => {
       />
       <RadioButton />
 
-      <View className="w-80 mx-10 pt-4 justify-center items-center ">
+      <View className="w-full pt-4 justify-center items-center  ">
         <TouchableOpacity
-          className="flex flex-row-reverse w-full items-center justify-center border-b border-[#E9EBED] pb-5 pt-3"
+          className="flex flex-row-reverse w-3/6 items-center justify-center border-b border-[#E9EBED] pb-5 pt-3"
           onPress={handleSaveModal}
         >
           <Text className="pr-4 font-ZainBold text-primary-500 text-center">
@@ -167,7 +165,10 @@ const PersonalInfo = () => {
                   {pageButtonTranslator.accept}{" "}
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={handleSaveModal} className="mt-4">
+              <TouchableOpacity
+                onPress={handleSaveModal}
+                className="mt-4 flex justify-center items-center "
+              >
                 <Text className="text-primary-500 font-ZainBold">
                   {pageButtonTranslator.cancel}{" "}
                 </Text>

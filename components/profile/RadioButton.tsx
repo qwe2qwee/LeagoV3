@@ -11,21 +11,24 @@ const RadioButton: React.FC = () => {
   const translator = radioButton.radio[language];
   const { details, setDetails } = useUserDetailsStore();
 
-  // Initial gender value from user details, defaults to "undefined" if invalid
+  // Ensure gender is initialized properly
   const [gender, setGender] = useState<Gender | undefined>(
-    user?.details.gender === "male" || user?.details.gender === "female"
+    user?.details?.gender === "male" || user?.details?.gender === "female"
       ? user.details.gender
       : undefined
   );
 
   const handleGenderChange = (newGender: Gender) => {
     setGender(newGender);
-    setDetails({ gender: newGender });
+    setDetails({ ...details, gender: newGender });
   };
 
   useEffect(() => {
     // Set initial gender from user details on mount
-    if (user?.details.gender === "male" || user?.details.gender === "female") {
+    if (
+      user?.details?.gender === "male" ||
+      user?.details?.gender === "female"
+    ) {
       setGender(user.details.gender);
     } else {
       setGender(undefined);
@@ -33,36 +36,64 @@ const RadioButton: React.FC = () => {
   }, [user]);
 
   return (
-    <View className="justify-center items-end p-6 pb-0">
-      <Text className="text-right font-ZainBold text-[#78828A]">
+    <View
+      style={{
+        justifyContent: "center",
+        alignItems: "flex-end",
+        padding: 16,
+        paddingBottom: 0,
+      }}
+    >
+      <Text
+        style={{ textAlign: "right", fontFamily: "ZainBold", color: "#78828A" }}
+      >
         {translator.gender}
       </Text>
-      <View className="flex flex-row-reverse w-full justify-around items-center mt-6">
+      <View
+        style={{
+          flexDirection: "row-reverse",
+          width: "100%",
+          justifyContent: "space-around",
+          alignItems: "center",
+          marginTop: 16,
+        }}
+      >
         {/* Male Option */}
         <TouchableOpacity
-          className="flex flex-row gap-2"
+          style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
           onPress={() => handleGenderChange("male")}
         >
           <Text
-            className={`font-ZainBold ${
-              gender === "male" ? "text-primary-400" : "text-gray-400"
-            }`}
+            style={{
+              fontFamily: "ZainBold",
+              color: gender === "male" ? "#4CAF50" : "#B0B0B0",
+            }}
           >
             {translator.male}
           </Text>
-          <View className="relative w-5 h-5">
+          <View style={{ position: "relative", width: 20, height: 20 }}>
             <Image
               source={radioButton.unchecked}
               resizeMode="contain"
-              className={`absolute w-full h-full ${
-                gender === "male" ? "bg-primary-400" : ""
-              } rounded-full`}
+              style={{
+                width: "100%",
+                height: "100%",
+                backgroundColor: gender === "male" ? "#4CAF50" : "transparent",
+                borderRadius: 20,
+              }}
             />
             {gender === "male" && (
               <Image
                 source={radioButton.vector}
                 resizeMode="contain"
-                className="absolute w-3 h-3 top-1 left-1 -translate-x-1/2 -translate-y-1/2"
+                style={{
+                  width: 12,
+                  height: 12,
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: [{ translateX: -6 }, { translateY: -6 }],
+                }}
               />
             )}
           </View>
@@ -70,29 +101,41 @@ const RadioButton: React.FC = () => {
 
         {/* Female Option */}
         <TouchableOpacity
-          className="flex flex-row gap-2"
+          style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
           onPress={() => handleGenderChange("female")}
         >
           <Text
-            className={`font-ZainBold ${
-              gender === "female" ? "text-primary-400" : "text-gray-400"
-            }`}
+            style={{
+              fontFamily: "ZainBold",
+              color: gender === "female" ? "#4CAF50" : "#B0B0B0",
+            }}
           >
             {translator.female}
           </Text>
-          <View className="relative w-5 h-5">
+          <View style={{ position: "relative", width: 20, height: 20 }}>
             <Image
               source={radioButton.unchecked}
               resizeMode="contain"
-              className={`absolute w-full h-full ${
-                gender === "female" ? "bg-primary-400" : ""
-              } rounded-full`}
+              style={{
+                width: "100%",
+                height: "100%",
+                backgroundColor:
+                  gender === "female" ? "#4CAF50" : "transparent",
+                borderRadius: 20,
+              }}
             />
             {gender === "female" && (
               <Image
                 source={radioButton.vector}
                 resizeMode="contain"
-                className="absolute w-3 h-3 top-1 left-1 -translate-x-1/2 -translate-y-1/2"
+                style={{
+                  width: 12,
+                  height: 12,
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: [{ translateX: -6 }, { translateY: -6 }],
+                }}
               />
             )}
           </View>

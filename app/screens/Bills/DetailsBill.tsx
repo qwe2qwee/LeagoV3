@@ -93,7 +93,6 @@ const DetailsBill = () => {
     <ParallaxScrollView
       headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
     >
-      {" "}
       <ScrollView contentContainerStyle={{ padding: 16, paddingTop: 90 }}>
         <View className="absolute top-2 left-2 right-2 flex-row justify-between p-2 z-10">
           <Pressable
@@ -195,16 +194,7 @@ const DetailsBill = () => {
           </View>
         </View>
       </ScrollView>
-      <View
-        className="absolute bottom-0 w-full items-center justify-center py-4 bg-white"
-        style={{
-          shadowColor: "#000", // iOS shadow color
-          shadowOffset: { width: 0, height: -2 }, // iOS shadow offset
-          shadowOpacity: 0.1, // iOS shadow opacity
-          shadowRadius: 3, // iOS shadow radius
-          elevation: 5, // Android elevation
-        }}
-      >
+      <View className="absolute bottom-0 w-full items-center justify-center py-4 ">
         <CustomButton
           title={t.backToBills}
           onPress={() => {
@@ -216,7 +206,7 @@ const DetailsBill = () => {
               },
             });
           }}
-          className="w-3/4 h-12"
+          className="w-3/5 h-14 "
         />
       </View>
     </ParallaxScrollView>

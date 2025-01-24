@@ -7,6 +7,7 @@ import {
   Platform,
   Image,
   TouchableOpacity,
+  Pressable,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { icons, translationForget } from "../../constants";
@@ -117,7 +118,7 @@ const ForgetReset: React.FC<ForgetResetProps> = ({
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
     >
-      <SafeAreaView style={{ flex: 1 }} className="bg-secondary">
+      <SafeAreaView style={{ flex: 1 }} className="bg-secondary-white">
         <ScrollView
           contentContainerStyle={{
             flexGrow: 1,
@@ -131,16 +132,19 @@ const ForgetReset: React.FC<ForgetResetProps> = ({
           <View
             style={{
               width: "100%",
-              alignItems: "flex-end",
-              paddingHorizontal: 20,
+              alignItems: "flex-start",
+              paddingHorizontal: 10,
               paddingTop: 5,
               paddingBottom: 50,
             }}
           >
-            <TouchableOpacity onPress={handleBackPress}>
+            <TouchableOpacity
+              onPress={handleBackPress}
+              className="bg-white rounded-full shadow-md p-3"
+            >
               <Image
                 source={icons.backArrow}
-                className="w-6 h-5"
+                className="w-6 h-6"
                 resizeMode="contain"
               />
             </TouchableOpacity>

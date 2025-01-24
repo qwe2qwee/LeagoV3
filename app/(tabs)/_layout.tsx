@@ -22,7 +22,7 @@ export default function TabLayout() {
       style={{
         justifyContent: "center",
         alignItems: "center",
-        top: "50%",
+        top: "67%",
         width: 60,
         height: 60,
         borderRadius: 30,
@@ -53,7 +53,7 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: "#333333",
           borderRadius: 50,
-          height: 78,
+          height: 80,
           marginHorizontal: 20,
           marginBottom: 20,
           position: "absolute",
