@@ -148,17 +148,29 @@ const AddressSelectionPage = () => {
 
   useEffect(() => {
     (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Location Error",
-          "Permission to access location was denied."
-        );
-        return;
-      }
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert(
+            language === "ar" ? "خطأ في الموقع" : "Location Error",
+            language === "ar"
+              ? "تم رفض إذن الوصول إلى الموقع."
+              : "Permission to access location was denied."
+          );
+          return;
+        }
 
-      const location = await Location.getCurrentPositionAsync({});
-      setUserLocation(location);
+        const location = await Location.getCurrentPositionAsync({});
+        setUserLocation(location);
+      } catch (error) {
+        Alert.alert(
+          language === "ar" ? "خطأ في الموقع" : "Location Error",
+          language === "ar"
+            ? "تعذر الوصول إلى الموقع. حاول مرة أخرى."
+            : "Failed to access location. Please try again."
+        );
+        console.error("Location Error:", error);
+      }
     })();
   }, []);
 

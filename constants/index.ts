@@ -268,7 +268,8 @@ export const translationsLogin = {
     noAccount: "Don't have an account?",
     createAccount: "Create one",
     error: "Error",
-    missingFields: "Please enter both email and password.",
+    missingFields: "Please enter your Phone number.",
+    invalidPhoneNumber: "The phone number must contain exactly 9 numbers ",
   },
   ar: {
     loginTitle: "مرحبًا بعودتك!",
@@ -280,7 +281,8 @@ export const translationsLogin = {
     noAccount: "ليس لديك حساب؟",
     createAccount: "إنشاء حساب",
     error: "خطأ",
-    missingFields: "يرجى إدخال البريد الإلكتروني وكلمة المرور.",
+    missingFields: "يرجى إدخال رقم الجوال.",
+    invalidPhoneNumber: "يجب أن يحتوي رقم الهاتف على 9 ارقام",
   },
 };
 
@@ -304,6 +306,7 @@ export const translationsignUp = {
     weakPassword: "Password must be at least 8 characters",
     emailExists: "Email already exists",
     phoneNumberExists: "Phone number already exists",
+    invalidPhoneNumber: "The phone number must contain exactly 9 numbers ",
   },
   ar: {
     createAccount: "إنشاء حسابك",
@@ -323,6 +326,7 @@ export const translationsignUp = {
     weakPassword: "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
     emailExists: "البريد الإلكتروني موجود بالفعل",
     phoneNumberExists: "رقم الهاتف موجود بالفعل",
+    invalidPhoneNumber: "يجب أن يحتوي رقم الهاتف على 9 ارقام",
   },
 };
 

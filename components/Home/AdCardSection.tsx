@@ -28,6 +28,7 @@ const AdCardSection: React.FC = () => {
     <FlatList
       data={adData}
       horizontal
+      style={{ height: 200, marginVertical: "auto" }} // Added margin to the container
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => <AdCard title={item.title} uri={item.uri} />}
       showsHorizontalScrollIndicator={false}

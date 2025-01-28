@@ -15,7 +15,7 @@ const Onboarding: React.FC = () => {
   const swiperRef = useRef<Swiper>(null);
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const isLastSlide = activeIndex === onboarding.length - 1;
-  const { language, user } = useAuthStore();
+  const { language, user, loading } = useAuthStore();
 
   return (
     <SafeAreaView className="flex h-full items-center justify-between bg-white">
@@ -37,6 +37,7 @@ const Onboarding: React.FC = () => {
             {item.skip && (
               <TouchableOpacity
                 onPress={() => router.replace("/(auth)/sign-in" as any)}
+                disabled={loading}
                 className="w-full flex justify-end items-end p-5"
               >
                 <Text className="text-black text-lg font-JakartaBold">
@@ -90,6 +91,8 @@ const Onboarding: React.FC = () => {
             ? router.replace("/(auth)/sign-up" as any)
             : swiperRef.current?.scrollBy(1)
         }
+        loading={loading}
+        disabled={loading}
         className="w-11/12 mt-4 mb-8 rounded-xl"
       />
     </SafeAreaView>

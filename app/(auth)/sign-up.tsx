@@ -8,7 +8,6 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
@@ -32,6 +31,7 @@ import {
 import { UpdatePhoneNumberAndSendOTP } from "@/lib/UpdatePhoneNumberAndSendOTP";
 import OTPComponent from "@/components/Auth/OTPComponent";
 import useAuthStore from "@/store/useAuthStore";
+import ErrorModal from "@/components/ui/ErrorModal";
 
 const signUp = () => {
   const { language, user, createUser } = useAuthStore();
@@ -46,11 +46,26 @@ const signUp = () => {
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
 
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
+
   const birthday = "1999-01-01";
   const gender = "other";
   const address = "unknown";
   const changelangS =
     language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold";
+
+  const showError = (message: string, success: boolean) => {
+    setErrorMessage(message);
+    setIsSuccess(success);
+    setErrorModalVisible(true);
+  };
+
+  const handleErrorModalClose = () => {
+    setErrorModalVisible(false);
+    setErrorMessage("");
+  };
 
   const handleInputChange = (field: string, value: string) => {
     setForm({ ...form, [field]: value });
@@ -78,9 +93,9 @@ const signUp = () => {
         router.replace("/(tabs)");
       } catch (error) {
         if (error instanceof Error) {
-          Alert.alert(t.error, error.message);
+          showError(error.message, false);
         } else {
-          Alert.alert(t.error, "Error during signup");
+          showError("Error during signup", false);
         }
       } finally {
         setLoading(false);
@@ -94,9 +109,9 @@ const signUp = () => {
       await UpdatePhoneNumberAndSendOTP(form.phone, language);
     } catch (error) {
       if (error instanceof Error) {
-        Alert.alert(t.error, error.message);
+        showError(error.message, false);
       } else {
-        Alert.alert(t.error, "Failed to resend OTP");
+        showError("Failed to resend OTP", false);
       }
     } finally {
       setLoading(false);
@@ -105,16 +120,24 @@ const signUp = () => {
 
   const validateForm = () => {
     if (!form.name || !form.email || !form.phone) {
-      Alert.alert(t.error, t.missingFields);
+      showError(t.missingFields, false);
       return false;
     }
     if (!/^\S+@\S+\.\S+$/.test(form.email)) {
-      Alert.alert(t.error, t.invalidEmail);
+      showError(t.invalidEmail, false);
       return false;
     }
     if (form.phone.length !== 13) {
-      Alert.alert(t.error, t.invalidPhone);
+      showError(t.invalidPhoneNumber, false);
       return false;
+    }
+
+    // Phone number validation
+    const phoneRegex = /^\+966\d{9}$/; // Regex for +966 followed by 9 digits
+
+    if (!phoneRegex.test(form.phone)) {
+      showError(t.invalidPhoneNumber, false);
+      return;
     }
 
     return true;
@@ -138,9 +161,9 @@ const signUp = () => {
       setModalVisible(true);
     } catch (error) {
       if (error instanceof Error) {
-        Alert.alert(t.error, error.message);
+        showError(error.message, false);
       } else {
-        Alert.alert(t.error, "Error during signup");
+        showError("Error during signup", false);
       }
     } finally {
       setLoading(false);
@@ -262,6 +285,12 @@ const signUp = () => {
               />
             </View>
           </ReactNativeModal>
+          <ErrorModal
+            isVisible={errorModalVisible}
+            message={errorMessage}
+            onClose={handleErrorModalClose}
+            isSecuss={isSuccess}
+          />
         </ScrollView>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

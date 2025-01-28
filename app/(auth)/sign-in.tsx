@@ -33,9 +33,6 @@ import {
 import VerifictionEandP from "@/components/Auth/VerifictionEandP";
 import ErrorModal from "@/components/ui/ErrorModal";
 
-// Define a type for the language
-type Language = "en" | "ar";
-
 const signIn = () => {
   const { loading, language } = useAuthStore();
   const [form, setForm] = useState({ value: "" });
@@ -68,21 +65,24 @@ const signIn = () => {
     setErrorMessage("");
   };
 
-  const handleBackPress = () => {
-    router.replace("/(auth)/sign-in");
-    setErrorModalVisible(false);
-  };
-
   const handleSendOtp = async () => {
     if (!form.value.trim()) {
-      showError(ttt.errorEmptyField, false);
+      showError(t.missingFields, false);
       return;
     }
 
-    setIsLoading(true);
     const formattedValue = `+966${form.value.trim()}`;
 
+    // Phone number validation
+    const phoneRegex = /^\+966\d{9}$/; // Regex for +966 followed by 9 digits
+
+    if (!phoneRegex.test(formattedValue)) {
+      showError(t.invalidPhoneNumber, false);
+      return;
+    }
     try {
+      setIsLoading(true);
+
       if (isPhone) {
         const phoneExists = await isPhoneNumberExisting(formattedValue);
         if (!phoneExists) {
@@ -111,7 +111,6 @@ const signIn = () => {
 
   const handleOtpSuccess = () => {
     setIsOtpModalVisible(false);
-    setErrorModalVisible(true);
     router.replace("/(tabs)");
   };
 
@@ -141,7 +140,7 @@ const signIn = () => {
               <Text
                 className={`text-lg text-secondary-white font-JakartaSemiBold absolute bottom-7 left-5 ${changelangS}`}
               >
-                {t.createAccount}
+                {t.loginTitle}
               </Text>
               <Text
                 className={`text-sm text-secondary-white font-JakartaSemiBold absolute bottom-2 left-5 ${changelangS}`}
@@ -152,7 +151,7 @@ const signIn = () => {
             <View className="p-5">
               <View className="flex flex-1 w-full">
                 <InputField
-                  label={"Phone"}
+                  label={tt.phone}
                   placeholder={tt.placeHol}
                   labelStyle={`text-black ${changelangS}`}
                   icon={icons.phone}

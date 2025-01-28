@@ -30,7 +30,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#000", // Fallback color for empty spaces
     borderRadius: 12,
     overflow: "hidden",
-
     marginRight: 16,
   },
   image: {
