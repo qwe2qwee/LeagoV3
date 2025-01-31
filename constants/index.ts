@@ -37,6 +37,7 @@ import Time from "../assets/icons/Time.png";
 import docsImage from "../assets/icons/docsImage.png";
 import support from "../assets/icons/support.png";
 import point1 from "../assets/icons/point1.png";
+import fallbackMap from "../assets/icons/fallbackMap.png";
 
 import camera from "../assets/icons/camera.png";
 import Illustration from "../assets/icons/Illustration.png";
@@ -78,6 +79,7 @@ export const icons = {
   phone,
   Time,
   support,
+  fallbackMap,
   Danger,
   close,
   docsImage,
@@ -609,3 +611,126 @@ export const calculateDays = (
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convert to days
   return diffDays;
 };
+
+interface Neighborhood {
+  name: {
+    en: string; // English name
+    ar: string; // Arabic name
+  };
+  lat: number;
+  lon: number;
+}
+
+interface City {
+  name: string;
+  neighborhoods: Neighborhood[];
+}
+
+export const cities: City[] = [
+  {
+    name: "Jeddah",
+    neighborhoods: [
+      {
+        name: { en: "Al Safa", ar: "الصّفا" },
+        lat: 21.583301,
+        lon: 39.205425,
+      },
+      {
+        name: { en: "Al Salamah", ar: "السلامة" },
+        lat: 21.584546,
+        lon: 39.157053,
+      },
+      {
+        name: { en: "Al Rawdah", ar: "الروضة" },
+        lat: 21.568743,
+        lon: 39.15774,
+      },
+      {
+        name: { en: "Al Faisaliyah", ar: "الفيصلية" },
+        lat: 21.565765,
+        lon: 39.182146,
+      },
+      {
+        name: { en: "Al Hamra", ar: "الحمراء" },
+        lat: 21.62487,
+        lon: 39.125568,
+      },
+      {
+        name: { en: "Al Aziziyah", ar: "العزيزية" },
+        lat: 21.580993,
+        lon: 39.165973,
+      },
+      {
+        name: { en: "Al Rehab", ar: "الرحاب" },
+        lat: 21.576294,
+        lon: 39.197559,
+      },
+      {
+        name: { en: "Al Khalidiyah", ar: "الخالدية" },
+        lat: 21.676562,
+        lon: 39.102833,
+      },
+      {
+        name: { en: "Al Bawadi", ar: "البوادي" },
+        lat: 21.592001,
+        lon: 39.165386,
+      },
+      {
+        name: { en: "Al Zahra", ar: "الزهراء" },
+        lat: 21.607601,
+        lon: 39.108096,
+      },
+      {
+        name: { en: "Al Shati", ar: "الشاطئ" },
+        lat: 21.623354,
+        lon: 39.103686,
+      },
+      {
+        name: { en: "Al Naseem", ar: "النسيم" },
+        lat: 21.602771,
+        lon: 39.147107,
+      },
+      {
+        name: { en: "Al Andalous", ar: "الأندلس" },
+        lat: 21.711985,
+        lon: 39.083981,
+      },
+      {
+        name: { en: "Al Balad", ar: "البلد" },
+        lat: 21.493005,
+        lon: 39.190122,
+      },
+      {
+        name: { en: "Al Mohamadiyah", ar: "المحمدية" },
+        lat: 21.641282,
+        lon: 39.135186,
+      },
+      {
+        name: { en: "Al Marwah", ar: "المروة" },
+        lat: 21.667327,
+        lon: 39.144141,
+      },
+      {
+        name: { en: "Al Naeem", ar: "النعيم" },
+        lat: 21.657746,
+        lon: 39.119316,
+      },
+      {
+        name: { en: "Al Sharafiyah", ar: "الشرفية" },
+        lat: 21.543333,
+        lon: 39.172778,
+      },
+      {
+        name: { en: "Al Thagher", ar: "الثغر" },
+        lat: 21.699027,
+        lon: 39.081627,
+      },
+      {
+        name: { en: "Prince Fawaz", ar: "الأمير فواز" },
+        lat: 21.602356,
+        lon: 39.155987,
+      },
+    ],
+  },
+  // Add more cities as needed
+];

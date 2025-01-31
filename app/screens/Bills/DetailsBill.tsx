@@ -7,12 +7,12 @@ import {
   Pressable,
   Linking,
   Alert,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import CustomButton from "@/components/ui/CustomButton";
 import { icons } from "@/constants";
-import MapView, { Marker } from "react-native-maps";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 
 // Localization support
@@ -30,6 +30,9 @@ const translations = {
     backToBills: "Pay",
     unknown: "Unknown",
     na: "N/A",
+    mapError: "Failed to load map",
+    invalidCoordinates: "Invalid coordinates",
+    openMap: "Open in Maps",
   },
   ar: {
     noDetails: "تفاصيل الحجز غير موجودة.",
@@ -44,6 +47,9 @@ const translations = {
     backToBills: "الدفع",
     unknown: "غير معروف",
     na: "غير متوفر",
+    mapError: "فشل تحميل الخريطة",
+    invalidCoordinates: "إحداثيات غير صالحة",
+    openMap: "فتح الخريطة",
   },
 };
 
@@ -69,16 +75,35 @@ const formatDateLocalized = (isoDate: string, locale: "ar" | "en"): string => {
   }
 };
 
+const isValidCoordinate = (num: number) =>
+  !isNaN(num) && num >= -180 && num <= 180;
+
 const DetailsBill = () => {
-  const { reservation: reservationString } = useLocalSearchParams(); // Get the serialized reservation
+  const { reservation: reservationString } = useLocalSearchParams();
   const router = useRouter();
 
-  // Parse the reservation JSON string into an object
   const reservation = reservationString
     ? JSON.parse(reservationString as any)
     : null;
 
-  const defaultLocation = { lat: 21.543333, lon: 39.172778 }; // Coordinates for Jeddah, SA
+  const defaultLocation = { lat: 21.543333, lon: 39.172778 };
+
+  const handleMapPress = () => {
+    const lat = Number(reservation?.carLocation?.lat) || defaultLocation.lat;
+    const lon = Number(reservation?.carLocation?.lon) || defaultLocation.lon;
+
+    if (!isValidCoordinate(lat) || !isValidCoordinate(lon)) {
+      Alert.alert(t.invalidCoordinates);
+      return;
+    }
+
+    const url = Platform.select({
+      ios: `http://maps.apple.com/?ll=${lat},${lon}`,
+      android: `https://www.google.com/maps?q=${lat},${lon}`,
+    });
+
+    Linking.openURL(url!).catch(() => Alert.alert(t.mapError));
+  };
 
   if (!reservation) {
     return (
@@ -94,6 +119,7 @@ const DetailsBill = () => {
       headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
     >
       <ScrollView contentContainerStyle={{ padding: 16, paddingTop: 90 }}>
+        {/* Header Buttons */}
         <View className="absolute top-2 left-2 right-2 flex-row justify-between p-2 z-10">
           <Pressable
             onPress={() => router.back()}
@@ -106,13 +132,13 @@ const DetailsBill = () => {
             />
           </Pressable>
           <Pressable
-            className="bg-white rounded-full p-3  relative w-12 h-12"
+            className="bg-white rounded-full p-3 relative w-12 h-12"
             style={{
-              shadowColor: "#000", // iOS shadow color
-              shadowOffset: { width: 0, height: -2 }, // iOS shadow offset
-              shadowOpacity: 0.1, // iOS shadow opacity
-              shadowRadius: 3, // iOS shadow radius
-              elevation: 3, // Android elevation
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: -2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 3,
+              elevation: 3,
             }}
           >
             <View className="flex items-center justify-center">
@@ -124,6 +150,8 @@ const DetailsBill = () => {
             </View>
           </Pressable>
         </View>
+
+        {/* Reservation Details */}
         <Text className="text-sm font-bold mb-4 text-right">
           {reservation.payId ? reservation.payId : reservation.carName} : رقم
           الفاتورة
@@ -154,37 +182,36 @@ const DetailsBill = () => {
         </Text>
         <View className="w-full h-[1px] bg-textColor-200"></View>
 
-        <View className="items-center justify-center mt-4 h-40 w-full ">
-          {/* Map Section */}
+        {/* Map Section */}
+        <View className="items-center justify-center mt-4 h-40 w-full">
           <View className="h-40 w-full">
             {reservation?.carLocation &&
             reservation.payStatus === "Completed" ? (
               <Pressable
-                onPress={() => {
-                  const { lat, lon } = reservation.carLocation;
-                  const url = `https://www.google.com/maps?q=${lat},${lon}`;
-                  Linking.openURL(url).catch((err) =>
-                    Alert.alert("Error", "Failed to open Google Maps")
-                  );
-                }}
+                onPress={handleMapPress}
                 className="h-full w-full rounded-lg overflow-hidden"
               >
-                <MapView
-                  style={{ height: "100%", borderRadius: 8 }}
-                  initialRegion={{
-                    latitude: reservation.carLocation.lat,
-                    longitude: reservation.carLocation.lon,
-                    latitudeDelta: 0.05,
-                    longitudeDelta: 0.05,
+                <Image
+                  source={{
+                    uri: `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=600&height=400&center=lonlat:${
+                      Number(reservation?.carLocation?.lon) ||
+                      defaultLocation.lon
+                    },${
+                      Number(reservation?.carLocation?.lat) ||
+                      defaultLocation.lat
+                    }&zoom=14&apiKey=${
+                      process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY
+                    }`,
                   }}
-                >
-                  <Marker
-                    coordinate={{
-                      latitude: reservation.carLocation.lat,
-                      longitude: reservation.carLocation.lon,
-                    }}
-                  />
-                </MapView>
+                  className="h-full w-full rounded-lg"
+                  onError={() => Alert.alert(t.mapError)}
+                  defaultSource={icons.fallbackMap}
+                />
+                <View className="absolute inset-0 items-center justify-center bg-black/10">
+                  <Text className="text-white font-bold text-lg">
+                    {t.openMap}
+                  </Text>
+                </View>
               </Pressable>
             ) : (
               <View className="items-center justify-center h-full w-full bg-gray-200 rounded-lg">
@@ -194,7 +221,9 @@ const DetailsBill = () => {
           </View>
         </View>
       </ScrollView>
-      <View className="absolute bottom-0 w-full items-center justify-center py-4 ">
+
+      {/* Payment Button */}
+      <View className="absolute bottom-0 left-0 right-0  w-full items-center justify-center py-4 px-5">
         <CustomButton
           title={t.backToBills}
           onPress={() => {

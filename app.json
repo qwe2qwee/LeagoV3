@@ -19,7 +19,11 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#FF5C39"
       },
-      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"],
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "INTERNET" // Add this for image loading
+      ],
 
       "package": "com.qwe2qwe.leagoV3",
       "versionCode": "11"

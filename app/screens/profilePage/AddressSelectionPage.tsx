@@ -1,3 +1,4 @@
+// app/screens/AddressSelection.tsx
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -7,19 +8,22 @@ import {
   FlatList,
   ActivityIndicator,
   Alert,
+  Image,
+  Linking,
+  Platform,
 } from "react-native";
-import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
-import useAuthStore from "@/store/useAuthStore";
 import { useRouter } from "expo-router";
+import { cities, icons } from "@/constants";
+import useAuthStore from "@/store/useAuthStore";
 
 interface Neighborhood {
   name: {
-    en: string; // English name
-    ar: string; // Arabic name
+    en: string;
+    ar: string;
   };
-  latitude: number;
-  longitude: number;
+  lat: number;
+  lon: number;
 }
 
 interface City {
@@ -27,215 +31,145 @@ interface City {
   neighborhoods: Neighborhood[];
 }
 
-const cities: City[] = [
-  {
-    name: "Jeddah",
-    neighborhoods: [
-      {
-        name: { en: "Al Safa", ar: "الصّفا" },
-        latitude: 21.583301,
-        longitude: 39.205425,
-      },
-      {
-        name: { en: "Al Salamah", ar: "السلامة" },
-        latitude: 21.584546,
-        longitude: 39.157053,
-      },
-      {
-        name: { en: "Al Rawdah", ar: "الروضة" },
-        latitude: 21.568743,
-        longitude: 39.15774,
-      },
-      {
-        name: { en: "Al Faisaliyah", ar: "الفيصلية" },
-        latitude: 21.565765,
-        longitude: 39.182146,
-      },
-      {
-        name: { en: "Al Hamra", ar: "الحمراء" },
-        latitude: 21.62487,
-        longitude: 39.125568,
-      },
-      // {
-      //   name: { en: "Al Aziziyah", ar: "العزيزية" },
-      //   latitude: 21.584873,
-      //   longitude: 39.205959,
-      // },
-      // {
-      //   name: { en: "Al Rehab", ar: "الرحاب" },
-      //   latitude: 21.584873,
-      //   longitude: 39.205959,
-      // },
-      // {
-      //   name: { en: "Al Khalidiyah", ar: "الخالدية" },
-      //   latitude: 21.584873,
-      //   longitude: 39.205959,
-      // },
-      {
-        name: { en: "Al Bawadi", ar: "البوادي" },
-        latitude: 21.592001,
-        longitude: 39.165386,
-      },
-      // {
-      //   name: { en: "Al Zahra", ar: "الزهراء" },
-      //   latitude: 21.584873,
-      //   longitude: 39.205959,
-      // },
-      // {
-      //   name: { en: "Al Shati", ar: "الشاطئ" },
-      //   latitude: 21.584873,
-      //   longitude: 39.205959,
-      // },
-      // {
-      //   name: { en: "Al Naseem", ar: "النسيم" },
-      //   latitude: 21.584873,
-      //   longitude: 39.205959,
-      // },
-      // {
-      //   name: { en: "Al Andalous", ar: "الأندلس" },
-      //   latitude: 21.584873,
-      //   longitude: 39.205959,
-      // },
-      {
-        name: { en: "Al Balad", ar: "البلد" },
-        latitude: 21.493005,
-        longitude: 39.190122,
-      },
-      // {
-      //   name: { en: "Al Mohamadiyah", ar: "المحمدية" },
-      //   latitude: 21.641282,
-      //   longitude: 39.135186,
-      // },
-      // {
-      //   name: { en: "Al Marwah", ar: "المروة" },
-      //   latitude: 21.584873,
-      //   longitude: 39.205959,
-      // },
-      // {
-      //   name: { en: "Al Naeem", ar: "النعيم" },
-      //   latitude: 21.584873,
-      //   longitude: 39.205959,
-      // },
-      // {
-      //   name: { en: "Al Sharafiyah", ar: "الشرفية" },
-      //   latitude: 21.584873,
-      //   longitude: 39.205959,
-      // },
-      // {
-      //   name: { en: "Al Thagher", ar: "الثغر" },
-      //   latitude: 21.584873,
-      //   longitude: 39.205959,
-      // },
-      // {
-      //   name: { en: "Prince Fawaz", ar: "الأمير فواز" },
-      //   latitude: 21.584873,
-      //   longitude: 39.205959,
-      // },
-    ],
-  },
-];
-
 const AddressSelectionPage = () => {
   const [selectedCity, setSelectedCity] = useState<City | null>(null);
   const [selectedNeighborhood, setSelectedNeighborhood] =
     useState<Neighborhood | null>(null);
-  const [userLocation, setUserLocation] =
-    useState<Location.LocationObject | null>(null);
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lon: number;
+  } | null>(null);
   const [loading, setLoading] = useState(false);
+  const { language, updateLocation, latitude, longitude } = useAuthStore();
+  const router = useRouter();
 
-  const { language, updateLocation } = useAuthStore();
-  const router = useRouter(); // For navigation
+  // Geoapify configuration
+  const GEOAPIFY_STYLE = "osm-bright";
+  const MAP_WIDTH = 600;
+  const MAP_HEIGHT = 400;
+  const ZOOM_LEVEL = 14;
+  const DEFAULT_COORDS = {
+    lat: latitude ? latitude : 21.585,
+    lon: longitude ? longitude : 39.192,
+  };
 
   useEffect(() => {
     (async () => {
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
-          Alert.alert(
-            language === "ar" ? "خطأ في الموقع" : "Location Error",
-            language === "ar"
-              ? "تم رفض إذن الوصول إلى الموقع."
-              : "Permission to access location was denied."
-          );
+          showLocationError("permission");
           return;
         }
 
         const location = await Location.getCurrentPositionAsync({});
-        setUserLocation(location);
+        if (
+          isValidCoordinate(location.coords.latitude, location.coords.longitude)
+        ) {
+          setUserLocation({
+            lat: location.coords.latitude,
+            lon: location.coords.longitude,
+          });
+        }
       } catch (error) {
-        Alert.alert(
-          language === "ar" ? "خطأ في الموقع" : "Location Error",
-          language === "ar"
-            ? "تعذر الوصول إلى الموقع. حاول مرة أخرى."
-            : "Failed to access location. Please try again."
-        );
-        console.error("Location Error:", error);
+        showLocationError("access");
       }
     })();
   }, []);
 
+  const isValidCoordinate = (lat: number, lon: number) =>
+    !isNaN(lat) &&
+    !isNaN(lon) &&
+    lat >= -90 &&
+    lat <= 90 &&
+    lon >= -180 &&
+    lon <= 180;
+
+  const showLocationError = (errorType: "permission" | "access") => {
+    const titles = {
+      ar: { permission: "خطأ في الموقع", access: "خطأ في الوصول" },
+      en: { permission: "Location Error", access: "Access Error" },
+    };
+
+    const messages = {
+      ar: {
+        permission: "تم رفض إذن الوصول إلى الموقع.",
+        access: "تعذر الوصول إلى الموقع. حاول مرة أخرى.",
+      },
+      en: {
+        permission: "Permission to access location was denied.",
+        access: "Failed to access location. Please try again.",
+      },
+    };
+
+    Alert.alert(titles[language][errorType], messages[language][errorType]);
+  };
+
   const handleCitySelect = (city: City) => {
     setSelectedCity(city);
-    setSelectedNeighborhood(null); // Reset neighborhood
+    setSelectedNeighborhood(null);
   };
 
   const handleNeighborhoodSelect = (neighborhood: Neighborhood) => {
     setSelectedNeighborhood(neighborhood);
   };
 
-  const confirmAndRedirect = async () => {
+  const confirmLocation = async () => {
     if (!selectedNeighborhood) return;
     setLoading(true);
 
     try {
-      // Update global user location in the store
-      updateLocation(
-        selectedNeighborhood.latitude,
-        selectedNeighborhood.longitude
-      );
+      await updateLocation(selectedNeighborhood.lat, selectedNeighborhood.lon);
 
-      // Show a confirmation alert
       Alert.alert(
-        "Location Confirmed",
-        `You selected ${selectedNeighborhood.name[language]}`,
-        [
-          {
-            text: "OK",
-            onPress: () => {
-              router.push("/(tabs)"); // Redirect to the homepage or another route
-            },
-          },
-        ]
+        language === "ar" ? "تم التحديد" : "Location Confirmed",
+        selectedNeighborhood.name[language],
+        [{ text: "OK", onPress: () => router.push("/(tabs)") }]
       );
     } catch (error) {
-      Alert.alert("Error", "Failed to update location. Please try again.");
+      Alert.alert(
+        language === "ar" ? "خطأ" : "Error",
+        language === "ar"
+          ? "فشل تحديث الموقع. حاول مرة أخرى."
+          : "Failed to update location. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSelectCurrentLocation = () => {
-    if (!userLocation) {
+  const openMapsApp = () => {
+    const coords = selectedNeighborhood || userLocation || DEFAULT_COORDS;
+    const url = Platform.select({
+      ios: `http://maps.apple.com/?ll=${coords.lat},${coords.lon}`,
+      android: `https://www.google.com/maps?q=${coords.lat},${coords.lon}`,
+    });
+
+    Linking.openURL(url!).catch(() =>
       Alert.alert(
-        "Location Error",
-        "Your current location is not available. Please try again."
-      );
-      return;
-    }
+        language === "ar" ? "خطأ" : "Error",
+        language === "ar" ? "تعذر فتح الخريطة" : "Failed to open maps"
+      )
+    );
+  };
 
-    const { latitude, longitude } = userLocation.coords;
+  // Simplified Image Component
+  const renderMapImage = () => {
+    const coords = selectedNeighborhood || userLocation || DEFAULT_COORDS;
+    const mapUrl = `https://maps.geoapify.com/v1/staticmap?style=${GEOAPIFY_STYLE}&width=${MAP_WIDTH}&height=${MAP_HEIGHT}&zoom=${ZOOM_LEVEL}&center=lonlat:${coords.lon},${coords.lat}&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`;
 
-    updateLocation(latitude, longitude); // Update the global state with the current location
-
-    Alert.alert(
-      "Location Selected",
-      "Your current location has been selected.",
-      [
-        {
-          text: "OK",
-          onPress: () => router.push("/(tabs)"), // Redirect after selecting the location
-        },
-      ]
+    return (
+      <Image
+        source={{ uri: mapUrl }}
+        style={styles.mapImage}
+        onError={() =>
+          Alert.alert(
+            language === "ar" ? "خطأ في الخريطة" : "Map Error",
+            language === "ar" ? "تعذر تحميل الخريطة" : "Failed to load map"
+          )
+        }
+        defaultSource={icons.fallbackMap}
+      />
     );
   };
 
@@ -244,122 +178,104 @@ const AddressSelectionPage = () => {
       <Text style={styles.header}>
         {language === "ar" ? "حدد موقعك" : "Select Your Address"}
       </Text>
+
       {/* City Selection */}
-      <View style={styles.dropdown}>
-        <Text style={styles.label}>
-          {language === "ar" ? "المدينة" : "City"}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>
+          {language === "ar" ? "اختر المدينة" : "Select City"}
         </Text>
         <FlatList
           data={cities}
-          keyExtractor={(item) => item.name}
           horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.name}
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[
-                styles.cityButton,
+                styles.selectionButton,
                 selectedCity?.name === item.name && styles.selectedButton,
               ]}
               onPress={() => handleCitySelect(item)}
             >
-              <Text style={styles.cityButtonText}>{item.name}</Text>
+              <Text style={styles.buttonText}>{item.name}</Text>
             </TouchableOpacity>
           )}
         />
       </View>
+
       {/* Neighborhood Selection */}
       {selectedCity && (
-        <View style={styles.dropdown}>
-          <Text style={styles.label}>
-            {language === "ar" ? "الحي" : "Neighborhood"}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            {language === "ar" ? "اختر الحي" : "Select Neighborhood"}
           </Text>
           <FlatList
             data={selectedCity.neighborhoods}
-            keyExtractor={(item) => item.name.en}
             horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => item.name.en}
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={[
-                  styles.cityButton,
+                  styles.selectionButton,
                   selectedNeighborhood?.name.en === item.name.en &&
                     styles.selectedButton,
                 ]}
                 onPress={() => handleNeighborhoodSelect(item)}
               >
-                <Text style={styles.cityButtonText}>{item.name[language]}</Text>
+                <Text style={styles.buttonText}>{item.name[language]}</Text>
               </TouchableOpacity>
             )}
           />
         </View>
       )}
-      {/* Map View */}
-      <View style={styles.mapContainer} className="bg-[rgb(243,244,246)]">
-        <MapView
-          style={styles.map}
-          region={{
-            latitude:
-              selectedNeighborhood?.latitude ||
-              userLocation?.coords.latitude ||
-              21.585,
-            longitude:
-              selectedNeighborhood?.longitude ||
-              userLocation?.coords.longitude ||
-              39.206,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
+
+      {/* Interactive Map Display */}
+      <View style={styles.mapContainer}>
+        <TouchableOpacity onPress={openMapsApp} activeOpacity={0.9}>
+          {renderMapImage()}
+          <View style={styles.mapOverlay}>
+            <Text style={styles.mapOverlayText}>
+              {language === "ar" ? "انقر لفتح الخريطة" : "Tap to open map"}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      {/* Action Buttons */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[styles.actionButton, styles.currentLocationButton]}
+          onPress={() => {
+            if (userLocation) {
+              updateLocation(userLocation.lat, userLocation.lon);
+              router.push("/(tabs)");
+            }
           }}
         >
-          {/* User Marker */}
-          {userLocation && (
-            <Marker
-              coordinate={{
-                latitude: userLocation.coords.latitude,
-                longitude: userLocation.coords.longitude,
-              }}
-              title={language === "ar" ? "موقعك" : "Your Location"}
-              pinColor="blue"
-            />
-          )}
-
-          {/* Neighborhood Marker */}
-          {selectedNeighborhood && (
-            <Marker
-              coordinate={{
-                latitude: selectedNeighborhood.latitude,
-                longitude: selectedNeighborhood.longitude,
-              }}
-              title={selectedNeighborhood.name[language]}
-              pinColor="green"
-            />
-          )}
-        </MapView>
-      </View>
-      {/* Select Current Location Button */}
-      <TouchableOpacity
-        style={styles.currentLocationButton}
-        onPress={handleSelectCurrentLocation}
-      >
-        <Text style={styles.currentLocationButtonText}>
-          {language === "ar"
-            ? "اختر موقعي الحالي"
-            : "Select My Current Location"}
-        </Text>
-      </TouchableOpacity>
-      {/* Confirm and Redirect Button */}
-      {selectedNeighborhood && (
-        <TouchableOpacity
-          style={styles.directionButton}
-          onPress={confirmAndRedirect}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.directionButtonText}>
-              {language === "ar" ? "تأكيد" : "Confirm"}
-            </Text>
-          )}
+          <Text style={styles.actionButtonText}>
+            {language === "ar"
+              ? "استخدم الموقع الحالي"
+              : "Use Current Location"}
+          </Text>
         </TouchableOpacity>
-      )}
+
+        {selectedNeighborhood && (
+          <TouchableOpacity
+            style={[styles.actionButton, styles.confirmButton]}
+            onPress={confirmLocation}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.actionButtonText}>
+                {language === "ar" ? "تأكيد الموقع" : "Confirm Location"}
+              </Text>
+            )}
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 };
@@ -367,65 +283,90 @@ const AddressSelectionPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#F8FAFC",
+    padding: 16,
   },
   header: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: 24,
+    fontWeight: "700",
     textAlign: "center",
+    color: "#1E293B",
     marginVertical: 20,
   },
-  dropdown: {
-    marginVertical: 10,
+  section: {
+    marginBottom: 20,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginHorizontal: 10,
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#475569",
+    marginBottom: 12,
+    paddingHorizontal: 8,
   },
-  cityButton: {
-    marginHorizontal: 5,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
+  selectionButton: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 25,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginHorizontal: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   selectedButton: {
-    backgroundColor: "#007BFF",
-    borderColor: "#0056b3",
+    backgroundColor: "#3B82F6",
   },
-  cityButtonText: {
-    color: "#000",
+  buttonText: {
+    color: "#64748B",
+    fontSize: 14,
+    fontWeight: "500",
   },
   mapContainer: {
     flex: 1,
+    borderRadius: 16,
+    overflow: "hidden",
+    marginVertical: 16,
+    backgroundColor: "#F1F5F9",
   },
-  map: {
+  mapImage: {
     width: "100%",
     height: "100%",
   },
-  directionButton: {
-    backgroundColor: "#007BFF",
-    padding: 15,
-    borderRadius: 5,
-    margin: 10,
+  mapOverlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(0,0,0,0.7)",
+    paddingVertical: 12,
     alignItems: "center",
   },
-  directionButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
+  mapOverlayText: {
+    color: "#FFFFFF",
+    fontWeight: "600",
+    fontSize: 16,
   },
-
+  buttonContainer: {
+    gap: 12,
+  },
+  actionButton: {
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   currentLocationButton: {
-    backgroundColor: "#28a745",
-    padding: 15,
-    borderRadius: 5,
-    margin: 10,
-    alignItems: "center",
+    backgroundColor: "#10B981",
   },
-  currentLocationButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
+  confirmButton: {
+    backgroundColor: "#3B82F6",
+  },
+  actionButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "600",
+    fontSize: 16,
   },
 });
 
