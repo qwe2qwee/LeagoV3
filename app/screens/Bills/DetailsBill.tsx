@@ -76,6 +76,15 @@ const formatDateLocalized = (isoDate: string, locale: "ar" | "en"): string => {
   }
 };
 
+const showMapError = () => {
+  Alert.alert(
+    locale === "ar" ? "خطأ" : "Error",
+    locale === "ar"
+      ? "تعذر فتح الخريطة. يرجى تثبيت تطبيق خرائط."
+      : "Failed to open maps. Please install a maps app."
+  );
+};
+
 const isValidCoordinate = (num: number) =>
   !isNaN(num) && num >= -180 && num <= 180;
 
@@ -104,6 +113,43 @@ const DetailsBill = () => {
     });
 
     Linking.openURL(url!).catch(() => Alert.alert(t.mapError));
+  };
+
+  const openMapsApp = async () => {
+    console.log(Platform.OS);
+    const lat = Number(reservation?.carLocation?.lat) || defaultLocation.lat;
+    const lon = Number(reservation?.carLocation?.lon) || defaultLocation.lon;
+
+    // Try Apple Maps on iOS
+    if (Platform.OS === "ios") {
+      const appleMapsUrl = `http://maps.apple.com/?ll=${lat},${lon}`;
+      const canOpen = await Linking.canOpenURL(appleMapsUrl);
+      if (canOpen) {
+        Linking.openURL(appleMapsUrl).catch(() => showMapError());
+        return;
+      }
+    }
+
+    // Try Google Maps on Android (if available)
+    if (Platform.OS === "android") {
+      const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+      const canOpen = await Linking.canOpenURL(googleMapsUrl);
+      if (canOpen) {
+        Linking.openURL(googleMapsUrl).catch(() => showMapError());
+        return;
+      }
+    }
+
+    // Fallback for Huawei devices (or devices without Google Maps)
+    const geoapifyUrl = `https://www.geoapify.com/redirect?to=streetmap&lat=${lat}&lon=${lon}`;
+    const canOpen = await Linking.canOpenURL(geoapifyUrl);
+    if (canOpen) {
+      Linking.openURL(geoapifyUrl).catch(() => showMapError());
+      return;
+    }
+
+    // If no maps app is available, show an error
+    showMapError();
   };
 
   if (!reservation) {

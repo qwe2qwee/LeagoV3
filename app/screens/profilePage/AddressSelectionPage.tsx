@@ -48,7 +48,7 @@ const AddressSelectionPage = () => {
   const GEOAPIFY_STYLE = "osm-bright";
   const MAP_WIDTH = 600;
   const MAP_HEIGHT = 400;
-  const ZOOM_LEVEL = 14;
+  const ZOOM_LEVEL = 13;
   const DEFAULT_COORDS = {
     lat: latitude ? latitude : 21.585,
     lon: longitude ? longitude : 39.192,
@@ -139,18 +139,48 @@ const AddressSelectionPage = () => {
     }
   };
 
-  const openMapsApp = () => {
+  const openMapsApp = async () => {
     const coords = selectedNeighborhood || userLocation || DEFAULT_COORDS;
-    const url = Platform.select({
-      ios: `http://maps.apple.com/?ll=${coords.lat},${coords.lon}`,
-      android: `https://www.google.com/maps?q=${coords.lat},${coords.lon}`,
-    });
+    console.log(Platform.OS);
 
-    Linking.openURL(url!).catch(() =>
-      Alert.alert(
-        language === "ar" ? "خطأ" : "Error",
-        language === "ar" ? "تعذر فتح الخريطة" : "Failed to open maps"
-      )
+    // Try Apple Maps on iOS
+    if (Platform.OS === "ios") {
+      const appleMapsUrl = `http://maps.apple.com/?ll=${coords.lat},${coords.lon}`;
+      const canOpen = await Linking.canOpenURL(appleMapsUrl);
+      if (canOpen) {
+        Linking.openURL(appleMapsUrl).catch(() => showMapError());
+        return;
+      }
+    }
+
+    // Try Google Maps on Android (if available)
+    if (Platform.OS === "android") {
+      const googleMapsUrl = `https://www.google.com/maps?q=${coords.lat},${coords.lon}`;
+      const canOpen = await Linking.canOpenURL(googleMapsUrl);
+      if (canOpen) {
+        Linking.openURL(googleMapsUrl).catch(() => showMapError());
+        return;
+      }
+    }
+
+    // Fallback for Huawei devices (or devices without Google Maps)
+    const geoapifyUrl = `https://www.geoapify.com/redirect?to=streetmap&lat=${coords.lat}&lon=${coords.lon}`;
+    const canOpen = await Linking.canOpenURL(geoapifyUrl);
+    if (canOpen) {
+      Linking.openURL(geoapifyUrl).catch(() => showMapError());
+      return;
+    }
+
+    // If no maps app is available, show an error
+    showMapError();
+  };
+
+  const showMapError = () => {
+    Alert.alert(
+      language === "ar" ? "خطأ" : "Error",
+      language === "ar"
+        ? "تعذر فتح الخريطة. يرجى تثبيت تطبيق خرائط."
+        : "Failed to open maps. Please install a maps app."
     );
   };
 
@@ -233,11 +263,11 @@ const AddressSelectionPage = () => {
 
       {/* Interactive Map Display */}
       <View style={styles.mapContainer}>
-        <TouchableOpacity onPress={openMapsApp} activeOpacity={0.9}>
+        <TouchableOpacity activeOpacity={0.9}>
           {renderMapImage()}
           <View style={styles.mapOverlay}>
             <Text style={styles.mapOverlayText}>
-              {language === "ar" ? "انقر لفتح الخريطة" : "Tap to open map"}
+              {`${language === "ar" ? "الموقع" : "Location"}`}
             </Text>
           </View>
         </TouchableOpacity>
@@ -305,11 +335,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   selectionButton: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#fff",
     borderRadius: 25,
     paddingVertical: 10,
     paddingHorizontal: 20,
     marginHorizontal: 6,
+    marginVertical: 6,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -340,7 +371,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "rgba(0,0,0,0.7)",
+    backgroundColor: "rgba(0,0,0,0.9)",
     paddingVertical: 12,
     alignItems: "center",
   },
