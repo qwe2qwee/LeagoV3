@@ -16,6 +16,7 @@ import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import { cities, icons } from "@/constants";
 import useAuthStore from "@/store/useAuthStore";
+import { appwriteConfig } from "@/lib/appwrite/config";
 
 interface Neighborhood {
   name: {
@@ -156,7 +157,7 @@ const AddressSelectionPage = () => {
   // Simplified Image Component
   const renderMapImage = () => {
     const coords = selectedNeighborhood || userLocation || DEFAULT_COORDS;
-    const mapUrl = `https://maps.geoapify.com/v1/staticmap?style=${GEOAPIFY_STYLE}&width=${MAP_WIDTH}&height=${MAP_HEIGHT}&zoom=${ZOOM_LEVEL}&center=lonlat:${coords.lon},${coords.lat}&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`;
+    const mapUrl = `https://maps.geoapify.com/v1/staticmap?style=${GEOAPIFY_STYLE}&width=${MAP_WIDTH}&height=${MAP_HEIGHT}&zoom=${ZOOM_LEVEL}&center=lonlat:${coords.lon},${coords.lat}&apiKey=${appwriteConfig.EXPO_PUBLIC_GEOAPIFY_API_KEY}`;
 
     return (
       <Image

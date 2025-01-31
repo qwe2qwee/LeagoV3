@@ -14,6 +14,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import CustomButton from "@/components/ui/CustomButton";
 import { icons } from "@/constants";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
+import { appwriteConfig, appwriteConfig1 } from "@/lib/appwrite/config";
 
 // Localization support
 const translations = {
@@ -200,7 +201,7 @@ const DetailsBill = () => {
                       Number(reservation?.carLocation?.lat) ||
                       defaultLocation.lat
                     }&zoom=14&apiKey=${
-                      process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY
+                      appwriteConfig.EXPO_PUBLIC_GEOAPIFY_API_KEY
                     }`,
                   }}
                   className="h-full w-full rounded-lg"
