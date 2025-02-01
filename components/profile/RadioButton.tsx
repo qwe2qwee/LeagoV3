@@ -1,21 +1,17 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import React, { useState, useEffect } from "react";
 import { radioButton } from "@/constants/profilePage";
 import useAuthStore from "@/store/useAuthStore";
 import { useUserDetailsStore } from "@/store/UserDetailsStore";
-
-type Gender = "male" | "female";
+import { Gender } from "@/constants";
 
 const RadioButton: React.FC = () => {
   const { language, user } = useAuthStore();
   const translator = radioButton.radio[language];
   const { details, setDetails } = useUserDetailsStore();
 
-  // Ensure gender is initialized properly
-  const [gender, setGender] = useState<Gender | undefined>(
-    user?.details?.gender === "male" || user?.details?.gender === "female"
-      ? user.details.gender
-      : undefined
+  const [gender, setGender] = useState<Gender>(
+    user?.details?.gender || "other"
   );
 
   const handleGenderChange = (newGender: Gender) => {
@@ -23,126 +19,122 @@ const RadioButton: React.FC = () => {
     setDetails({ ...details, gender: newGender });
   };
 
-  useEffect(() => {
-    // Set initial gender from user details on mount
-    if (
-      user?.details?.gender === "male" ||
-      user?.details?.gender === "female"
-    ) {
-      setGender(user.details.gender);
-    } else {
-      setGender(undefined);
-    }
-  }, [user]);
-
-  return (
-    <View
-      style={{
-        justifyContent: "center",
-        alignItems: "flex-end",
-        padding: 16,
-        paddingBottom: 0,
-      }}
+  const GenderOption = ({ genderType }: { genderType: Gender }) => (
+    <TouchableOpacity
+      onPress={() => handleGenderChange(genderType)}
+      style={[
+        styles.optionContainer,
+        gender === genderType && styles.selectedOption,
+      ]}
+      accessibilityRole="radio"
+      accessibilityState={{ checked: gender === genderType }}
+      accessibilityLabel={`Select ${translator[genderType]} gender`}
     >
       <Text
-        style={{ textAlign: "right", fontFamily: "ZainBold", color: "#78828A" }}
+        style={[
+          styles.optionText,
+          gender === genderType && styles.selectedText,
+        ]}
       >
-        {translator.gender}
+        {translator[genderType]}
       </Text>
-      <View
-        style={{
-          flexDirection: "row-reverse",
-          width: "100%",
-          justifyContent: "space-around",
-          alignItems: "center",
-          marginTop: 16,
-        }}
-      >
-        {/* Male Option */}
-        <TouchableOpacity
-          style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
-          onPress={() => handleGenderChange("male")}
+      <View style={styles.radioIndicator}>
+        <View
+          style={[
+            styles.radioOuter,
+            gender === genderType && styles.radioOuterSelected,
+          ]}
         >
-          <Text
-            style={{
-              fontFamily: "ZainBold",
-              color: gender === "male" ? "#4CAF50" : "#B0B0B0",
-            }}
-          >
-            {translator.male}
-          </Text>
-          <View style={{ position: "relative", width: 20, height: 20 }}>
+          {gender === genderType && (
             <Image
-              source={radioButton.unchecked}
+              source={radioButton.vector}
               resizeMode="contain"
-              style={{
-                width: "100%",
-                height: "100%",
-                backgroundColor: gender === "male" ? "#4CAF50" : "transparent",
-                borderRadius: 20,
-              }}
+              style={styles.radioInner}
             />
-            {gender === "male" && (
-              <Image
-                source={radioButton.vector}
-                resizeMode="contain"
-                style={{
-                  width: 12,
-                  height: 12,
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: [{ translateX: -6 }, { translateY: -6 }],
-                }}
-              />
-            )}
-          </View>
-        </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
 
-        {/* Female Option */}
-        <TouchableOpacity
-          style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
-          onPress={() => handleGenderChange("female")}
-        >
-          <Text
-            style={{
-              fontFamily: "ZainBold",
-              color: gender === "female" ? "#4CAF50" : "#B0B0B0",
-            }}
-          >
-            {translator.female}
-          </Text>
-          <View style={{ position: "relative", width: 20, height: 20 }}>
-            <Image
-              source={radioButton.unchecked}
-              resizeMode="contain"
-              style={{
-                width: "100%",
-                height: "100%",
-                backgroundColor:
-                  gender === "female" ? "#4CAF50" : "transparent",
-                borderRadius: 20,
-              }}
-            />
-            {gender === "female" && (
-              <Image
-                source={radioButton.vector}
-                resizeMode="contain"
-                style={{
-                  width: 12,
-                  height: 12,
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: [{ translateX: -6 }, { translateY: -6 }],
-                }}
-              />
-            )}
-          </View>
-        </TouchableOpacity>
+  useEffect(() => {
+    const userGender = user?.details?.gender;
+    setGender(
+      userGender && ["male", "female", "other"].includes(userGender)
+        ? userGender
+        : "other"
+    );
+  }, [user?.details?.gender]);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.label}>{translator.gender}</Text>
+      <View style={styles.optionsContainer}>
+        <GenderOption genderType="male" />
+        <GenderOption genderType="female" />
       </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+    paddingBottom: 0,
+  },
+  label: {
+    textAlign: "right",
+    fontFamily: "ZainBold",
+    color: "#78828A",
+    marginBottom: 16,
+    fontSize: 16,
+  },
+  optionsContainer: {
+    flexDirection: "row-reverse",
+    justifyContent: "space-around",
+    gap: 7,
+  },
+  optionContainer: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 8,
+    padding: 10,
+    borderRadius: 8,
+  },
+  selectedOption: {
+    backgroundColor: "#F5F5F5",
+  },
+  optionText: {
+    fontFamily: "ZainBold",
+    color: "#B0B0B0",
+    fontSize: 14,
+  },
+  selectedText: {
+    color: "#FF5C39",
+  },
+  radioIndicator: {
+    width: 24,
+    height: 24,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  radioOuter: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "#B0B0B0",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  radioOuterSelected: {
+    borderColor: "#FF5C39",
+    backgroundColor: "#FF5C39",
+  },
+  radioInner: {
+    width: 12,
+    height: 12,
+  },
+});
 
 export default RadioButton;

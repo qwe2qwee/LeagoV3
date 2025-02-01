@@ -1,4 +1,12 @@
-import { Image, Pressable, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  Pressable,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useEffect, useState } from "react";
 import {
   pageButton,
@@ -7,7 +15,7 @@ import {
 } from "@/constants/profilePage";
 import DateTimePicker from "react-native-ui-datepicker";
 import Modal from "react-native-modal";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import useAuthStore from "@/store/useAuthStore";
 import { router } from "expo-router";
 import { icons } from "@/constants";
@@ -17,20 +25,23 @@ import RadioButton from "@/components/Profile/RadioButton";
 import InfoBoxWithTitle from "@/components/Profile/InfoBoxWithTitle";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 
-type DateType = any; // Adjust according to the actual type if you know it, or use 'any' for flexibility
-
+type DateType = string | Dayjs | null;
 const PersonalInfo = () => {
   const { language, user, updateUserDetails } = useAuthStore();
+  const [loading, setLoading] = useState<boolean>(false);
+
   const { details, setDetails } = useUserDetailsStore();
 
   useEffect(() => {
-    setDetails({
-      address: user?.details?.address,
-      birthday: user?.details?.birthday,
-      gender: user?.details?.gender,
-      name: user?.details?.name,
-    });
-  }, []);
+    if (user?.details) {
+      setDetails({
+        address: user.details.address || "",
+        birthday: user.details.birthday || "",
+        gender: user.details.gender || "male",
+        name: user.details.name || "",
+      });
+    }
+  }, [user?.details]); // Add proper dependency
 
   const pageTitleTranslator = pageTitle[language];
   const personalInfoPageTranslator = personalInfoPage[language];
@@ -40,14 +51,11 @@ const PersonalInfo = () => {
   const [openSaveModal, setOpenSaveModal] = useState(false);
   const [date, setDate] = useState<DateType>(details.birthday);
 
-  const handleChange = ({ date }: { date: DateType }) => {
-    // Convert to JavaScript Date if it's a Day.js object
-    if (date && typeof date.toDate === "function") {
-      const dateConvert = date.toString();
-      setDate(dayjs(dateConvert).format("YYYY-MM-DD")); // Convert Day.js to JavaScript String
-      setDetails({ birthday: dayjs(dateConvert).format("YYYY-MM-DD") });
-    } else {
-      setDate(date); // If it's already a Date object, use it as-is
+  const handleChange = ({ date }: { date: any }) => {
+    if (dayjs.isDayjs(date)) {
+      const formattedDate = date.format("YYYY-MM-DD");
+      setDate(formattedDate);
+      setDetails({ ...details, birthday: formattedDate });
     }
   };
   const handleOnPress = () => {
@@ -58,9 +66,34 @@ const PersonalInfo = () => {
     setOpenSaveModal(!openSaveModal);
   };
 
-  const handleOnSave = () => {
-    updateUserDetails(details);
+  const handleOnSave = async () => {
+    try {
+      if (!details.name || !details.birthday) {
+        Alert.alert(
+          language === "ar" ? "خطأ" : "Error",
+          language === "ar"
+            ? "الرجاء ملء جميع الحقول المطلوبة"
+            : "Please fill all required fields"
+        );
+        return;
+      }
+
+      setLoading(true);
+      await updateUserDetails(details);
+      router.back();
+    } catch (error) {
+      Alert.alert(
+        language === "ar" ? "خطأ" : "Error",
+        language === "ar" ? "فشل حفظ التعديلات" : "Failed to save changes"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    setDate(details.birthday);
+  }, [details.birthday]);
 
   return (
     <ParallaxScrollView
@@ -97,9 +130,21 @@ const PersonalInfo = () => {
           className="flex flex-row-reverse items-center justify-between  h-12 mt-3 rounded-xl bg-[#fff] w-11/12"
           style={{ borderWidth: 1, borderColor: "#E5E5E5" }}
         >
-          <Text className="pr-4 font-ZainRegular text-[#9CA4AB]">{date}</Text>
+          <Text className="pr-4 font-ZainRegular text-[#9CA4AB]">
+            {date
+              ? dayjs(date).format(
+                  language === "ar" ? "DD/MM/YYYY" : "MM/DD/YYYY"
+                )
+              : "-"}
+          </Text>
           <View>
-            <TouchableOpacity onPress={handleOnPress}>
+            <TouchableOpacity
+              onPress={handleOnPress}
+              accessibilityLabel={
+                language === "ar" ? "حدد التاريخ" : "Select date"
+              }
+              accessibilityRole="button"
+            >
               <Image
                 source={personalInfoPageTranslator.icon}
                 resizeMode="contain"
@@ -158,12 +203,16 @@ const PersonalInfo = () => {
             <View className="items-center justify-center">
               <TouchableOpacity
                 onPress={handleOnSave}
+                disabled={loading}
                 className="bg-primary-500 w-44 h-11 justify-center items-center rounded-md"
               >
-                <Text className="text-center text-white font-ZainBold">
-                  {" "}
-                  {pageButtonTranslator.accept}{" "}
-                </Text>
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text className="text-center text-white font-ZainBold">
+                    {pageButtonTranslator.accept}
+                  </Text>
+                )}
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleSaveModal}

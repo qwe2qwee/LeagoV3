@@ -1,3 +1,4 @@
+import { Gender } from "@/constants";
 import { create } from "zustand";
 
 interface UserDetails {
@@ -13,26 +14,36 @@ interface UserDetailsStore {
   resetDetails: () => void; // Reset to initial state
 }
 
+// Add validation to store
+const validateGender = (gender: string): Gender =>
+  ["male", "female", "other"].includes(gender) ? (gender as Gender) : "other";
+
 export const useUserDetailsStore = create<UserDetailsStore>((set) => ({
   details: {
-    address: "unknown",
-    birthday: "1999-01-01",
+    address: "",
+    birthday: "",
     gender: "other",
-    name: "Hossin",
+    name: "",
   },
 
   setDetails: (newDetails) =>
     set((state) => ({
-      details: { ...state.details, ...newDetails },
+      details: {
+        ...state.details,
+        ...newDetails,
+        gender: newDetails.gender
+          ? validateGender(newDetails.gender)
+          : state.details.gender,
+      },
     })),
 
   resetDetails: () =>
     set({
       details: {
-        address: "unknown",
-        birthday: "1999-01-01",
+        address: "",
+        birthday: "",
         gender: "other",
-        name: "user",
+        name: "",
       },
     }),
 }));

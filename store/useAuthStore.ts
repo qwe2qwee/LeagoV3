@@ -185,12 +185,13 @@ const useAuthStore = create<AuthState>((set) => ({
 
       const jsonUserDetails = JSON.stringify(details);
 
+      const jj = [jsonUserDetails];
       // Update the document in Appwrite
       await databases.updateDocument(
         appwriteConfig.databaseId as string,
         appwriteConfig.usersCollectionId as string,
         user.$id,
-        { details: [jsonUserDetails] }
+        { details: jj }
       );
 
       // Update the state with the new details

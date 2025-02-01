@@ -28,7 +28,7 @@ export const radioButton = {
       female: "أنثى",
     },
   },
-};
+} as any;
 
 // Profile Page
 

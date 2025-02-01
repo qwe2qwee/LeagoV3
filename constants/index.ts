@@ -791,3 +791,5 @@ export const cities: City[] = [
   },
   // Add more cities as needed
 ];
+
+export type Gender = "male" | "female" | "other";
