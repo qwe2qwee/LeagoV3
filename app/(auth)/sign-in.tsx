@@ -82,7 +82,6 @@ const signIn = () => {
     }
     try {
       setIsLoading(true);
-
       if (isPhone) {
         const phoneExists = await isPhoneNumberExisting(formattedValue);
         if (!phoneExists) {

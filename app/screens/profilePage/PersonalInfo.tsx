@@ -77,16 +77,16 @@ const PersonalInfo = () => {
         );
         return;
       }
-
       setLoading(true);
       await updateUserDetails(details);
-      router.back();
+      router.push("/(tabs)/Profile");
     } catch (error) {
       Alert.alert(
         language === "ar" ? "خطأ" : "Error",
         language === "ar" ? "فشل حفظ التعديلات" : "Failed to save changes"
       );
     } finally {
+      setOpenSaveModal(false);
       setLoading(false);
     }
   };
@@ -193,35 +193,37 @@ const PersonalInfo = () => {
             {pageButtonTranslator.saveChanges}
           </Text>
         </TouchableOpacity>
-        <Modal animationIn="slideInUp" coverScreen isVisible={openSaveModal}>
-          <View className="bg-white w-80 h-64 rounded-2xl">
-            <View className="p-16 pb-8">
-              <Text className="text-center text-lg font-ZainBold">
-                {pageButtonTranslator.agreementQuestion}
-              </Text>
-            </View>
-            <View className="items-center justify-center">
-              <TouchableOpacity
-                onPress={handleOnSave}
-                disabled={loading}
-                className="bg-primary-500 w-44 h-11 justify-center items-center rounded-md"
-              >
-                {loading ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text className="text-center text-white font-ZainBold">
-                    {pageButtonTranslator.accept}
-                  </Text>
-                )}
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleSaveModal}
-                className="mt-4 flex justify-center items-center "
-              >
-                <Text className="text-primary-500 font-ZainBold">
-                  {pageButtonTranslator.cancel}{" "}
+        <Modal animationIn="fadeIn" coverScreen isVisible={openSaveModal}>
+          <View className="justify-center items-center mt-6 w-full h-full ">
+            <View className="bg-white w-80 h-64 mx-auto rounded-2xl justify-center items-center ">
+              <View className="p-16 pb-8">
+                <Text className="text-center text-lg font-ZainBold">
+                  {pageButtonTranslator.agreementQuestion}
                 </Text>
-              </TouchableOpacity>
+              </View>
+              <View className="items-center justify-center">
+                <TouchableOpacity
+                  onPress={handleOnSave}
+                  disabled={loading}
+                  className="bg-primary-500 w-44 h-11 justify-center items-center rounded-md"
+                >
+                  {loading ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text className="text-center text-white font-ZainBold">
+                      {pageButtonTranslator.accept}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleSaveModal}
+                  className="mt-4 flex justify-center items-center "
+                >
+                  <Text className="text-primary-500 font-ZainBold">
+                    {pageButtonTranslator.cancel}{" "}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>

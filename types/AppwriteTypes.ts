@@ -1,6 +1,6 @@
 // appwriteTypes.ts
 
-import { Models } from "appwrite"; // Use Appwrite SDK types if available
+import { Models } from "react-native-appwrite"; // Use Appwrite SDK types if available
 
 // Base interface for an Appwrite document
 export interface AppwriteDocument {

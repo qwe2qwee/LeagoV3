@@ -241,6 +241,16 @@ export const onboardingDocs = [
       en: "Select License",
       ar: " اختر رخصتك",
     },
+    errors: {
+      document_pick_failed: {
+        en: "Document selection failed",
+        ar: "فشل اختيار المستند",
+      },
+      upload_failed: {
+        en: "Upload failed, please try again",
+        ar: "فشل التحميل، يرجى المحاولة مرة أخرى",
+      },
+    } as any,
   },
 ];
 
@@ -793,3 +803,10 @@ export const cities: City[] = [
 ];
 
 export type Gender = "male" | "female" | "other";
+
+export function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+export const blurhash =
+  "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";

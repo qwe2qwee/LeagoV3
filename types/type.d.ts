@@ -146,7 +146,7 @@ declare interface TouchableFeildWithIconProps {
   icon: any;
   title: string;
   pathName: any;
-  titleStyle?: string
+  titleStyle?: string;
 }
 
 // for parse the car
@@ -200,4 +200,20 @@ declare interface InfoBoxWithTitleProps {
   title: string;
   info: srting;
   icon?: any;
+}
+
+export type DocumentType = "identity" | "license";
+
+export interface FileAsset {
+  uri: string;
+  mimeType: string;
+  name: string;
+  size: number;
+}
+
+export interface DocumentState {
+  file?: FileAsset;
+  url?: string;
+  uploading: boolean;
+  error?: string;
 }

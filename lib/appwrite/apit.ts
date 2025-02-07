@@ -3,21 +3,16 @@ import {
   AppwriteUser,
   CarDataProps,
   CarDocument,
-  PhoneTokenResponse,
-  Reservation,
   ReservationInfo,
   SessionResponse,
 } from "@/types/AppwriteTypes";
 import {
   ID,
   Models,
-  Permission,
   Query,
   RealtimeResponseEvent,
-  Role,
 } from "react-native-appwrite";
-import { account, appwriteConfig, avatars, databases, storage } from "./config";
-import { fetchCarDetails } from "@/constants";
+import { account, appwriteConfig, databases, storage } from "./config";
 import { Alert } from "react-native";
 
 // Error localization definition for English and Arabic
@@ -165,6 +160,20 @@ export async function savePassword(userId: string, password: string) {
   console.log("Password saved:", response);
 }
 
+export const getDocumentByUserAndType = async (userId: string) => {
+  try {
+    const documents = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.userdocs,
+      [Query.equal("creatorId", userId), Query.limit(1)]
+    );
+
+    return documents.documents[0];
+  } catch (error) {
+    throw error;
+  }
+};
+
 // get the pass
 export async function getPassword(userId: string) {
   try {
@@ -239,7 +248,7 @@ export async function createUser(
         email,
         userName: transliterateArabicToEnglish(name),
         phoneNumber: phone,
-        details: [jsonUserDetails], // Store JSON string in details array
+        details: jsonUserDetails, // Store JSON string in details array
       }
     );
 
@@ -606,73 +615,237 @@ export async function signOut(): Promise<void> {
  * ====================================== */
 
 // Upload File
-export async function uploadFile(
-  file: { name: string; mimeType: string; size: number; uri: string },
-  type: string
-): Promise<string | undefined> {
-  if (!file) return;
+// export async function uploadFile(
+//   file: { name: string; mimeType: string; size: number; uri: string },
+//   type: string
+// ): Promise<string | undefined> {
+//   if (!file) return;
 
-  // Asset distribution based on the solution you found
-  const asset = {
-    name: file.name,
-    type: file.mimeType,
-    size: file.size,
-    uri: file.uri,
-  };
+//   // Asset distribution based on the solution you found
+//   const asset = {
+//     name: file.name,
+//     type: file.mimeType,
+//     size: file.size,
+//     uri: file.uri,
+//   };
+
+//   try {
+//     // Convert URI to a File-like object
+//     // Upload file to Appwrite
+//     const uploadedFile = await storage.createFile(
+//       appwriteConfig.storageIdDocs as string, // Replace with your Appwrite bucket ID
+//       ID.unique(), // Generate a unique file ID
+//       asset // Directly passing the file data
+//     );
+
+//     // Get file preview URL (assuming getFilePreview is a helper function)
+//     const fileUrl = await getFilePreview(uploadedFile.$id, "image");
+//     return fileUrl;
+//   } catch (error) {
+//     throw new Error(`File upload error: ${error}`);
+//   }
+// }
+
+// Define types for file data and allowed file types.
+interface FileData {
+  name: string;
+  mimeType: string;
+  size: number;
+  uri: string;
+}
+
+// We now use 'identity' or 'license' as the allowed types.
+type FileType = "identity" | "license";
+
+interface AppwriteFile {
+  $id: string;
+  // ... any other file properties you expect from storage.createFile()
+}
+
+declare const databasesss: {
+  listDocuments: (
+    databaseId: string,
+    collectionId: string,
+    queries: any[]
+  ) => Promise<{ documents: any[] }>;
+  updateDocument: (
+    databaseId: string,
+    collectionId: string,
+    documentId: string,
+    data: Record<string, any>
+  ) => Promise<any>;
+};
+
+declare const storageee: {
+  createFile: (
+    storageId: string,
+    fileId: string,
+    file: any
+  ) => Promise<AppwriteFile>;
+  deleteFile: (storageId: string, fileId: string) => Promise<void>;
+  getFileView: (storageId: string, fileId: string) => string;
+  getFilePreview: (
+    storageId: string,
+    fileId: string,
+    width: number,
+    height: number,
+    gravity: string,
+    quality: number
+  ) => string;
+};
+
+// A helper function to safely extract error messages.
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+// Enhanced uploadFile function with update-or-create logic
+/**
+ * Uploads a file to storage and updates the corresponding user document.
+ *
+ * @param file - The file details.
+ * @param type - The type of file ('video' or 'image').
+ * @param userId - The user's ID.
+ * @returns A Promise resolving to the preview URL of the uploaded file.
+ */
+export async function uploadFile(
+  file: FileData,
+  type: FileType,
+  userId: string
+): Promise<string> {
+  if (!file) throw new Error("No file provided");
 
   try {
-    // Convert URI to a File-like object
-    // Upload file to Appwrite
-    const uploadedFile = await storage.createFile(
-      appwriteConfig.storageIdDocs as string, // Replace with your Appwrite bucket ID
-      ID.unique(), // Generate a unique file ID
-      asset // Directly passing the file data
+    // 1. Retrieve the user's document by querying for creatorId.
+    const userDocs = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.userdocs,
+      [Query.equal("creatorId", userId)]
     );
 
-    // Get file preview URL (assuming getFilePreview is a helper function)
+    let userDocId: string | null = null;
+    let existingFileId: string | null = null;
+    if (userDocs.documents.length > 0) {
+      const userDoc = userDocs.documents[0];
+      userDocId = userDoc.$id;
+      // Check for an existing file based on the type.
+      if (type === "identity" && userDoc.identity) {
+        existingFileId = userDoc.identity;
+      } else if (type === "license" && userDoc.license) {
+        existingFileId = userDoc.license;
+      }
+    }
+
+    // 2. Delete the old file if one is already stored.
+    if (existingFileId !== null) {
+      try {
+        await storage.deleteFile(appwriteConfig.storageIdDocs, existingFileId);
+      } catch (deleteError) {
+        console.warn(
+          `Failed to delete existing ${type} file:`,
+          getErrorMessage(deleteError)
+        );
+      }
+    }
+
+    // 3. Prepare the file object for upload.
+    const fileToUpload = {
+      uri: file.uri,
+      name: file.name,
+      type: file.mimeType,
+      size: file.size,
+    };
+
+    // 4. Upload the new file.
+    const uploadedFile = await storage.createFile(
+      appwriteConfig.storageIdDocs,
+      ID.unique(),
+      fileToUpload
+    );
+    if (!uploadedFile || !uploadedFile.$id) {
+      throw new Error("Failed to create new file");
+    }
+
+    // 5. Get a preview URL for the uploaded file.
     const fileUrl = await getFilePreview(uploadedFile.$id, type);
+    if (!fileUrl) throw new Error("Failed to generate file URL");
+
+    // 6. Update the document with the new file’s ID.
+    // Here we store the file ID (which you can use to get the preview URL) in the field that matches the type.
+    if (userDocId) {
+      // Update the existing document.
+      const updateData: Record<string, any> = {};
+      if (type === "identity") {
+        updateData.identity = uploadedFile.$id;
+      } else if (type === "license") {
+        updateData.license = uploadedFile.$id;
+      }
+      await databases.updateDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.userdocs,
+        userDocId,
+        updateData
+      );
+    } else {
+      // Create a new document if none exists.
+      // Note: You can set default values for any fields as needed.
+      const createData: Record<string, any> = {
+        creatorId: userId,
+        canRent: false, // default value; adjust as needed.
+        identity: "",
+        license: "",
+      };
+      if (type === "identity") {
+        createData.identity = uploadedFile.$id;
+      } else if (type === "license") {
+        createData.license = uploadedFile.$id;
+      }
+      await databases.createDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.userdocs,
+        ID.unique(),
+        createData
+      );
+    }
+
+    // 7. Return the preview URL.
     return fileUrl;
-  } catch (error) {
-    throw new Error(`File upload error: ${error}`);
+  } catch (error: unknown) {
+    console.error(`[${type}] Upload failed:`, getErrorMessage(error));
+    throw new Error(
+      `Failed to upload ${type} document: ${getErrorMessage(error)}`
+    );
   }
 }
 
 // Function to get a preview URL for the uploaded file
+/**
+ * Generates a preview URL for the uploaded file.
+ *
+ * @param fileId - The ID of the uploaded file.
+ * @param type - The type of file ('video' or 'image').
+ * @returns A Promise resolving to the preview URL.
+ */
 export async function getFilePreview(
   fileId: string,
-  type: string
+  type: FileType
 ): Promise<string> {
   try {
-    let fileUrl: webkitURL;
+    let fileUrl: string;
 
-    if (type === "video") {
-      fileUrl = storage.getFileView(
-        appwriteConfig.storageIdDocs as string,
-        fileId
-      );
-    } else if (type === "image") {
-      fileUrl = storage.getFilePreview(
-        appwriteConfig.storageIdDocs as string,
-        fileId,
-        2000,
-        2000,
-        "top" as any,
-        100
-      );
-    } else {
-      throw new Error("Invalid file type");
+    fileUrl = storage.getFilePreview(
+      appwriteConfig.storageIdDocs,
+      fileId
+    ) as any;
+
+    if (!fileUrl) {
+      throw new Error("Failed to generate file preview URL");
     }
 
-    if (!fileUrl) throw new Error("Failed to generate file preview URL");
-
-    return fileUrl as any;
-  } catch (error) {
-    console.error("Failed to get file preview:", error);
-    throw new Error(
-      `Failed to get file preview: ${
-        error instanceof Error ? error.message : String(error)
-      }`
-    );
+    return fileUrl;
+  } catch (error: unknown) {
+    console.error("Failed to get file preview:", getErrorMessage(error));
+    throw new Error(`Failed to get file preview: ${getErrorMessage(error)}`);
   }
 }
 /** ======================================

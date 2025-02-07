@@ -47,7 +47,6 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
         tabBarShowLabel: false,
-
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: {
@@ -55,6 +54,7 @@ export default function TabLayout() {
           borderRadius: 50,
           height: 80,
           marginHorizontal: 20,
+          overflow: "hidden",
           marginBottom: 20,
           position: "absolute",
           alignItems: "center", // Center items vertically

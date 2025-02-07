@@ -1,4 +1,10 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import React, { useState } from "react";
 import { router } from "expo-router";
 import {
@@ -16,7 +22,7 @@ const profile = () => {
   const fieldTranslator = profilePage[language];
   const SecTranslator = profileSections[language];
   const logOutTranslator = logOutModal[language];
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [open, setOpen] = useState(false);
 
@@ -24,15 +30,18 @@ const profile = () => {
     setOpen(!open);
   };
 
+  // ... inside your component
+
   const handleLogOut = async () => {
-    setIsLoggingOut(true);
     try {
+      setIsLoading(true);
+      // Add your actual logout logic here
       await logout();
       setOpen(false);
     } catch (error) {
-      console.error("Error logging out:", error);
+      console.error("Logout failed:", error);
     } finally {
-      setIsLoggingOut(false);
+      setIsLoading(false);
     }
   };
 
@@ -122,17 +131,30 @@ const profile = () => {
               <View className="items-center justify-center">
                 <TouchableOpacity
                   onPress={handleLogOut}
-                  className="bg-primary-500 w-44 h-11 justify-center items-center rounded-md"
+                  disabled={isLoading}
+                  className={`bg-primary-500 w-44 h-11 justify-center items-center rounded-md ${
+                    isLoading ? "opacity-75" : ""
+                  }`}
                 >
-                  <Text className="text-center text-white font-ZainBold">
-                    {" "}
-                    {logOutTranslator.yes}{" "}
-                  </Text>
+                  {isLoading ? (
+                    <ActivityIndicator color="white" />
+                  ) : (
+                    <Text className="text-center text-white font-ZainBold">
+                      {logOutTranslator.yes}
+                    </Text>
+                  )}
                 </TouchableOpacity>
-                <TouchableOpacity onPress={handleOnPress} className="mt-4">
-                  <Text className="text-primary-500 font-ZainBold">
-                    {" "}
-                    {logOutTranslator.cancel}{" "}
+                <TouchableOpacity
+                  onPress={handleOnPress}
+                  disabled={isLoading}
+                  className="mt-4"
+                >
+                  <Text
+                    className={`text-primary-500 font-ZainBold ${
+                      isLoading ? "opacity-50" : ""
+                    }`}
+                  >
+                    {logOutTranslator.cancel}
                   </Text>
                 </TouchableOpacity>
               </View>

@@ -94,7 +94,7 @@ const useAuthStore = create<AuthState>((set) => ({
           email,
           userName: transliterateArabicToEnglish(name),
           phoneNumber: phone,
-          details: [jsonUserDetails],
+          details: jsonUserDetails,
         }
       );
 
@@ -144,10 +144,20 @@ const useAuthStore = create<AuthState>((set) => ({
 
       const userDocument = currentUser.documents[0] as AppwriteUser;
 
-      let details: UserDetails | undefined;
+      let details: UserDetails | null = null;
       try {
-        if (userDocument.details && userDocument.details.length > 0) {
-          details = JSON.parse(userDocument.details[0]);
+        // Check if details exists and is a non-empty string
+        if (userDocument.details && typeof userDocument.details === "string") {
+          const parsedDetails = JSON.parse(userDocument.details);
+
+          // Validate the parsed details is an object
+          if (
+            parsedDetails &&
+            typeof parsedDetails === "object" &&
+            !Array.isArray(parsedDetails)
+          ) {
+            details = parsedDetails as UserDetails;
+          }
         }
       } catch (error) {
         console.error("Failed to parse user details:", error);
@@ -191,7 +201,7 @@ const useAuthStore = create<AuthState>((set) => ({
         appwriteConfig.databaseId as string,
         appwriteConfig.usersCollectionId as string,
         user.$id,
-        { details: jj }
+        { details: jsonUserDetails }
       );
 
       // Update the state with the new details
