@@ -68,7 +68,7 @@ const profile = () => {
                 <TouchableFeildWithIcon
                   icon={fieldTranslator.documents.icon}
                   title={fieldTranslator.documents.title}
-                  pathName="/screens/Auth/SelectUsersDocs"
+                  pathName="/screens/Auth/SelectUsersDocsPage"
                 />
                 {/* <TouchableFeildWithIcon
                     icon={fieldTranslator.address.icon}

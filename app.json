@@ -11,7 +11,9 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "We need your location to show nearby neighborhoods."
+        "NSLocationWhenInUseUsageDescription": "We need your location to show nearby neighborhoods.",
+        "NSCameraUsageDescription": "We need access to your camera to upload photos.",
+        "NSPhotoLibraryUsageDescription": "We need access to your photo library to upload images."
       }
     },
     "android": {
@@ -22,9 +24,10 @@
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
-        "INTERNET" // Add this for image loading
+        "INTERNET",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
       ],
-
       "package": "com.qwe2qwe.leagoV3",
       "versionCode": "12"
     },
@@ -36,15 +39,25 @@
     "plugins": [
       "expo-router",
       [
+        "expo-document-picker",
+        {
+          "iCloudContainerEnvironment": "Production"
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/images/icon.png",
-          "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#FF5C39"
         }
       ]
     ],
+    "splash": {
+      "image": "./assets/images/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FF5C39"
+    },
     "experiments": {
       "typedRoutes": true
     },

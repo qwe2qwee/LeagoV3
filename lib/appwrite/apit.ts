@@ -424,6 +424,80 @@ export async function sendOtpToEmail(
     throw new Error(error.message);
   }
 }
+interface AppwriteUserDoc {
+  $id: string;
+  userId: string;
+  identityUrl?: string;
+  licenseUrl?: string;
+}
+
+interface PickedFile {
+  name: string;
+  size: number;
+  uri: string;
+  type: string;
+}
+
+// Example upload function
+export async function uploadUserDocument(
+  file: PickedFile,
+  type: "identity" | "license"
+): Promise<string> {
+  const user = await account.get();
+  try {
+    // Upload file to storage
+    const fileResponse = await storage.createFile(
+      appwriteConfig.storageIdDocs,
+      ID.unique(),
+      file // cast or adjust as needed based on Appwrite SDK types
+    );
+
+    // Get file URL
+    const fileUrl = storage.getFilePreview(
+      appwriteConfig.storageIdDocs,
+      fileResponse.$id
+    );
+
+    // Update user document
+    const existingDoc = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.userdocs,
+
+      [Query.equal("userId", user.$id)]
+    );
+
+    if (existingDoc.documents.length > 0) {
+      // Update existing document
+      await databases.updateDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.userdocs,
+
+        existingDoc.documents[0].$id,
+        {
+          [type === "identity" ? "identityUrl" : "licenseUrl"]: fileUrl,
+        }
+      );
+    } else {
+      // Create new document
+      await databases.createDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.userdocs,
+
+        ID.unique(),
+        {
+          userId: user.$id,
+          identityUrl: type === "identity" ? fileUrl : "",
+          licenseUrl: type === "license" ? fileUrl : "",
+        }
+      );
+    }
+
+    return fileUrl as any;
+  } catch (error) {
+    console.error("Error in uploadUserDocument:", error);
+    throw new Error("Failed to upload document");
+  }
+}
 
 // Function to get email by phone number
 export const getEmailByPhoneNumber = async (

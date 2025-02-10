@@ -138,6 +138,7 @@ const useAuthStore = create<AuthState>((set) => ({
         [Query.equal("$id", currentAccount.$id)]
       );
 
+      // await loadExistingDocuments(currentAccount.$id);
       if (currentUser.documents.length === 0) {
         throw new Error("No user document found in the database");
       }

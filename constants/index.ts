@@ -38,6 +38,7 @@ import docsImage from "../assets/icons/docsImage.png";
 import support from "../assets/icons/support.png";
 import point1 from "../assets/icons/point1.png";
 import fallbackMap from "../assets/icons/fallbackMap.png";
+import add from "../assets/icons/add.png";
 
 import camera from "../assets/icons/camera.png";
 import Illustration from "../assets/icons/Illustration.png";
@@ -102,7 +103,7 @@ export const icons = {
   pin,
   point,
   point1,
-
+  add,
   profile,
   star,
   target,
