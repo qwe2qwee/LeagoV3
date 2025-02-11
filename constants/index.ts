@@ -204,6 +204,25 @@ export const onboarding = [
   },
 ];
 
+export const translationsSearch = {
+  en: {
+    search: "Search",
+    clear: "Clear",
+    noCarsAvailable: "No cars available",
+    errorLoadingCars: "Error loading cars. Please try again.",
+    distance: "{{distance}} km",
+    city: "{{city}}",
+  },
+  ar: {
+    search: "بحث",
+    clear: "مسح",
+    noCarsAvailable: "لا توجد سيارات متاحة",
+    errorLoadingCars: "حدث خطأ أثناء تحميل السيارات. يرجى المحاولة مرة أخرى.",
+    distance: "{{distance}} كم",
+    city: "{{city}}",
+  },
+};
+
 export const onboardingDocs = [
   {
     id: 1,
@@ -500,6 +519,23 @@ export async function fetchCarDetails(
     return { name: null, year: null, color: null };
   }
 }
+
+// Function to calculate the distance in kilometers between two points
+export const calculateDistanceInKmm = (loc1: any, loc2: any) => {
+  const toRad = (value: any) => (value * Math.PI) / 180;
+
+  const R = 6371; // Radius of the Earth in kilometers
+  const dLat = toRad(loc2.lat - loc1.lat);
+  const dLon = toRad(loc2.lon - loc1.lon);
+  const lat1 = toRad(loc1.lat);
+  const lat2 = toRad(loc2.lat);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return parseFloat((R * c).toFixed(1)); // Distance formatted to one decimal place
+};
 
 export type TranslationSignUpKeys = keyof typeof translationsignUp;
 

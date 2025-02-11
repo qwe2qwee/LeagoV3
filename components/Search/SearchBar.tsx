@@ -92,8 +92,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
       <TouchableOpacity
         onPress={handleSearch}
         disabled={!query.trim() || loading} // Disable during loading
-        className={`ml-2 p-1 py-3 w-1/6 rounded-lg ${
-          query.trim() && !loading ? "bg-blue-500" : "bg-gray-300"
+        className={`ml-2 p-1 py-3 w-1/6 rounded-lg  ${
+          query.trim() && !loading ? "bg-primary-400" : "bg-gray-300"
         }`}
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabelSearch}
@@ -105,7 +105,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
         {loading ? (
           <ActivityIndicator size="small" color="#fff" />
         ) : (
-          <Text className="text-center text-white font-semibold">
+          <Text
+            className={` text-center text-white ${
+              isArabic ? "font-ZainBold " : "font-MontserratMedium "
+            }`}
+          >
             {searchButtonText}
           </Text>
         )}

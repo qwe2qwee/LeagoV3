@@ -14,7 +14,8 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import CustomButton from "@/components/ui/CustomButton";
 import { icons } from "@/constants";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { appwriteConfig, appwriteConfig1 } from "@/lib/appwrite/config";
+import { appwriteConfig } from "@/lib/appwrite/config";
+import useAuthStore from "@/store/useAuthStore";
 
 // Localization support
 const translations = {
@@ -55,8 +56,6 @@ const translations = {
 };
 
 // Set the desired locale
-const locale = "ar"; // Change to "en" for English
-const t = translations[locale];
 
 const formatDateLocalized = (isoDate: string, locale: "ar" | "en"): string => {
   try {
@@ -76,20 +75,14 @@ const formatDateLocalized = (isoDate: string, locale: "ar" | "en"): string => {
   }
 };
 
-const showMapError = () => {
-  Alert.alert(
-    locale === "ar" ? "خطأ" : "Error",
-    locale === "ar"
-      ? "تعذر فتح الخريطة. يرجى تثبيت تطبيق خرائط."
-      : "Failed to open maps. Please install a maps app."
-  );
-};
-
 const isValidCoordinate = (num: number) =>
   !isNaN(num) && num >= -180 && num <= 180;
 
 const DetailsBill = () => {
   const { reservation: reservationString } = useLocalSearchParams();
+  const { user, language } = useAuthStore();
+  const t = translations[language];
+
   const router = useRouter();
 
   const reservation = reservationString
@@ -113,43 +106,6 @@ const DetailsBill = () => {
     });
 
     Linking.openURL(url!).catch(() => Alert.alert(t.mapError));
-  };
-
-  const openMapsApp = async () => {
-    console.log(Platform.OS);
-    const lat = Number(reservation?.carLocation?.lat) || defaultLocation.lat;
-    const lon = Number(reservation?.carLocation?.lon) || defaultLocation.lon;
-
-    // Try Apple Maps on iOS
-    if (Platform.OS === "ios") {
-      const appleMapsUrl = `http://maps.apple.com/?ll=${lat},${lon}`;
-      const canOpen = await Linking.canOpenURL(appleMapsUrl);
-      if (canOpen) {
-        Linking.openURL(appleMapsUrl).catch(() => showMapError());
-        return;
-      }
-    }
-
-    // Try Google Maps on Android (if available)
-    if (Platform.OS === "android") {
-      const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lon}`;
-      const canOpen = await Linking.canOpenURL(googleMapsUrl);
-      if (canOpen) {
-        Linking.openURL(googleMapsUrl).catch(() => showMapError());
-        return;
-      }
-    }
-
-    // Fallback for Huawei devices (or devices without Google Maps)
-    const geoapifyUrl = `https://www.geoapify.com/redirect?to=streetmap&lat=${lat}&lon=${lon}`;
-    const canOpen = await Linking.canOpenURL(geoapifyUrl);
-    if (canOpen) {
-      Linking.openURL(geoapifyUrl).catch(() => showMapError());
-      return;
-    }
-
-    // If no maps app is available, show an error
-    showMapError();
   };
 
   if (!reservation) {
@@ -199,29 +155,71 @@ const DetailsBill = () => {
         </View>
 
         {/* Reservation Details */}
-        <Text className="text-sm font-bold mb-4 text-right">
+        <Text
+          className={`mb-4  ${
+            language === "ar"
+              ? "font-ZainMedium text-right"
+              : "font-Montserrat text-left"
+          } `}
+        >
           {reservation.payId ? reservation.payId : reservation.carName} : رقم
           الفاتورة
         </Text>
-        <Text className="text-sm mb-2">
+        <Text
+          className={`mb-4  ${
+            language === "ar"
+              ? "font-ZainMedium text-right"
+              : "font-Montserrat text-left"
+          } `}
+        >
           {t.year}: {reservation.carYear || t.unknown}
         </Text>
-        <Text className="text-sm mb-2">
+        <Text
+          className={`mb-4  ${
+            language === "ar"
+              ? "font-ZainMedium text-right"
+              : "font-Montserrat text-left"
+          } `}
+        >
           {t.city}: {reservation.city || t.unknown}
         </Text>
-        <Text className="text-sm mb-2">
+        <Text
+          className={`mb-4  ${
+            language === "ar"
+              ? "font-ZainMedium text-right"
+              : "font-Montserrat text-left"
+          } `}
+        >
           {t.status}: {reservation.status || t.na}
         </Text>
-        <Text className="text-sm mb-2">
+        <Text
+          className={`mb-4  ${
+            language === "ar"
+              ? "font-ZainMedium text-right"
+              : "font-Montserrat text-left"
+          } `}
+        >
           {t.reservationDate}: {reservation.reservationDate || t.na}
         </Text>
-        <Text className="text-sm mb-2">
+        <Text
+          className={`mb-4  ${
+            language === "ar"
+              ? "font-ZainMedium text-right"
+              : "font-Montserrat text-left"
+          } `}
+        >
           {t.start}:{" "}
           {reservation.reservationStart
             ? formatDateLocalized(reservation.reservationStart, "ar")
             : t.na}
         </Text>
-        <Text className="text-sm mb-4 ">
+        <Text
+          className={`mb-4  ${
+            language === "ar"
+              ? "font-ZainMedium text-right"
+              : "font-Montserrat text-left"
+          } `}
+        >
           {t.end}:{" "}
           {reservation.reservationEnd
             ? formatDateLocalized(reservation.reservationEnd, "ar")
@@ -262,7 +260,13 @@ const DetailsBill = () => {
               </Pressable>
             ) : (
               <View className="items-center justify-center h-full w-full bg-gray-200 rounded-lg">
-                <Text>{t.noDetails}</Text>
+                <Text
+                  className={`mb-4 text-center  ${
+                    language === "ar" ? "font-ZainMedium" : "font-Montserrat "
+                  } `}
+                >
+                  {t.noDetails}
+                </Text>
               </View>
             )}
           </View>

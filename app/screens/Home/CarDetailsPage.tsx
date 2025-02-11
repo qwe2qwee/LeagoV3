@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, Image, Pressable, ScrollView } from "react-native";
+import React from "react";
+import { View, Text, Image, Pressable } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import CustomButton from "@/components/ui/CustomButton";
-import { getColorHashCode, icons } from "@/constants";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { cityTranslations, getColorHashCode, icons } from "@/constants";
 import useAuthStore from "@/store/useAuthStore";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import AvailableRentType from "@/components/ui/AvailableRentType";
@@ -33,8 +32,11 @@ const CarDetailsPage: React.FC = () => {
     carCity,
   } = useLocalSearchParams();
   const router = useRouter();
-  const bookingTime = "Today, 01:00 PM - 02:00 PM";
-  const { language = "en", user } = useAuthStore();
+  const { user, language } = useAuthStore();
+  const bookingTime =
+    language === "en"
+      ? "Today, 01:00 PM - 02:00 PM"
+      : "اليوم، 1.00 مساءً إلى 2.00 مساءً";
 
   const translations = {
     en: {
@@ -64,8 +66,18 @@ const CarDetailsPage: React.FC = () => {
     return data;
   };
 
+  const translateCity = (
+    city: string | undefined,
+    language: "en" | "ar"
+  ): string => {
+    if (!city) return language === "ar" ? "غير معروف" : "Unknown";
+    const translation = cityTranslations[city];
+    return translation ? translation[language] : city;
+  };
+
   const parsedCarDetails: CarDetails = parseJSON(carDetails);
   const parsedRentSalary: RentSalary = parseJSON(carRentSalary);
+
   const imageUri: string | undefined = Array.isArray(parseJSON(carImages))
     ? parseJSON(carImages)[0]
     : carImage;
@@ -103,8 +115,18 @@ const CarDetailsPage: React.FC = () => {
       </View>
 
       <View className="p-3">
-        <View className="flex-row justify-between mt-4">
-          <Text className="text-2xl font-bold">
+        <View
+          className={` justify-between mt-4 ${
+            language === "ar" ? "flex-row-reverse" : "flex-row"
+          }`}
+        >
+          <Text
+            className={`text-2xl ${
+              language === "ar"
+                ? "text-right font-ZainBold"
+                : "text-left font-MontserratBold"
+            }`}
+          >
             {parsedCarDetails.name[language]}
           </Text>
           <AvailableRentType
@@ -113,15 +135,31 @@ const CarDetailsPage: React.FC = () => {
             textStyle={{ fontSize: 14, fontWeight: "bold" }} // Optional text style
           />
         </View>
-        <View className="flex-row items-center justify-between my-3">
-          <View className="flex-row items-center">
+        <View
+          className={`justify-between my-3 items-center ${
+            language === "ar" ? "flex-row-reverse" : "flex-row"
+          }`}
+        >
+          <View
+            className={` items-center ${
+              language === "ar" ? "flex-row-reverse" : "flex-row"
+            }`}
+          >
             <Image
               source={icons.point}
-              className="w-5 h-5 mr-1"
+              className="w-5 h-5 mx-1"
               tintColor={"#9CA4AB"}
               resizeMode="contain"
             />
-            <Text className="text-sm text-[#9CA4AB]">{carCity || "N/A"}</Text>
+            <Text
+              className={`text-sm text-[#9CA4AB] ${
+                language === "ar"
+                  ? "text-right font-ZainBold"
+                  : "text-left font-MontserratMedium"
+              }`}
+            >
+              {translateCity(carCity as any, language) || "N/A"}
+            </Text>
           </View>
 
           <Text className="text-sm text-[#9CA4AB] mt-2">
@@ -132,28 +170,58 @@ const CarDetailsPage: React.FC = () => {
             ></View>
           </Text>
         </View>
-        <View className="flex-col items-start my-3">
-          <View className="flex-row items-center">
+        <View
+          className={` flex-col  my-3 ${
+            language === "ar" ? "items-end" : "items-start"
+          }`}
+        >
+          <View
+            className={`items-center ${
+              language === "ar" ? "flex-row-reverse" : "flex-row"
+            }`}
+          >
             <Image
               source={icons.Time}
-              className="w-5 h-5 mr-1"
+              className="w-5 h-5 mx-1"
               tintColor={"#9CA4AB"}
               resizeMode="contain"
             />
-            <Text className="text-sm text-[#9CA4AB]">
+            <Text
+              className={`text-sm text-[#9CA4AB] ${
+                language === "ar"
+                  ? "text-right font-ZainBold"
+                  : "text-left font-Montserrat"
+              }`}
+            >
               {translations[language].bookingHours}
             </Text>
           </View>
-          <View className="m-3 ml-6 border-dashed border-[#E2E3E8] border-2 p-1">
+          <View
+            className={`m-3  border-dashed border-[#E2E3E8] border-2 p-1 ${
+              language === "ar" ? "mr-6" : "ml-6"
+            }`}
+          >
             <Text className="text-primary-400">{bookingTime}</Text>
           </View>
         </View>
 
         <View className="mt-4">
-          <Text className="text-lg font-semibold">
+          <Text
+            className={`text-lg  ${
+              language === "ar"
+                ? "text-right font-ZainBold"
+                : "text-left font-MontserratBold"
+            }`}
+          >
             {translations[language].carDetails}
           </Text>
-          <Text className="text-gray-600">
+          <Text
+            className={`text-gray-600  ${
+              language === "ar"
+                ? "text-right font-ZainRegular"
+                : "text-left font-Montserrat"
+            }`}
+          >
             {translations[language].mileage}:{" "}
             {parsedCarDetails?.mileage || "N/A"}
           </Text>

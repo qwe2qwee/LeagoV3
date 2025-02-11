@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Path, Svg } from "react-native-svg";
 import { StatusBar } from "expo-status-bar";
 import CustomButton from "@/components/ui/CustomButton";
+import useAuthStore from "@/store/useAuthStore";
 
 const LeagoMark = () => {
   return (
@@ -40,32 +41,66 @@ const LeagoMark = () => {
   );
 };
 
+// Localization setup
+const translations = {
+  en: {
+    thankYou: "Payment Complete, Thank You!",
+    receiptNumber: "Receipt Number",
+    homeButton: "Return to Home",
+  },
+  ar: {
+    thankYou: "تم الدفع ، شكرا لاختيارك",
+    receiptNumber: "رقم الإيصال",
+    homeButton: "العودة للصفحة الرئيسية",
+  },
+};
+
 const PaymentCompletePage = () => {
   const { paymentId } = useLocalSearchParams();
+  const { user, language } = useAuthStore();
+
+  const t = translations[language]; // Get translations based on the language
+
   return (
     <SafeAreaView className="bg-white">
-      <View className="items-center justify-center h-full w-full bg-white">
+      <View className="items-center justify-center h-full w-full bg-white px-4">
         <Image
           source={require("../../../assets/images/Completed.png")}
           className="h-52 w-23"
           resizeMode="contain"
         />
-        <View className="flex-row-reverse pt-10 gap-x-3 items-center justify-center">
-          <Text className="text-xl font-zainExtraBold py-5">
-            تم الدفع ، شكرا لاختيارك
+        <View
+          className={`pt-10 gap-x-3 items-center justify-center flex-col ${
+            language === "ar" ? "" : ""
+          } `}
+        >
+          <Text
+            className={`mb-4 text-xl py-5  ${
+              language === "ar"
+                ? "font-ZainMedium text-right"
+                : "font-Montserrat text-left"
+            } `}
+          >
+            {t.thankYou}
           </Text>
           <LeagoMark />
         </View>
         <View className="flex items-center justify-center">
-          <Text className="text-2xl font-zainBold text-[#63666A]">
-            رقم الإيصال
+          <Text
+            className={`text-2xl font-zainBold text-[#63666A]  ${
+              language === "ar"
+                ? "font-ZainMedium text-right"
+                : "font-Montserrat text-left"
+            } `}
+          >
+            {t.receiptNumber}
           </Text>
           <Text className="text-xl font-zainRegular pt-2 text-[#63666A]">
             {paymentId}
           </Text>
         </View>
         <CustomButton
-          title=" العودة للصفحة الرئيسية"
+          title={t.homeButton}
           className="mt-7 bg-primary w-4/5"
           onPress={() => router.push("/(tabs)/Bills")}
         />

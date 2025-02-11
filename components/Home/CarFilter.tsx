@@ -21,6 +21,9 @@ const carBrands = [
   { name: "Jeep", logo: icons.hyundai },
   { name: "Ford", logo: icons.hyundai },
   { name: "Chery", logo: icons.hyundai },
+  { name: "Mazda", logo: icons.hyundai },
+  { name: "Suzuki", logo: icons.hyundai },
+  { name: "Porsche", logo: icons.hyundai },
 
   { name: "BMW", logo: icons.hyundai },
   { name: "Mercedes-Benz", logo: icons.hyundai },
@@ -28,8 +31,6 @@ const carBrands = [
   { name: "Infiniti", logo: icons.hyundai },
   { name: "GMC", logo: icons.hyundai },
   { name: "Dodge", logo: icons.hyundai },
-  { name: "Suzuki", logo: icons.hyundai },
-  { name: "Mazda", logo: icons.hyundai },
   { name: "Peugeot", logo: icons.hyundai },
   { name: "Tesla", logo: icons.hyundai },
   { name: "Volkswagen", logo: icons.hyundai },
@@ -44,7 +45,6 @@ const carBrands = [
   { name: "Maserati", logo: icons.hyundai },
   { name: "Aston Martin", logo: icons.hyundai },
   { name: "Lamborghini", logo: icons.hyundai },
-  { name: "Porsche", logo: icons.hyundai },
 ];
 
 const CarFilter: React.FC<CarFilterProps> = ({
@@ -72,7 +72,7 @@ const CarFilter: React.FC<CarFilterProps> = ({
             resizeMode="contain"
           />
           <Text
-            className={`text-center ${
+            className={`text-center font-MontserratMedium ${
               selectedBrand === item.name
                 ? "text-white font-bold"
                 : "text-black"

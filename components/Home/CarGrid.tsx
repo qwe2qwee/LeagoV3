@@ -7,24 +7,13 @@ import {
   TouchableOpacity,
   Dimensions,
   StyleSheet,
-  ActivityIndicator,
 } from "react-native";
-import {
-  parseCarLocation,
-  parseDetails,
-  listCars,
-  likeCar,
-  hasUserLikedCar,
-} from "@/lib/appwrite/apit";
+import { parseDetails } from "@/lib/appwrite/apit";
 import { CarDocument } from "@/types/AppwriteTypes";
 import { router } from "expo-router";
-import {
-  cityTranslations,
-  getAvailableRentType,
-  getColorHashCode,
-} from "@/constants";
-import useAuthStore from "@/store/useAuthStore";
+import { cityTranslations, getColorHashCode } from "@/constants";
 import AvailableRentType from "../ui/AvailableRentType";
+import useCarStore from "@/store/CarStore";
 
 interface CarGridProps {
   selectedBrand: string | null;
@@ -33,7 +22,7 @@ interface CarGridProps {
   isRefreshing: boolean;
   language: "en" | "ar";
   cars: CarDocument[];
-  isLoading: boolean; // Add isLoading prop
+  isLoading: boolean;
 }
 
 const translations = {
@@ -42,14 +31,14 @@ const translations = {
     year: "Year",
     dailyRate: "/day",
     noCarsAvailable: "No cars available",
-    loading: "Loading cars...", // Translation for loading
+    loading: "Loading cars...",
   },
   ar: {
     city: "المدينة",
     year: "السنة",
     dailyRate: "/اليوم",
     noCarsAvailable: "لا توجد سيارات متاحة",
-    loading: "جاري تحميل السيارات...", // Arabic translation
+    loading: "جاري تحميل السيارات...",
   },
 };
 
@@ -74,15 +63,15 @@ const translateCity = (
   city: string | undefined,
   language: "en" | "ar"
 ): string => {
-  if (!city) return language === "ar" ? "غير معروف" : "Unknown"; // Default to "Unknown"
+  if (!city) return language === "ar" ? "غير معروف" : "Unknown";
   const translation = cityTranslations[city];
-  return translation ? translation[language] : city; // Fallback to the original if not found
+  return translation ? translation[language] : city;
 };
 
 const CarGrid: React.FC<CarGridProps> = ({ language, cars, isLoading }) => {
   const screenWidth = Dimensions.get("window").width;
   const { city, year, noCarsAvailable, loading } = translations[language];
-  const t = translationss[language]; // Select translation based on language
+  const t = translationss[language];
 
   const renderItem = ({ item }: { item: CarDocument }) => {
     const carDetails = Array.isArray(item.details)
@@ -98,6 +87,16 @@ const CarGrid: React.FC<CarGridProps> = ({ language, cars, isLoading }) => {
         activeOpacity={0.7}
         onPress={() => {
           if (carInfo.image && carInfo.rentType) {
+            useCarStore.getState().setCarParams({
+              carId: item?.$id,
+              carDetails: carInfo,
+              carName: item.brand ?? "Unknown",
+              carRentSalary: carInfo.rentType,
+              carImages: carInfo.image,
+              carImage: carInfo.image, // Assuming this is the main image
+              ownerId: item.ownerId ?? "N/A",
+              carCity: item.city ?? "N/A",
+            });
             router.push({
               pathname: "/screens/Home/CarDetailsPage",
               params: {
@@ -111,8 +110,6 @@ const CarGrid: React.FC<CarGridProps> = ({ language, cars, isLoading }) => {
                 carCity: item.city ?? "N/A",
               },
             });
-          } else {
-            console.error("Incomplete car details");
           }
         }}
         style={[styles.cardContainer, { width: screenWidth * 0.45 }]}
@@ -125,47 +122,89 @@ const CarGrid: React.FC<CarGridProps> = ({ language, cars, isLoading }) => {
         <View
           style={{
             display: "flex",
-            direction: language === "en" ? "rtl" : "ltr",
             justifyContent: "space-between",
-            alignItems: language === "ar" ? "flex-end" : "flex-start",
           }}
         >
-          <Text style={styles.carBrand}>{carInfo.name[language] ?? "N/A"}</Text>
+          <Text
+            className={`${
+              language === "ar"
+                ? "font-ZainBold text-right"
+                : "font-MontserratBold text-left"
+            } `}
+            style={styles.carBrand}
+          >
+            {carInfo.name[language] ?? "N/A"}
+          </Text>
+
           <View
             style={{ backgroundColor: color }}
-            className={`w-2 h-2 rounded-full border-[1px]`}
+            className={`w-2 h-2 rounded-full border-[1px] ${
+              language === "ar" ? "ml-auto" : "mr-auto"
+            }`}
           ></View>
 
           <AvailableRentType
-            rentType={carInfo.rentType} // Pass rentType from carInfo
-            containerStyle={{ marginVertical: 1 }} // Optional container style
-            textStyle={{ fontSize: 14, fontWeight: "" }} // Optional text style
+            rentType={carInfo.rentType}
+            containerStyle={{ marginVertical: 1 }}
+            textStyle={{ fontSize: 14 }}
           />
 
-          <Text style={styles.carCity}>{`${city}: ${translateCity(
-            item.city,
-            language
-          )}`}</Text>
-          <Text style={styles.carYear}>{`${year}: ${
-            carInfo.year ?? "N/A"
-          }`}</Text>
+          <Text
+            className={`${
+              language === "ar"
+                ? "font-ZainBold text-right"
+                : "font-MontserratMedium text-left"
+            }`}
+            style={styles.carCity}
+          >
+            {`${city}: ${translateCity(item.city, language)}`}
+          </Text>
+
+          <Text
+            className={`${
+              language === "ar"
+                ? "font-ZainBold text-right"
+                : "font-Montserrat text-left"
+            }`}
+            style={styles.carYear}
+          >
+            {`${year}: ${carInfo.year ?? "N/A"}`}
+          </Text>
         </View>
       </TouchableOpacity>
     );
   };
 
   if (isLoading) {
-    // Show loading indicator when loading
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>{loading}</Text>
+        <Text
+          className={`${
+            language === "ar"
+              ? "font-ZainMedium text-right"
+              : "font-MontserratMedium text-left"
+          }`}
+          style={styles.loadingText}
+        >
+          {loading}
+        </Text>
       </View>
     );
   }
 
   if (cars.length === 0) {
-    // Show no cars available when no data is present
-    return <Text style={styles.noCarsText}>{noCarsAvailable}</Text>;
+    return (
+      <Text
+        className={`${
+          language === "ar"
+            ? "font-ZainBold text-right"
+            : "font-MontserratBold text-left"
+        }`}
+        style={styles.noCarsText}
+      >
+        {noCarsAvailable}
+      </Text>
+    );
   }
 
   return (
@@ -180,6 +219,7 @@ const CarGrid: React.FC<CarGridProps> = ({ language, cars, isLoading }) => {
 };
 
 const styles = StyleSheet.create({
+  // Keep all your existing styles the same
   cardContainer: {
     backgroundColor: "white",
     margin: 8,
@@ -197,7 +237,6 @@ const styles = StyleSheet.create({
   },
   carBrand: {
     fontSize: 16,
-    fontWeight: "bold",
     marginTop: 8,
   },
   carPrice: {

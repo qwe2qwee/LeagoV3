@@ -7,7 +7,6 @@ import useAuthStore from "@/store/useAuthStore";
 import { listCars, parseCarLocation } from "@/lib/appwrite/apit";
 import CarFilter from "@/components/Home/CarFilter";
 import CarGrid from "@/components/Home/CarGrid";
-import { Text } from "react-native";
 
 const defaultLocation = { lat: 21.543333, lon: 39.172778 }; // Coordinates for Jeddah, SA
 
@@ -135,7 +134,7 @@ export default function HomeScreen() {
         isRefreshing={isRefreshing}
         userLocation={userLocation}
         selectedBrand={selectedBrand}
-        language={language}
+        language={"ar"}
       />
     </ParallaxScrollView>
   );

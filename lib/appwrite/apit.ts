@@ -981,17 +981,64 @@ export function parseDetails(details: any, lang: "en" | "ar" = "en") {
 }
 
 // Function to list car documents from the database
-export async function listCars(
-  queries?: any,
-  lang: "en" | "ar" = "en",
-  limit = 200,
-  offset = 0
-) {
+// export async function listCars(
+//   lang: "en" | "ar" = "en",
+//   limit = 200,
+//   offset = 0
+// ) {
+//   try {
+//     const response = await databases.listDocuments<CarDocument>(
+//       appwriteConfig.databaseId as string,
+//       appwriteConfig.carsCollectionId as string,
+//       [Query.offset(offset), Query.limit(limit), Query.orderDesc("$createdAt")]
+//     );
+
+//     return response.documents.map((car) => ({
+//       ...car,
+//       carLocation: parseCarLocation(car.carLocation, lang),
+//       details: parseDetails(car.details, lang),
+//     }));
+//   } catch (error) {
+//     console.error(
+//       lang === "en"
+//         ? "Unable to retrieve the car list. Please try again."
+//         : "تعذر استرجاع قائمة السيارات. حاول مرة أخرى.",
+//       error
+//     );
+//     throw new Error(
+//       lang === "en"
+//         ? "Unable to retrieve the car list. Please try again."
+//         : "تعذر استرجاع قائمة السيارات. حاول مرة أخرى."
+//     );
+//   }
+// }
+
+interface ListCarsParams {
+  lang?: "en" | "ar";
+  limit?: number;
+  offset?: number;
+  filters?: string[];
+}
+
+export async function listCars({
+  lang = "en",
+  limit = 20,
+  offset = 0,
+  filters = [],
+}: ListCarsParams = {}) {
   try {
+    const queries = [
+      Query.offset(offset),
+      Query.limit(limit),
+      Query.orderDesc("$createdAt"),
+      Query.notEqual("isHidden", true), // Filter hidden cars on server
+      ...filters,
+    ];
+
     const response = await databases.listDocuments<CarDocument>(
-      appwriteConfig.databaseId as string,
-      appwriteConfig.carsCollectionId as string,
-      [Query.offset(offset), Query.limit(limit), Query.orderDesc("$createdAt")]
+      appwriteConfig.databaseId!,
+      appwriteConfig.carsCollectionId!,
+      queries
     );
 
     return response.documents.map((car) => ({
@@ -1000,17 +1047,10 @@ export async function listCars(
       details: parseDetails(car.details, lang),
     }));
   } catch (error) {
-    console.error(
-      lang === "en"
-        ? "Unable to retrieve the car list. Please try again."
-        : "تعذر استرجاع قائمة السيارات. حاول مرة أخرى.",
-      error
-    );
-    throw new Error(
-      lang === "en"
-        ? "Unable to retrieve the car list. Please try again."
-        : "تعذر استرجاع قائمة السيارات. حاول مرة أخرى."
-    );
+    const errorMsg =
+      lang === "en" ? "Failed to load car list" : "فشل تحميل قائمة السيارات";
+    console.error(errorMsg, error);
+    throw new Error(errorMsg);
   }
 }
 
@@ -1037,6 +1077,45 @@ export async function searchCars(query: string, offset = 0, limit = 10) {
     throw error;
   }
 }
+
+interface SearchCarsParams {
+  query: string;
+  lang?: "en" | "ar";
+  searchField?: "brand" | "model";
+  offset?: number;
+  limit?: number;
+}
+
+// export async function searchCars({
+//   query,
+//   lang = "en",
+//   searchField = "brand",
+//   offset = 0,
+//   limit = 10,
+// }: SearchCarsParams) {
+//   try {
+//     const response = await databases.listDocuments<CarDocument>(
+//       appwriteConfig.databaseId!,
+//       appwriteConfig.carsCollectionId!,
+//       [
+//         Query.search(searchField, query),
+//         Query.limit(limit),
+//         Query.offset(offset),
+//         Query.notEqual("isHidden", true),
+//       ]
+//     );
+
+//     return response.documents.map((car) => ({
+//       ...car,
+//       carLocation: parseCarLocation(car.carLocation, lang),
+//       details: parseDetails(car.details, lang),
+//     }));
+//   } catch (error) {
+//     const errorMsg = lang === "en" ? "Search failed" : "فشل البحث";
+//     console.error(errorMsg, error);
+//     throw new Error(errorMsg);
+//   }
+// }
 
 // Function to create a new car document
 export const createCarDocument = async (

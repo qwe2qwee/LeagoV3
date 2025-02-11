@@ -1,3 +1,4 @@
+import useAuthStore from "@/store/useAuthStore";
 import React from "react";
 import { Pressable, Text, StyleSheet } from "react-native";
 
@@ -6,7 +7,7 @@ interface CustomButtonProps {
   onPress: () => void; // Function to execute on button press
   disabled?: boolean; // Whether the button is disabled
   textStyle?: string | object; // Additional text styles
-  className?: string | object; // Additional container styles
+  className?: any; // Additional container styles
 }
 
 const CustomButtonBook: React.FC<CustomButtonProps> = ({
@@ -16,6 +17,8 @@ const CustomButtonBook: React.FC<CustomButtonProps> = ({
   textStyle,
   className,
 }) => {
+  const { user, language } = useAuthStore();
+
   return (
     <Pressable
       onPress={onPress}
@@ -26,7 +29,14 @@ const CustomButtonBook: React.FC<CustomButtonProps> = ({
         disabled ? styles.disabledButton : styles.enabledButton,
       ]}
     >
-      <Text style={[styles.text]}>{title}</Text>
+      <Text
+        style={[styles.text]}
+        className={` text-center ${
+          language === "ar" ? " font-ZainRegular" : " font-Montserrat"
+        }`}
+      >
+        {title}
+      </Text>
     </Pressable>
   );
 };

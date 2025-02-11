@@ -8,7 +8,7 @@ import {
   listCars,
   searchCars,
 } from "@/lib/appwrite/apit";
-import { getColorHashCode } from "@/constants";
+import { cityTranslations, getColorHashCode } from "@/constants";
 import SearchBar from "@/components/Search/SearchBar";
 import {
   findBrandByPartialModel,
@@ -39,13 +39,14 @@ const Search = () => {
   const [cars, setCars] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const { query, clearQuery } = useSearchStore();
+  const [refreshing, setRefreshing] = useState(false);
 
   const [offset, setOffset] = useState(0);
   const [isEndReached, setIsEndReached] = useState(true);
-  const { latitude, longitude, language } = useAuthStore();
+  const { latitude, longitude } = useAuthStore();
   const LIMIT = 2;
-  let debounceTimeout: any;
 
+  const { language } = useAuthStore();
   const translations = {
     en: {
       search: "Search",
@@ -66,6 +67,15 @@ const Search = () => {
   };
 
   const t = translations[language];
+
+  const translateCity = (
+    city: string | undefined,
+    language: "en" | "ar"
+  ): string => {
+    if (!city) return language === "ar" ? "غير معروف" : "Unknown";
+    const translation = cityTranslations[city];
+    return translation ? translation[language] : city;
+  };
 
   // Function to load all cars initially using listCars
   const loadAllCars = async () => {
@@ -183,7 +193,9 @@ const Search = () => {
 
     const color = getColorHashCode(carInfo.color || "unknown");
     const distanceText =
-      item.distance > 100 ? `${item.city || "N/A"}` : `${item.distance} km`; // Display city if distance > 100 km
+      item.distance > 100
+        ? `${translateCity(item.city, language) || "N/A"}`
+        : `${item.distance} km`; // Display city if distance > 100 km
     return (
       <CarList
         carInfo={carInfo}
@@ -194,9 +206,22 @@ const Search = () => {
     );
   };
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      // Simulate a network request or refresh logic
+      await loadAllCars();
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
     >
       <SearchBar
         handleSearch={handleSearch}

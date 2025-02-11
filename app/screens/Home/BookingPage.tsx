@@ -123,8 +123,22 @@ const BookingPage: React.FC = () => {
             />
           </Pressable>
         </View>
-        <Text style={styles.title}>{t.bookingDetails}</Text>
-        <Text style={[language === "ar" ? styles.labelAr : styles.labelEn]}>
+        <Text
+          style={styles.title}
+          className={` ${
+            language === "ar" ? " font-ZainRegular" : " font-Montserrat"
+          }`}
+        >
+          {t.bookingDetails}
+        </Text>
+        <Text
+          style={[language === "ar" ? styles.labelAr : styles.labelEn]}
+          className={` ${
+            language === "ar"
+              ? "text-right font-ZainRegular"
+              : "text-left font-Montserrat"
+          }`}
+        >
           {t.selectRentalPeriod}
         </Text>
 
@@ -156,6 +170,9 @@ const BookingPage: React.FC = () => {
                   !parsedCarRentSalary[period]?.availability &&
                     styles.disabledText,
                 ]}
+                className={` ${
+                  language === "ar" ? " font-ZainRegular" : " font-Montserrat"
+                }`}
               >
                 {t[period]}
               </Text>
@@ -164,14 +181,28 @@ const BookingPage: React.FC = () => {
         </View>
 
         {/* Start Date */}
-        <Text style={[language === "ar" ? styles.labelAr : styles.labelEn]}>
+        <Text
+          style={[language === "ar" ? styles.labelAr : styles.labelEn]}
+          className={` ${
+            language === "ar"
+              ? "text-right font-ZainRegular"
+              : "text-left font-Montserrat"
+          }`}
+        >
           {t.startDate}
         </Text>
         <Pressable
           onPress={() => setShowDatePicker("start")}
           style={styles.datePicker}
         >
-          <Text style={styles.dateText}>
+          <Text
+            style={styles.dateText}
+            className={` ${
+              language === "ar"
+                ? "text-right font-ZainRegular"
+                : "text-left font-Montserrat"
+            }`}
+          >
             {startDate ? startDate.toDateString() : t.selectStartDate}
           </Text>
         </Pressable>
@@ -179,19 +210,38 @@ const BookingPage: React.FC = () => {
         {/* End Date (Daily Only) */}
         {rentalPeriod === "daily" && (
           <>
-            <Text style={[language === "ar" ? styles.labelAr : styles.labelEn]}>
+            <Text
+              style={[language === "ar" ? styles.labelAr : styles.labelEn]}
+              className={` ${
+                language === "ar"
+                  ? "text-right font-ZainRegular"
+                  : "text-left font-Montserrat"
+              }`}
+            >
               {t.endDate}
             </Text>
             <Pressable
               onPress={() => setShowDatePicker("end")}
               style={styles.datePicker}
             >
-              <Text style={styles.dateText}>
+              <Text
+                style={styles.dateText}
+                className={` ${
+                  language === "ar"
+                    ? "text-right font-ZainRegular"
+                    : "text-left font-Montserrat"
+                }`}
+              >
                 {endDate ? endDate.toDateString() : t.selectEndDate}
               </Text>
             </Pressable>
             {startDate && endDate && (
-              <Text style={styles.infoText}>
+              <Text
+                style={styles.infoText}
+                className={` text-center ${
+                  language === "ar" ? " font-ZainRegular" : " font-Montserrat"
+                }`}
+              >
                 {t.totalDays}: {calculateDays(startDate, endDate)}
               </Text>
             )}
@@ -220,6 +270,11 @@ const BookingPage: React.FC = () => {
 
         {/* Total Price */}
         <Text
+          className={` ${
+            language === "ar"
+              ? "text-right font-ZainRegular"
+              : "text-left font-Montserrat"
+          }`}
           style={[
             language === "ar" ? styles.totalPriceAr : styles.totalPriceEn,
           ]}
