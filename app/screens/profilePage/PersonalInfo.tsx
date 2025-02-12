@@ -123,7 +123,13 @@ const PersonalInfo = () => {
         info={user?.details?.name || "الاسم"}
       />
       <View className="justify-center items-center p-6 pb-0 b">
-        <Text className="text-right  w-full font-ZainBold text-[#78828A]">
+        <Text
+          className={`  w-full  text-[#78828A] ${
+            language === "ar"
+              ? "font-ZainBold text-right"
+              : "font-MontserratBold text-left"
+          }   `}
+        >
           {personalInfoPageTranslator.dateOfBirth}
         </Text>
         <View
@@ -154,7 +160,13 @@ const PersonalInfo = () => {
             <Modal animationIn="slideInUp" coverScreen isVisible={open}>
               <View className=" justify-center items-center mt-6 ">
                 <View className=" bg-white rounded-2xl w-[90%] p-9 items-center justify-center shadow-lg shadow-slate-600">
-                  <Text className="text-lg font-ZainBold pb-2">
+                  <Text
+                    className={`text-lg pb-2 ${
+                      language === "ar"
+                        ? "font-ZainBold "
+                        : "font-MontserratBold "
+                    }   `}
+                  >
                     {personalInfoPageTranslator.dateOfBirth}
                   </Text>
                   <DateTimePicker
@@ -164,7 +176,13 @@ const PersonalInfo = () => {
                     selectedItemColor="#FF5733"
                   />
                   <TouchableOpacity onPress={handleOnPress}>
-                    <Text className="font-ZainBold text-primary-400">
+                    <Text
+                      className={`text-primary-400 pb-2 ${
+                        language === "ar"
+                          ? "font-ZainBold "
+                          : "font-MontserratBold "
+                      }   `}
+                    >
                       {pageButtonTranslator.accept}
                     </Text>
                   </TouchableOpacity>
@@ -189,7 +207,13 @@ const PersonalInfo = () => {
           className="flex flex-row-reverse w-3/6 items-center justify-center border-b border-[#E9EBED] pb-5 pt-3"
           onPress={handleSaveModal}
         >
-          <Text className="pr-4 font-ZainBold text-primary-500 text-center">
+          <Text
+            className={` text-primary-500 text-center ${
+              language === "ar"
+                ? "font-ZainBold  pr-4  "
+                : "font-MontserratBold  pl-4  "
+            }   `}
+          >
             {pageButtonTranslator.saveChanges}
           </Text>
         </TouchableOpacity>
@@ -197,7 +221,13 @@ const PersonalInfo = () => {
           <View className="justify-center items-center mt-6 w-full h-full ">
             <View className="bg-white w-80 h-64 mx-auto rounded-2xl justify-center items-center ">
               <View className="p-16 pb-8">
-                <Text className="text-center text-lg font-ZainBold">
+                <Text
+                  className={` text-center text-lg ${
+                    language === "ar"
+                      ? "font-ZainBold "
+                      : "font-MontserratBold "
+                  }   `}
+                >
                   {pageButtonTranslator.agreementQuestion}
                 </Text>
               </View>
@@ -210,7 +240,13 @@ const PersonalInfo = () => {
                   {loading ? (
                     <ActivityIndicator color="#fff" />
                   ) : (
-                    <Text className="text-center text-white font-ZainBold">
+                    <Text
+                      className={` text-center text-white ${
+                        language === "ar"
+                          ? "font-ZainBold "
+                          : "font-MontserratBold "
+                      }   `}
+                    >
                       {pageButtonTranslator.accept}
                     </Text>
                   )}
@@ -219,7 +255,13 @@ const PersonalInfo = () => {
                   onPress={handleSaveModal}
                   className="mt-4 flex justify-center items-center "
                 >
-                  <Text className="text-primary-500 font-ZainBold">
+                  <Text
+                    className={` text-center text-primary-500 ${
+                      language === "ar"
+                        ? "font-ZainBold "
+                        : "font-MontserratBold "
+                    }   `}
+                  >
                     {pageButtonTranslator.cancel}{" "}
                   </Text>
                 </TouchableOpacity>

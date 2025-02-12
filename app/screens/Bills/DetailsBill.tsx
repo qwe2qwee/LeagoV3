@@ -35,6 +35,7 @@ const translations = {
     mapError: "Failed to load map",
     invalidCoordinates: "Invalid coordinates",
     openMap: "Open in Maps",
+    rciptNumber: "Receipt Number",
   },
   ar: {
     noDetails: "تفاصيل الحجز غير موجودة.",
@@ -52,6 +53,7 @@ const translations = {
     mapError: "فشل تحميل الخريطة",
     invalidCoordinates: "إحداثيات غير صالحة",
     openMap: "فتح الخريطة",
+    rciptNumber: " رقم الفاتورة",
   },
 };
 
@@ -162,8 +164,8 @@ const DetailsBill = () => {
               : "font-Montserrat text-left"
           } `}
         >
-          {reservation.payId ? reservation.payId : reservation.carName} : رقم
-          الفاتورة
+          {t.rciptNumber} :{" "}
+          {reservation.payId ? reservation.payId : reservation.carName}
         </Text>
         <Text
           className={`mb-4  ${

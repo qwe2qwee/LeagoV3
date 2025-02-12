@@ -1,15 +1,7 @@
-import {
-  View,
-  Text,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Image,
-  TextInput,
-  Platform,
-  Keyboard,
-} from "react-native";
+import { View, Text, TextInput } from "react-native";
 import React from "react";
 import { InputFieldProps } from "@/types/type";
+import useAuthStore from "@/store/useAuthStore";
 
 const InputFieldAddress = ({
   label,
@@ -21,9 +13,17 @@ const InputFieldAddress = ({
   onChangeText,
   ...props
 }: InputFieldProps) => {
+  const { language } = useAuthStore();
+
   return (
     <View className="justify-center items-end p-6 pb-0">
-      <Text className={`text-right font-ZainBold text-[#78828A] ${labelStyle}`}>
+      <Text
+        className={` text-[#78828A] ${
+          language === "ar"
+            ? "font-ZainBold text-right"
+            : "font-MontserratBold text-left"
+        }  ${labelStyle} `}
+      >
         {label}
       </Text>
       <View

@@ -68,7 +68,15 @@ const RadioButton: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{translator.gender}</Text>
+      <Text
+        className={` text-[#78828A] w-full  ${
+          language === "ar"
+            ? "font-ZainBold text-right"
+            : "font-MontserratBold text-left"
+        }   `}
+      >
+        {translator.gender}
+      </Text>
       <View style={styles.optionsContainer}>
         <GenderOption genderType="male" />
         <GenderOption genderType="female" />

@@ -48,7 +48,6 @@ export default function HomeScreen() {
         const offset = (currentPage - 1) * 2;
 
         const fetchedCars = await listCars({
-          queries: [],
           lang: language,
           limit: 200,
           offset,
@@ -134,7 +133,7 @@ export default function HomeScreen() {
         isRefreshing={isRefreshing}
         userLocation={userLocation}
         selectedBrand={selectedBrand}
-        language={"ar"}
+        language={language}
       />
     </ParallaxScrollView>
   );

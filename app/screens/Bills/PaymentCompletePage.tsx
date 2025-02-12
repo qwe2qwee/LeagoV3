@@ -57,7 +57,7 @@ const translations = {
 
 const PaymentCompletePage = () => {
   const { paymentId } = useLocalSearchParams();
-  const { user, language } = useAuthStore();
+  const { language } = useAuthStore();
 
   const t = translations[language]; // Get translations based on the language
 
