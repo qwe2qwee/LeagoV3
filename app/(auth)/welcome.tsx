@@ -9,13 +9,17 @@ import useAuthStore from "@/store/useAuthStore";
 import CustomButtonAuth from "@/components/Auth/CustomButtonAuth";
 
 // Define a type for the language
-type Language = "en" | "ar";
+
+
+
 
 const Onboarding: React.FC = () => {
   const swiperRef = useRef<Swiper>(null);
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const isLastSlide = activeIndex === onboarding.length - 1;
   const { language, user, loading } = useAuthStore();
+  const changelangS =
+    language === "ar" ? "font-ZainBold" : "font-MontserratSemiBold";
 
   return (
     <SafeAreaView className="flex h-full items-center justify-between bg-white">
@@ -40,7 +44,7 @@ const Onboarding: React.FC = () => {
                 disabled={loading}
                 className="w-full flex justify-end items-end p-5"
               >
-                <Text className="text-black text-lg font-JakartaBold">
+                <Text className={`text-black text-lg font-JakartaBold ${changelangS}`}>
                   {item.skip[language]}
                 </Text>
               </TouchableOpacity>
@@ -55,22 +59,14 @@ const Onboarding: React.FC = () => {
             />
             <View className="flex flex-row items-center justify-center mt-5">
               <Text
-                className={`text-black text-3xl mx-10 text-center ${
-                  (language as any) === "en"
-                    ? "font-MontserratBold"
-                    : "font-ZainBold"
-                }`}
+                className={`text-black text-3xl mx-10 text-center ${changelangS}`}
               >
                 {item.title[language]}{" "}
                 {/* Display title in the selected language */}
               </Text>
             </View>
             <Text
-              className={`text-[#858585] text-base font-JakartaSemiBold text-center mx-10 mt-3 ${
-                (language as any) === "en"
-                  ? "font-MontserratRegular"
-                  : "font-ZainRegular"
-              }`}
+              className={`text-[#858585] text-base font-JakartaSemiBold text-center mx-10 mt-3 ${changelangS}`}
             >
               {item.description[language]}{" "}
               {/* Display description in the selected language */}
@@ -94,6 +90,7 @@ const Onboarding: React.FC = () => {
         loading={loading}
         disabled={loading}
         className="w-11/12 mt-4 mb-8 rounded-xl"
+        textStyle={`text-xl ${changelangS}`}
       />
     </SafeAreaView>
   );

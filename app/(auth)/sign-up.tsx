@@ -54,7 +54,7 @@ const signUp = () => {
   const gender = "other";
   const address = "unknown";
   const changelangS =
-    language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold";
+    language === "ar" ? "font-ZainBold" : "font-MontserratSemiBold";
 
   const showError = (message: string, success: boolean) => {
     setErrorMessage(message);

@@ -114,7 +114,7 @@ const signIn = () => {
   };
 
   let changelangS =
-    language === "ar" ? "font-ZainBoldn" : "font-MontserratSemiBold";
+    language === "ar" ? "font-ZainBold" : "font-MontserratSemiBold";
 
   return (
     <KeyboardAvoidingView
@@ -163,7 +163,7 @@ const signIn = () => {
                     className="flex-row px-3"
                     onPress={() => router.push("/(auth)/reset/email")}
                   >
-                    <Text className="text-[#F61F1F] text-xs underline">
+                    <Text className={`text-[#F61F1F] text-xs underline ${changelangS}`}>
                       {t.forgotPassword}
                     </Text>
                   </TouchableOpacity>
