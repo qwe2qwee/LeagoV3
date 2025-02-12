@@ -1,4 +1,5 @@
 import { translationModalReset } from "@/constants";
+import useAuthStore from "@/store/useAuthStore";
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Modal from "react-native-modal";
@@ -18,9 +19,13 @@ const ErrorModal: React.FC<ErrorModalProps> = ({
   message,
   isSecuss,
   onClose,
-  language = "ar", // Default language is Arabic
 }) => {
+
+  const { language } = useAuthStore();
   const t = translationModalReset[language];
+
+  const changelangS =
+    language === "ar" ? "font-ZainBold" : "font-MontserratSemiBold";
 
   return (
     <Modal
@@ -32,12 +37,12 @@ const ErrorModal: React.FC<ErrorModalProps> = ({
       useNativeDriver
     >
       <View style={styles.modalContainer}>
-        <Text style={[isSecuss ? styles.titleSuccess : styles.titleError]}>
+        <Text style={[isSecuss ? styles.titleSuccess : styles.titleError]} className={`${changelangS}`}>
           {isSecuss ? t.successTitle : t.errorTitle}
         </Text>
-        <Text style={styles.message}>{message}</Text>
+        <Text style={styles.message} className={`${changelangS}`}>{message}</Text>
         <TouchableOpacity style={styles.button} onPress={onClose}>
-          <Text style={styles.buttonText}>{t.buttonText}</Text>
+          <Text style={styles.buttonText} className={`${changelangS}`}>{t.buttonText} </Text>
         </TouchableOpacity>
       </View>
     </Modal>

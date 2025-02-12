@@ -492,7 +492,7 @@ export const translationsVerificationForgot = {
 export const translationModalReset = {
   ar: {
     successTitle: "نجاح",
-    errorTitle: "خطاء",
+    errorTitle: "خطأ",
     buttonText: "موافق",
   },
   en: {
