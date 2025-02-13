@@ -17,6 +17,40 @@ import { updatePayStatusInAppwrite } from "@/lib/appwrite/apit";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { moyasarConfig } from "@/lib/appwrite/config";
 import { icons } from "@/constants";
+import useAuthStore from "@/store/useAuthStore";
+
+const translations = {
+  en: {
+    title: "Payment Details",
+    name: "Cardholder Name",
+    cardNumber: "Card Number",
+    expiry: "MM/YY",
+    cvc: "CVC",
+    payNow: "Pay Now",
+    totalAmount: "Total Amount",
+    currency: "SAR",
+    paymentSuccess: "Payment Successful",
+    paymentFailed: "Payment Failed",
+    error: "Error",
+    retry: "Try Again",
+    back: "Back",
+  },
+  ar: {
+    title: "تفاصيل الدفع",
+    name: "اسم صاحب البطاقة",
+    cardNumber: "رقم البطاقة",
+    expiry: "شهر/سنة",
+    cvc: "رمز التحقق",
+    payNow: "ادفع الآن",
+    totalAmount: "المبلغ الإجمالي",
+    currency: "ريال",
+    paymentSuccess: "تم الدفع بنجاح",
+    paymentFailed: "فشل في الدفع",
+    error: "خطأ",
+    retry: "حاول مرة أخرى",
+    back: "عودة",
+  },
+};
 
 const PaymentScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -26,6 +60,9 @@ const PaymentScreen: React.FC = () => {
   const [expiry, setExpiry] = useState<string>("");
 
   const { total, reservationId } = useLocalSearchParams() as any;
+  const { language } = useAuthStore();
+
+  const t = translations[language];
 
   const createPayment = async () => {
     const url = moyasarConfig.url || "";
@@ -130,13 +167,13 @@ const PaymentScreen: React.FC = () => {
           </View>
 
           <CustomTextInput
-            placeholder="الاسم"
+            placeholder={t.name}
             value={name}
             onChangeText={setName}
             containerStyle="w-[98%] px-0"
           />
           <CustomTextInput
-            placeholder="رقم البطاقة"
+            placeholder={t.cardNumber}
             value={number}
             onChangeText={setNumber}
             keyboardType="numeric"
@@ -145,14 +182,14 @@ const PaymentScreen: React.FC = () => {
 
           <View className="flex-row justify-between  mb-4 max-w-[100vw] ">
             <CustomTextInput
-              placeholder="MM/YY"
+              placeholder={t.expiry}
               value={expiry}
               onChangeText={setExpiry}
               keyboardType="numbers-and-punctuation"
               containerStyle={"w-[45%] mr-3"}
             />
             <CustomTextInput
-              placeholder="CVC"
+              placeholder={t.cvc}
               value={cvc}
               onChangeText={setCvc}
               keyboardType="numeric"
@@ -164,15 +201,17 @@ const PaymentScreen: React.FC = () => {
         <View className="w-full h-2/5 px-6  flex-col-reverse justify-center items-center">
           <View className="w-[50%] px-1 justify-center items-center">
             <CustomButton
-              title="ادفع الان"
+              title={t.payNow}
               onPress={createPayment}
               loading={isLoading}
               className="w-full my-2 p-3 bg-primary "
             />
           </View>
           <View className="w-[50%] px-1 justify-center items-center py-10">
-            <Text className="font-zainRegular"> المبلغ الإجمالي</Text>
-            <Text className="font-zainRegular text-xl">{total} ريال</Text>
+            <Text className="font-zainRegular"> {t.totalAmount}</Text>
+            <Text className="font-zainRegular text-xl">
+              {total} {t.currency}
+            </Text>
           </View>
         </View>
       </KeyboardAvoidingView>

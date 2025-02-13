@@ -81,7 +81,11 @@ const ContactUs = () => {
       </View>
       <View className="w-80 mx-10 mt-20">
         <TouchableOpacity
-          className="flex flex-row-reverse w-full items-center justify-start border-b border-[#E9EBED] pb-5 pt-3"
+          className={` flex w-full items-center border-b border-[#E9EBED] pb-5 pt-3 ${
+            language === "ar"
+              ? "flex-row-reverse justify-start "
+              : "justify-start flex-row "
+          } `}
           onPress={() => contact("whatsapp", phoneNumber)}
         >
           <Image
@@ -89,21 +93,41 @@ const ContactUs = () => {
             resizeMode="contain"
             className="w-7 h-7"
           />
-          <Text className="pr-4 font-ZainBold">{translator.whatsappChat}</Text>
+          <Text
+            className={`${
+              language === "ar"
+                ? "font-ZainExtraBold pr-4"
+                : "font-MontserratBold pl-4"
+            }  `}
+          >
+            {translator.whatsappChat}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          className="flex flex-row-reverse w-full items-center justify-start border-b border-[#E9EBED] pb-5 pt-3 mt-4"
+          className={` flex w-full items-center border-b border-[#E9EBED] pb-5 pt-3 mt-4 ${
+            language === "ar"
+              ? "flex-row-reverse justify-start "
+              : "justify-start flex-row "
+          } `}
           onPress={() => contact("email", email, subject, body)}
         >
           <Image source={icons.mail} resizeMode="contain" className="w-7 h-7" />
-          <Text className="pr-4 font-ZainBold">{translator.email}</Text>
+          <Text
+            className={`${
+              language === "ar"
+                ? "font-ZainExtraBold pr-4"
+                : "font-MontserratBold pl-4"
+            }  `}
+          >
+            {translator.email}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           className="p-6 mx-auto mt-4"
           onPress={() => router.push("/screens/profilePage/TermsAndConditions")}
         >
           <Text
-            className={`text-primary-400 ${
+            className={`text-primary-400 text-center ${
               language == "ar" ? "font-ZainRegular" : "font-MontserratMedium"
             }`}
           >
@@ -111,10 +135,22 @@ const ContactUs = () => {
           </Text>
         </TouchableOpacity>
         <View className=" w-80 border-b border-[#E9EBED] mt-10">
-          <Text className="font-ZainBold">
+          <Text
+            className={` ${
+              language === "ar"
+                ? "font-ZainBold text-right "
+                : "font-MontserratBold  text-left"
+            }   `}
+          >
             {companyAddressTranslator.companyName}
           </Text>
-          <Text className="font-ZainRegular">
+          <Text
+            className={` ${
+              language === "ar"
+                ? "font-ZainBold text-right "
+                : "font-MontserratBold  text-left"
+            }   `}
+          >
             {companyAddressTranslator.Address}
           </Text>
         </View>

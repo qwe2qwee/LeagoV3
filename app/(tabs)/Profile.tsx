@@ -19,6 +19,8 @@ import ParallaxScrollView from "@/components/ParallaxScrollView";
 
 const profile = () => {
   const { language, logout, user } = useAuthStore();
+  // const language = "en";
+
   const fieldTranslator = profilePage[language];
   const SecTranslator = profileSections[language];
   const logOutTranslator = logOutModal[language];
@@ -54,8 +56,11 @@ const profile = () => {
           <>
             <View className="itmes-center justify-center">
               <Text
-                className="text-sm pr-10 py-2.5 font-ZainBold"
-                style={{ textAlign: language === "ar" ? "right" : "left" }}
+                className={`text-sm pr-10 py-2.5 ${
+                  language === "ar"
+                    ? "font-ZainBold text-right "
+                    : "font-MontserratBold text-left "
+                } `}
               >
                 {SecTranslator.account}
               </Text>
