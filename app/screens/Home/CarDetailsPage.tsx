@@ -1,11 +1,13 @@
-import React from "react";
-import { View, Text, Image, Pressable } from "react-native";
+import React, { useState } from "react";
+import { View, Text, Image, Pressable, Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import CustomButton from "@/components/ui/CustomButton";
 import { cityTranslations, getColorHashCode, icons } from "@/constants";
 import useAuthStore from "@/store/useAuthStore";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import AvailableRentType from "@/components/ui/AvailableRentType";
+import { checkDocumentExists } from "@/lib/appwrite/apit";
+import ModalError from "@/components/Home/ModalError";
 
 interface CarDetails {
   name: { [key: string]: string };
@@ -21,6 +23,9 @@ interface RentSalary {
 }
 
 const CarDetailsPage: React.FC = () => {
+  const [showError, setShowError] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const {
     carId,
     carDetails,
@@ -230,22 +235,54 @@ const CarDetailsPage: React.FC = () => {
         <CustomButton
           title={translations[language].bookNow}
           className="rounded-lg mt-6 p-4"
-          onPress={() => {
-            if (!user) {
-              router.replace({
-                pathname: "/(auth)/sign-in",
-              });
-              return;
-            }
-            if (carId) {
+          loading={loading}
+          onPress={async () => {
+            try {
+              // Check authentication first
+              if (!user) {
+                router.replace({ pathname: "/(auth)/sign-in" });
+                return;
+              }
+
+              setLoading(true);
+              setShowError(false); // Reset error state
+
+              // Parallel document checks
+              const [hasIdentity, hasLicense] = await Promise.all([
+                checkDocumentExists(user.$id, "identity"),
+                checkDocumentExists(user.$id, "license"),
+              ]);
+
+              // Validate documents before proceeding
+              if (!hasIdentity || !hasLicense) {
+                setShowError(true);
+
+                return;
+              }
+
+              // Validate car ID
+              if (!carId) {
+                Alert.alert("Error", "Missing car information");
+                return;
+              }
+
+              // Navigate only after all validations
               router.push({
                 pathname: "/screens/Home/BookingPage",
                 params: { carId, carRentSalary, ownerId },
               });
-            } else {
-              console.error("carId is missing.");
+            } catch (error) {
+              console.error("Booking error:", error);
+            } finally {
+              setLoading(false);
             }
           }}
+        />
+        <ModalError
+          isVisible={showError}
+          errorType="fileSize"
+          onClose={() => setShowError(false)}
+          onRetry={() => router.replace("/screens/Auth/SelectUsersDocsPage")}
         />
       </View>
     </ParallaxScrollView>

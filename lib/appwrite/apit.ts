@@ -7,6 +7,7 @@ import {
   SessionResponse,
 } from "@/types/AppwriteTypes";
 import {
+  AppwriteException,
   ID,
   Models,
   Query,
@@ -396,6 +397,39 @@ export async function isUserNameExisting(userName: string): Promise<boolean> {
   }
 }
 
+export const checkDocumentExists = async (
+  userId: string,
+  docType: "identity" | "license"
+): Promise<boolean> => {
+  try {
+    const field = `${docType}Url`;
+    const response = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.userdocs,
+      [
+        Query.equal("userId", userId),
+        Query.isNotNull(field), // Explicit null check
+        Query.limit(1), // Optimize query for existence check
+      ]
+    );
+
+    // Strict check for valid URL format
+    const hasValidUrl = response.documents.some((doc) => {
+      const url = doc[field];
+      return url && typeof url === "string" && url.startsWith("http");
+    });
+
+    return response.total > 0 && hasValidUrl;
+  } catch (error) {
+    if (error instanceof AppwriteException) {
+      console.error(`Appwrite Error (${error.code}): ${error.message}`);
+    } else {
+      console.error("Unexpected error:", error);
+    }
+    return false;
+  }
+};
+
 // Function to transliterate Arabic name to English
 export function transliterateArabicToEnglish(name: string): string {
   // Helper function to check if a character is Arabic
@@ -438,66 +472,76 @@ interface PickedFile {
   type: string;
 }
 
-// Example upload function
 export async function uploadUserDocument(
   file: PickedFile,
   type: "identity" | "license"
 ): Promise<string> {
   const user = await account.get();
+  let storageFileId: string | null = null;
+
   try {
-    // Upload file to storage
+    // 1. Upload file to storage first
     const fileResponse = await storage.createFile(
       appwriteConfig.storageIdDocs,
       ID.unique(),
-      file // cast or adjust as needed based on Appwrite SDK types
+      file
     );
-
-    // Get file URL
+    storageFileId = fileResponse.$id;
     const fileUrl = storage.getFilePreview(
       appwriteConfig.storageIdDocs,
-      fileResponse.$id
+      storageFileId
     );
 
-    // Update user document
-    const existingDoc = await databases.listDocuments(
-      appwriteConfig.databaseId,
-      appwriteConfig.userdocs,
+    // 2. Atomic document operation with conflict resolution
+    const updateData = {
+      [type === "identity" ? "identityUrl" : "licenseUrl"]: fileUrl,
+    };
 
-      [Query.equal("userId", user.$id)]
-    );
-
-    if (existingDoc.documents.length > 0) {
-      // Update existing document
-      await databases.updateDocument(
-        appwriteConfig.databaseId,
-        appwriteConfig.userdocs,
-
-        existingDoc.documents[0].$id,
-        {
-          [type === "identity" ? "identityUrl" : "licenseUrl"]: fileUrl,
-        }
-      );
-    } else {
-      // Create new document
+    try {
+      // Try to create new document (will fail if exists due to unique constraint)
       await databases.createDocument(
         appwriteConfig.databaseId,
         appwriteConfig.userdocs,
-
-        ID.unique(),
+        user.$id, // Use user ID as document ID for true 1:1 relationship
         {
           userId: user.$id,
-          identityUrl: type === "identity" ? fileUrl : "",
-          licenseUrl: type === "license" ? fileUrl : "",
+          ...updateData,
+          // Initialize other field as empty string
+          ...(type === "identity" ? { licenseUrl: "" } : { identityUrl: "" }),
         }
       );
+    } catch (createError) {
+      console.log(createError);
+
+      if (createError.code === 409) {
+        // Document exists, update it
+        await databases.updateDocument(
+          appwriteConfig.databaseId,
+          appwriteConfig.userdocs,
+          user.$id, // Known document ID
+          updateData
+        );
+      } else {
+        throw createError;
+      }
     }
 
-    return fileUrl as any;
+    return fileUrl.href;
   } catch (error) {
-    console.error("Error in uploadUserDocument:", error);
-    throw new Error("Failed to upload document");
+    // Cleanup uploaded file if any error occurs after upload
+    if (storageFileId) {
+      await storage
+        .deleteFile(appwriteConfig.storageIdDocs, storageFileId)
+        .catch((cleanupError) =>
+          console.error("File cleanup failed:", cleanupError)
+        );
+    }
+
+    console.error("Upload error:", error);
+    throw new Error(`Document upload failed: ${error.message}`);
   }
 }
+``;
 
 // Function to get email by phone number
 export const getEmailByPhoneNumber = async (

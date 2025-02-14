@@ -1,5 +1,5 @@
 import { View, Text, Pressable, Image } from "react-native";
-import React, { useState } from "react";
+import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { address, pageTitle } from "@/constants/profilePage";
 import useAuthStore from "@/store/useAuthStore";
@@ -26,7 +26,9 @@ const Address = () => {
           />
         </Pressable>
         <Text
-          className={`${language === "ar" ? "font-ZainExtraBold" : "font-MontserratBold"} text-center text-[#272B3B] `}
+          className={`${
+            language === "ar" ? "font-ZainExtraBold" : "font-MontserratBold"
+          } text-center text-[#272B3B] `}
         >
           {pageTitleTranslator.myAddress}
         </Text>

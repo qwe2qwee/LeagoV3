@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Alert, Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet } from "react-native";
 import { router } from "expo-router"; // For navigation
 import CustomButton from "@/components/ui/CustomButton";
 import { translationReset } from "@/constants";

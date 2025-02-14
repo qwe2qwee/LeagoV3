@@ -82,7 +82,7 @@ const isValidCoordinate = (num: number) =>
 
 const DetailsBill = () => {
   const { reservation: reservationString } = useLocalSearchParams();
-  const { user, language } = useAuthStore();
+  const { language } = useAuthStore();
   const t = translations[language];
 
   const router = useRouter();
