@@ -11,12 +11,14 @@ import {
   Image,
   Linking,
   Platform,
+  InteractionManager,
 } from "react-native";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import { cities, icons } from "@/constants";
 import useAuthStore from "@/store/useAuthStore";
 import { appwriteConfig } from "@/lib/appwrite/config";
+import { push } from "expo-router/build/global-state/routing";
 
 interface Neighborhood {
   name: {
@@ -34,6 +36,7 @@ interface City {
 
 const AddressSelectionPage = () => {
   const [selectedCity, setSelectedCity] = useState<City | null>(null);
+  const [showBottun, setShowButton] = useState(false);
   const [selectedNeighborhood, setSelectedNeighborhood] =
     useState<Neighborhood | null>(null);
   const [userLocation, setUserLocation] = useState<{
@@ -77,6 +80,30 @@ const AddressSelectionPage = () => {
       }
     })();
   }, []);
+
+  const handleshowButton = async () => {
+    if (!userLocation) {
+      console.error("User location is null, cannot update location");
+      return;
+    }
+
+    setSelectedCity(null);
+    setSelectedNeighborhood(null);
+
+    try {
+      setLoading(true);
+      updateLocation(userLocation.lat, userLocation.lon);
+      await InteractionManager.runAfterInteractions();
+      setLoading(true);
+      setTimeout(() => {
+        setShowButton(true);
+        setLoading(false);
+        router.push("/(tabs)/Profile");
+      }, 5000);
+    } catch (error) {
+      console.error("Error updating location", error);
+    }
+  };
 
   const isValidCoordinate = (lat: number, lon: number) =>
     !isNaN(lat) &&
@@ -139,51 +166,6 @@ const AddressSelectionPage = () => {
     }
   };
 
-  const openMapsApp = async () => {
-    const coords = selectedNeighborhood || userLocation || DEFAULT_COORDS;
-    console.log(Platform.OS);
-
-    // Try Apple Maps on iOS
-    if (Platform.OS === "ios") {
-      const appleMapsUrl = `http://maps.apple.com/?ll=${coords.lat},${coords.lon}`;
-      const canOpen = await Linking.canOpenURL(appleMapsUrl);
-      if (canOpen) {
-        Linking.openURL(appleMapsUrl).catch(() => showMapError());
-        return;
-      }
-    }
-
-    // Try Google Maps on Android (if available)
-    if (Platform.OS === "android") {
-      const googleMapsUrl = `https://www.google.com/maps?q=${coords.lat},${coords.lon}`;
-      const canOpen = await Linking.canOpenURL(googleMapsUrl);
-      if (canOpen) {
-        Linking.openURL(googleMapsUrl).catch(() => showMapError());
-        return;
-      }
-    }
-
-    // Fallback for Huawei devices (or devices without Google Maps)
-    const geoapifyUrl = `https://www.geoapify.com/redirect?to=streetmap&lat=${coords.lat}&lon=${coords.lon}`;
-    const canOpen = await Linking.canOpenURL(geoapifyUrl);
-    if (canOpen) {
-      Linking.openURL(geoapifyUrl).catch(() => showMapError());
-      return;
-    }
-
-    // If no maps app is available, show an error
-    showMapError();
-  };
-
-  const showMapError = () => {
-    Alert.alert(
-      language === "ar" ? "خطأ" : "Error",
-      language === "ar"
-        ? "تعذر فتح الخريطة. يرجى تثبيت تطبيق خرائط."
-        : "Failed to open maps. Please install a maps app."
-    );
-  };
-
   // Simplified Image Component
   const renderMapImage = () => {
     const coords = selectedNeighborhood || userLocation || DEFAULT_COORDS;
@@ -228,7 +210,14 @@ const AddressSelectionPage = () => {
               ]}
               onPress={() => handleCitySelect(item)}
             >
-              <Text style={styles.buttonText}>{item.name}</Text>
+              <Text
+                style={[
+                  styles.buttonText,
+                  selectedCity?.name === item.name && styles.buttonTextS,
+                ]}
+              >
+                {item.name}
+              </Text>
             </TouchableOpacity>
           )}
         />
@@ -254,7 +243,15 @@ const AddressSelectionPage = () => {
                 ]}
                 onPress={() => handleNeighborhoodSelect(item)}
               >
-                <Text style={styles.buttonText}>{item.name[language]}</Text>
+                <Text
+                  style={[
+                    styles.buttonText,
+                    selectedNeighborhood?.name.en === item.name.en &&
+                      styles.buttonTextS,
+                  ]}
+                >
+                  {item.name[language]}
+                </Text>
               </TouchableOpacity>
             )}
           />
@@ -277,25 +274,30 @@ const AddressSelectionPage = () => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.actionButton, styles.currentLocationButton]}
-          onPress={() => {
-            if (userLocation) {
-              updateLocation(userLocation.lat, userLocation.lon);
-              router.push("/(tabs)");
-            }
-          }}
+          disabled={loading}
+          onPress={handleshowButton}
         >
           <Text style={styles.actionButtonText}>
-            {language === "ar"
-              ? "استخدم الموقع الحالي"
-              : "Use Current Location"}
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.actionButtonText}>
+                {language === "ar"
+                  ? "استخدم الموقع الحالي"
+                  : "Use Current Location"}
+              </Text>
+            )}
           </Text>
         </TouchableOpacity>
 
-        {selectedNeighborhood && (
+        {(selectedNeighborhood || showBottun) && (
           <TouchableOpacity
             style={[styles.actionButton, styles.confirmButton]}
             onPress={confirmLocation}
             disabled={loading}
+            accessibilityLabel={
+              language === "ar" ? "تأكيد الموقع" : "Confirm Location"
+            }
           >
             {loading ? (
               <ActivityIndicator color="#fff" />
@@ -348,10 +350,15 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   selectedButton: {
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#FF5C39",
   },
   buttonText: {
     color: "#64748B",
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  buttonTextS: {
+    color: "#fff",
     fontSize: 14,
     fontWeight: "500",
   },
@@ -390,10 +397,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   currentLocationButton: {
-    backgroundColor: "#10B981",
+    backgroundColor: "#FF5C39",
   },
   confirmButton: {
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#63666A",
   },
   actionButtonText: {
     color: "#FFFFFF",

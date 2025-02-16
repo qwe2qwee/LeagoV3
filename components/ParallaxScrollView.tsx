@@ -41,16 +41,16 @@ export default function ParallaxScrollView({
           translateY: interpolate(
             scrollOffset.value,
             [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
-            [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75],
-            Easing.out(Easing.quad) // Smooth easing for translateY
+            [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75]
+            // Easing.out(Easing.quad) // Smooth easing for translateY
           ),
         },
         {
           scale: interpolate(
             scrollOffset.value,
             [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
-            [2, 1, 1],
-            Easing.out(Easing.quad) // Smooth easing for scale
+            [2, 1, 1]
+            // Easing.out(Easing.quad) // Smooth easing for scale
           ),
         },
       ],
