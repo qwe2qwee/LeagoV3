@@ -10,8 +10,8 @@ import {
 import * as DocumentPicker from "expo-document-picker";
 import useAuthStore from "@/store/useAuthStore";
 import { uploadUserDocument } from "@/lib/appwrite/apit";
-import { appwriteConfig, databases, storage } from "@/lib/appwrite/config"; // Added storage import
-import { Query } from "react-native-appwrite";
+import { appwriteConfig, databases, storage } from "@/lib/appwrite/config";
+import { ID, Query } from "react-native-appwrite";
 import { blurhash, icons, onboardingDocs } from "@/constants";
 import { router } from "expo-router";
 import TopBar from "@/components/Auth/TopBar";
@@ -40,6 +40,13 @@ export default function SelectUsersDocsPage() {
   const [licenseLocal, setLicenseLocal] = useState<PickedFile | null>(null);
   const [uploading, setUploading] = useState(false);
   const [userDoc, setUserDoc] = useState<AppwriteUserDoc | null>(null); // Store full document data
+
+  // Helper function to extract file ID from URL
+  const extractFileId = (url: string) => {
+    const urlParts = url.split("/files/");
+    if (urlParts.length < 2) throw new Error("Invalid URL format");
+    return urlParts[1].split("/")[0];
+  };
 
   // Fetch user documents on component mount and user change
   useEffect(() => {
@@ -118,9 +125,7 @@ export default function SelectUsersDocsPage() {
       }
 
       // Extract file ID from storage URL
-      const urlParts = currentUrl.split("/files/");
-      if (urlParts.length < 2) throw new Error("Invalid URL format");
-      const fileId = urlParts[1].split("/")[0];
+      const fileId = extractFileId(currentUrl);
 
       // Delete file from storage
       await storage.deleteFile(appwriteConfig.storageIdDocs, fileId);
@@ -158,41 +163,79 @@ export default function SelectUsersDocsPage() {
 
     setUploading(true);
     try {
-      // Prepare upload promises
       const uploadPromises = [];
+
+      // Helper function to handle file replacement
+      const replaceFile = async (
+        type: "identity" | "license",
+        localFile: PickedFile,
+        currentUrl: string | null
+      ) => {
+        try {
+          // Delete old file if exists
+          if (currentUrl) {
+            const oldFileId = extractFileId(currentUrl);
+            await storage.deleteFile(appwriteConfig.storageIdDocs, oldFileId);
+          }
+        } catch (error) {
+          console.error(`Error deleting old ${type} file:`, error);
+        }
+
+        // Upload new file
+        const newUrl = await uploadUserDocument(localFile, type);
+        return { type, url: newUrl };
+      };
+
       if (identityLocal) {
         uploadPromises.push(
-          uploadUserDocument(identityLocal, "identity").then((url) => ({
-            type: "identity",
-            url,
-          }))
-        );
-      }
-      if (licenseLocal) {
-        uploadPromises.push(
-          uploadUserDocument(licenseLocal, "license").then((url) => ({
-            type: "license",
-            url,
-          }))
+          replaceFile("identity", identityLocal, identityUrl)
         );
       }
 
-      // Execute uploads concurrently
+      if (licenseLocal) {
+        uploadPromises.push(replaceFile("license", licenseLocal, licenseUrl));
+      }
+
       const results = await Promise.all(uploadPromises);
 
-      // Update state with new URLs
+      // Update database document
+      const updateData = results.reduce((acc, result) => {
+        acc[result.type === "identity" ? "identityUrl" : "licenseUrl"] =
+          result.url;
+        return acc;
+      }, {} as Record<string, string>);
+
+      if (userDoc) {
+        // Update existing document
+        await databases.updateDocument(
+          appwriteConfig.databaseId,
+          appwriteConfig.userdocs,
+          userDoc.$id,
+          updateData
+        );
+      } else if (user) {
+        // Create new document
+        await databases.createDocument(
+          appwriteConfig.databaseId,
+          appwriteConfig.userdocs,
+          ID.unique(),
+          {
+            userId: user.$id,
+            ...updateData,
+          }
+        );
+      }
+
+      // Update local state
       results.forEach((result) => {
         result.type === "identity"
           ? setIdentityUrl(result.url)
           : setLicenseUrl(result.url);
       });
 
-      // Clear local selections
       setIdentityLocal(null);
       setLicenseLocal(null);
       Alert.alert("Success", "Documents uploaded successfully!");
-
-      // Navigate after successful upload
       router.replace("/(tabs)/Profile");
     } catch (error) {
       console.error("Upload error:", error);
