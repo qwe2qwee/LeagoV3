@@ -59,8 +59,8 @@ const PaymentScreen: React.FC = () => {
   const [cvc, setCvc] = useState<string>("");
   const [expiry, setExpiry] = useState<string>("");
 
-  const { total, reservationId } = useLocalSearchParams() as any;
-  const { language } = useAuthStore();
+  const { total, reservationId, branchId } = useLocalSearchParams() as any;
+  const { language, user } = useAuthStore();
 
   const t = translations[language];
 
@@ -107,7 +107,13 @@ const PaymentScreen: React.FC = () => {
           payId: data.id as string,
           price: total as string,
         };
-        await updatePayStatusInAppwrite(reservationId, ddd);
+
+        await updatePayStatusInAppwrite(
+          reservationId,
+          ddd,
+          user?.$id,
+          branchId
+        );
         router.push({
           pathname: "/screens/Bills/PaymentCompletePage",
           params: { paymentId: data.id },

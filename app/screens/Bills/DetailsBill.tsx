@@ -85,6 +85,8 @@ const DetailsBill = () => {
   const { language } = useAuthStore();
   const t = translations[language];
 
+  console.log(reservationString);
+
   const router = useRouter();
 
   const reservation = reservationString
@@ -285,6 +287,7 @@ const DetailsBill = () => {
               params: {
                 total: reservation.bill,
                 reservationId: reservation.id,
+                branchId: reservation.branchId,
               },
             });
           }}

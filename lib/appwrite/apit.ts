@@ -1586,11 +1586,16 @@ export async function ReservationsRelative(
 
 export async function updatePayStatusInAppwrite(
   reservationId: string,
-  pay: object
+  pay: object,
+  userId: string,
+  branchId: string
 ): Promise<void> {
   try {
     // Convert the pay object into a string
 
+    if (!reservationId) console.log("reservationId not found");
+    if (!branchId) console.log("branchId not found");
+    if (!userId) console.log("userId not found");
     const payString = JSON.stringify(pay);
 
     // Update the reservation document's pay field in Appwrite
@@ -1598,7 +1603,7 @@ export async function updatePayStatusInAppwrite(
       appwriteConfig.databaseId as string,
       appwriteConfig.reservationsCollectionId as string,
       reservationId,
-      { pay: payString } // Update the `pay` field with the JSON string
+      { pay: payString, branchId: branchId, userId: userId } // Update the `pay` field with the JSON string
     );
 
     // Show success feedback
