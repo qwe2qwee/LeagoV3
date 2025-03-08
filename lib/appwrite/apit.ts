@@ -510,9 +510,7 @@ export async function uploadUserDocument(
           ...(type === "identity" ? { licenseUrl: "" } : { identityUrl: "" }),
         }
       );
-    } catch (createError) {
-      console.log(createError);
-
+    } catch (createError: any) {
       if (createError.code === 409) {
         // Document exists, update it
         await databases.updateDocument(
@@ -527,7 +525,7 @@ export async function uploadUserDocument(
     }
 
     return fileUrl.href;
-  } catch (error) {
+  } catch (error: any) {
     // Cleanup uploaded file if any error occurs after upload
     if (storageFileId) {
       await storage

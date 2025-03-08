@@ -111,8 +111,8 @@ const PaymentScreen: React.FC = () => {
         await updatePayStatusInAppwrite(
           reservationId,
           ddd,
-          user?.$id,
-          branchId
+          user?.$id as string,
+          branchId as string
         );
         router.push({
           pathname: "/screens/Bills/PaymentCompletePage",
